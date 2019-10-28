@@ -1,0 +1,36 @@
+{
+  "schemaVersion": 1,
+  "id": "wi-zoom",
+  "version": "${version}",
+
+  "name": "WI Zoom",
+  "description": "The zoom from the Wurst Client as a standalone mod.",
+  "authors": [
+    "Alexander01998"
+  ],
+  "contact": {
+    "homepage": "https://fabricmc.net/",
+    "sources": "https://github.com/FabricMC/fabric-example-mod"
+  },
+
+  "license": "GPL-3.0-or-later",
+  "icon": "assets/modid/icon.png",
+
+  "environment": "client",
+  "entrypoints": {
+    "main": [
+      "net.wurstclient.zoom.WiZoomInitializer"
+    ]
+  },
+  "mixins": [
+    "wi-zoom.mixins.json"
+  ],
+
+  "depends": {
+    "fabricloader": ">=0.4.0",
+    "fabric": "*"
+  },
+  "suggests": {
+    "flamingo": "*"
+  }
+}
