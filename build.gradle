@@ -55,7 +55,7 @@ repositories {
 
 dependencies {
     
-    compile("org.spongepowered:mixin:0.7.4-SNAPSHOT") {
+    compile("org.spongepowered:mixin:0.7.10-SNAPSHOT") {
         exclude module: 'launchwrapper'
         exclude module: 'guava'
         exclude module: 'gson'
@@ -108,6 +108,7 @@ shadowJar {
     dependencies {
         include(dependency('org.spongepowered:mixin'))
     }
+    exclude 'dummyThing'
     exclude 'LICENSE.txt'
     classifier = 'release'
 }
