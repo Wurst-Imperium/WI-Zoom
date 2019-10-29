@@ -15,7 +15,7 @@ Hold down the **V** key to activate the zoom (this keybind can be changed). Whil
 
 ## Downloads
 
-Coming soon! (I'm just waiting for CurseForge to approve the mod.)
+https://www.curseforge.com/minecraft/mc-mods/wi-zoom/files
 
 ## Setup For Developers (using Windows 10 and Eclipse)
 
