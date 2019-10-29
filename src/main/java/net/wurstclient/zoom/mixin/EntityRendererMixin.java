@@ -13,37 +13,30 @@ import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Redirect;
 
-import net.minecraft.client.options.GameOptions;
-import net.minecraft.client.render.GameRenderer;
-import net.minecraft.resource.ResourceManager;
-import net.minecraft.resource.SynchronousResourceReloadListener;
+import net.minecraft.client.renderer.EntityRenderer;
+import net.minecraft.client.resources.IResourceManager;
+import net.minecraft.client.resources.IResourceManagerReloadListener;
+import net.minecraft.client.settings.GameSettings;
 import net.wurstclient.zoom.WiZoom;
 
-@Mixin(GameRenderer.class)
-public class GameRendererMixin
-	implements AutoCloseable, SynchronousResourceReloadListener
+@SuppressWarnings("deprecation")
+@Mixin(EntityRenderer.class)
+public class EntityRendererMixin implements IResourceManagerReloadListener
 {
 	@Redirect(
 		at = @At(value = "FIELD",
-			target = "Lnet/minecraft/client/options/GameOptions;fov:D",
+			target = "Lnet/minecraft/client/settings/GameSettings;fovSetting:F",
 			opcode = Opcodes.GETFIELD,
 			ordinal = 0),
-		method = {"getFov(Lnet/minecraft/client/render/Camera;FZ)D"})
-	private double getFov(GameOptions options)
+		method = {"getFOVModifier(FZ)F"})
+	private float getFov(GameSettings settings)
 	{
-		return WiZoom.INSTANCE.changeFovBasedOnZoom(options.fov);
+		return WiZoom.INSTANCE.changeFovBasedOnZoom(settings.fovSetting);
 	}
 	
 	@Shadow
 	@Override
-	public void apply(ResourceManager var1)
-	{
-		
-	}
-	
-	@Shadow
-	@Override
-	public void close() throws Exception
+	public void onResourceManagerReload(IResourceManager resourceManager)
 	{
 		
 	}

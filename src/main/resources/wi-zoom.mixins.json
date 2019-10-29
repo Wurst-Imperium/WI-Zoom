@@ -5,8 +5,7 @@
   "mixins": [
   ],
   "client": [
-    "GameRendererMixin",
-    "MouseMixin"
+    "EntityRendererMixin"
   ],
   "injectors": {
     "defaultRequire": 1

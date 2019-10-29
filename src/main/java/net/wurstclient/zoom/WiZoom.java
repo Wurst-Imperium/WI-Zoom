@@ -7,13 +7,15 @@
  */
 package net.wurstclient.zoom;
 
-import org.lwjgl.glfw.GLFW;
+import org.lwjgl.input.Keyboard;
+import org.lwjgl.input.Mouse;
 
-import net.fabricmc.fabric.api.client.keybinding.FabricKeyBinding;
-import net.fabricmc.fabric.api.client.keybinding.KeyBindingRegistry;
-import net.minecraft.client.util.InputUtil;
-import net.minecraft.util.Identifier;
+import net.minecraft.client.settings.KeyBinding;
 import net.minecraft.util.math.MathHelper;
+import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.fml.client.registry.ClientRegistry;
+import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+import net.minecraftforge.fml.common.gameevent.InputEvent;
 
 public enum WiZoom
 {
@@ -21,28 +23,26 @@ public enum WiZoom
 	
 	public static final String VERSION = "1.0";
 	
-	private FabricKeyBinding zoomKey;
+	private KeyBinding zoomKey;
 	
 	public void initialize()
 	{
 		System.out.println("Starting WI Zoom...");
 		
-		zoomKey =
-			FabricKeyBinding.Builder.create(new Identifier("wi-zoom", "zoom"),
-				InputUtil.Type.KEYSYM, GLFW.GLFW_KEY_V, "WI Zoom").build();
-		
-		KeyBindingRegistry.INSTANCE.register(zoomKey);
+		zoomKey = new KeyBinding("wi-zoom.zoom", Keyboard.KEY_V, "WI Zoom");
+		ClientRegistry.registerKeyBinding(zoomKey);
+		MinecraftForge.EVENT_BUS.register(this);
 	}
 	
-	private final double defaultLevel = 3;
-	private Double currentLevel;
+	private final float defaultLevel = 3;
+	private Float currentLevel;
 	
-	public double changeFovBasedOnZoom(double fov)
+	public float changeFovBasedOnZoom(float fov)
 	{
 		if(currentLevel == null)
 			currentLevel = defaultLevel;
 		
-		if(!zoomKey.isPressed())
+		if(!zoomKey.isKeyDown())
 		{
 			currentLevel = defaultLevel;
 			return fov;
@@ -51,18 +51,20 @@ public enum WiZoom
 		return fov / currentLevel;
 	}
 	
-	public void onMouseScroll(double amount)
+	@SubscribeEvent
+	public void onMouseScroll(InputEvent.MouseInputEvent event)
 	{
-		if(!zoomKey.isPressed())
+		if(!zoomKey.isKeyDown())
 			return;
 		
 		if(currentLevel == null)
 			currentLevel = defaultLevel;
 		
+		int amount = Mouse.getDWheel();
 		if(amount > 0)
-			currentLevel *= 1.1;
+			currentLevel *= 1.1F;
 		else if(amount < 0)
-			currentLevel *= 0.9;
+			currentLevel *= 0.9F;
 		
 		currentLevel = MathHelper.clamp(currentLevel, 1, 50);
 	}

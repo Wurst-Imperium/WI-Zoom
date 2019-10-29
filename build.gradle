@@ -1,13 +1,24 @@
 buildscript {
     repositories {
         jcenter()
-        maven { url = "http://files.minecraftforge.net/maven" }
+        maven {
+            name = 'Minecraft Forge'
+            url = 'http://files.minecraftforge.net/maven'
+        }
+        maven {
+            name = 'SpongePowered'
+            url = 'http://repo.spongepowered.org/maven'
+        }
     }
     dependencies {
         classpath 'net.minecraftforge.gradle:ForgeGradle:2.3-SNAPSHOT'
+        classpath 'org.spongepowered:mixingradle:0.4-SNAPSHOT'
+        classpath 'com.github.jengelman.gradle.plugins:shadow:1.2.3'
     }
 }
 apply plugin: 'net.minecraftforge.gradle.forge'
+apply plugin: 'org.spongepowered.mixin'
+apply plugin: 'com.github.johnrengelman.shadow'
 //Only edit below this line, the above code adds and enables the necessary things for Forge to be setup.
 
 
@@ -31,9 +42,26 @@ minecraft {
     // simply re-run your setup task after changing the mappings to update your workspace.
     mappings = "snapshot_20171003"
     // makeObfSourceJar = false // an Srg named sources jar is made by default. uncomment this to disable.
+    
+    coreMod = 'net.wurstclient.zoom.WiZoomCoreMod'
+}
+
+repositories {
+    maven {
+        name = 'spongepowered-repo'
+        url = 'http://repo.spongepowered.org/maven/'
+    }
 }
 
 dependencies {
+    
+    compile("org.spongepowered:mixin:0.7.4-SNAPSHOT") {
+        exclude module: 'launchwrapper'
+        exclude module: 'guava'
+        exclude module: 'gson'
+        exclude module: 'commons-io'
+    }
+    
     // you may put jars on which you depend on in ./libs
     // or you may define them like so..
     //compile "some.group:artifact:version:classifier"
@@ -75,3 +103,38 @@ processResources {
         exclude 'mcmod.info'
     }
 }
+
+shadowJar {
+    dependencies {
+        include(dependency('org.spongepowered:mixin'))
+    }
+    exclude 'LICENSE.txt'
+    classifier = 'release'
+}
+
+mixin {
+    defaultObfuscationEnv searge
+    add sourceSets.main, 'mixins.wi-zoom.refmap.json'
+}
+
+reobf {
+    shadowJar {
+        mappingType = 'SEARGE'
+        classpath = sourceSets.main.compileClasspath
+    }
+}
+
+jar {
+    manifest {
+        attributes(
+            'MixinConfigs': 'wi-zoom.mixins.json',
+            'tweakClass': 'org.spongepowered.asm.launch.MixinTweaker',
+            'TweakOrder': 0,
+            'FMLCorePluginContainsFMLMod': 'true',
+            'FMLCorePlugin': 'net.wurstclient.zoom.WiZoomCoreMod',
+            'ForceLoadAsMod': 'true'
+        )
+    }
+}
+
+build.dependsOn(shadowJar)
