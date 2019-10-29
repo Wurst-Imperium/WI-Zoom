@@ -1,0 +1,16 @@
+[
+{
+  "modid": "wi-zoom",
+  "name": "WI Zoom",
+  "description": "The zoom from the Wurst Client as a standalone mod.",
+  "version": "${version}",
+  "mcversion": "${mcversion}",
+  "url": "",
+  "updateUrl": "",
+  "authorList": ["Alexander01998"],
+  "credits": "Copyright (C) 2019 Wurst-Imperium. All rights reserved.",
+  "logoFile": "net/wurstclient/zoom/WI Zoom logo.jpg",
+  "screenshots": [],
+  "dependencies": []
+}
+]
