@@ -29,3 +29,6 @@ run/
 hs_err_pid*
 
 desktop.ini
+
+# forge
+eclipse
