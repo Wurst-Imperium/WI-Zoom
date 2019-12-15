@@ -66,4 +66,9 @@ public enum WiZoom
 		
 		currentLevel = MathHelper.clamp(currentLevel, 1, 50);
 	}
+	
+	public FabricKeyBinding getZoomKey()
+	{
+		return zoomKey;
+	}
 }
