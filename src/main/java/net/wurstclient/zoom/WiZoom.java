@@ -42,7 +42,7 @@ public enum WiZoom
 		if(currentLevel == null)
 			currentLevel = defaultLevel;
 		
-		if(!zoomKey.isKeyDown())
+		if(!isZooming())
 		{
 			currentLevel = defaultLevel;
 			return fov;
@@ -54,7 +54,7 @@ public enum WiZoom
 	@SubscribeEvent
 	public void onMouseScroll(InputEvent.MouseInputEvent event)
 	{
-		if(!zoomKey.isKeyDown())
+		if(!isZooming())
 			return;
 		
 		if(currentLevel == null)
@@ -67,5 +67,10 @@ public enum WiZoom
 			currentLevel *= 0.9F;
 		
 		currentLevel = MathHelper.clamp(currentLevel, 1, 50);
+	}
+	
+	public boolean isZooming()
+	{
+		return zoomKey.isKeyDown();
 	}
 }
