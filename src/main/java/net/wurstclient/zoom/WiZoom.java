@@ -21,7 +21,7 @@ public enum WiZoom
 {
 	INSTANCE;
 	
-	public static final String VERSION = "1.0";
+	public static final String VERSION = "1.0.1";
 	
 	private KeyBinding zoomKey;
 	
