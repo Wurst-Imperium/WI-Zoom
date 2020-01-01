@@ -11,6 +11,8 @@ import org.lwjgl.glfw.GLFW;
 
 import net.fabricmc.fabric.api.client.keybinding.FabricKeyBinding;
 import net.fabricmc.fabric.api.client.keybinding.KeyBindingRegistry;
+import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.options.GameOptions;
 import net.minecraft.client.util.InputUtil;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.MathHelper;
@@ -22,6 +24,9 @@ public enum WiZoom
 	public static final String VERSION = "1.0.1";
 	
 	private FabricKeyBinding zoomKey;
+	private final double defaultLevel = 3;
+	private Double currentLevel;
+	private Double defaultMouseSensitivity;
 	
 	public void initialize()
 	{
@@ -34,19 +39,34 @@ public enum WiZoom
 		KeyBindingRegistry.INSTANCE.register(zoomKey);
 	}
 	
-	private final double defaultLevel = 3;
-	private Double currentLevel;
-	
 	public double changeFovBasedOnZoom(double fov)
 	{
+		GameOptions gameOptions = MinecraftClient.getInstance().options;
+		
 		if(currentLevel == null)
 			currentLevel = defaultLevel;
 		
 		if(!zoomKey.isPressed())
 		{
 			currentLevel = defaultLevel;
+			
+			if(defaultMouseSensitivity != null)
+			{
+				gameOptions.mouseSensitivity = defaultMouseSensitivity;
+				defaultMouseSensitivity = null;
+			}
+			
 			return fov;
 		}
+		
+		if(defaultMouseSensitivity == null)
+			defaultMouseSensitivity = gameOptions.mouseSensitivity;
+			
+		// Adjust mouse sensitivity in relation to zoom level.
+		// (fov / currentLevel) / fov is a value between 0.02 (50x zoom)
+		// and 1 (no zoom).
+		gameOptions.mouseSensitivity =
+			defaultMouseSensitivity * (fov / currentLevel / fov);
 		
 		return fov / currentLevel;
 	}
