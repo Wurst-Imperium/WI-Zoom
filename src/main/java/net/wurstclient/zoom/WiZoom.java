@@ -10,6 +10,8 @@ package net.wurstclient.zoom;
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.input.Mouse;
 
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.settings.GameSettings;
 import net.minecraft.client.settings.KeyBinding;
 import net.minecraft.util.math.MathHelper;
 import net.minecraftforge.common.MinecraftForge;
@@ -24,6 +26,9 @@ public enum WiZoom
 	public static final String VERSION = "1.0.1";
 	
 	private KeyBinding zoomKey;
+	private final float defaultLevel = 3;
+	private Float currentLevel;
+	private Float defaultMouseSensitivity;
 	
 	public void initialize()
 	{
@@ -34,19 +39,34 @@ public enum WiZoom
 		MinecraftForge.EVENT_BUS.register(this);
 	}
 	
-	private final float defaultLevel = 3;
-	private Float currentLevel;
-	
 	public float changeFovBasedOnZoom(float fov)
 	{
+		GameSettings gameSettings = Minecraft.getMinecraft().gameSettings;
+		
 		if(currentLevel == null)
 			currentLevel = defaultLevel;
 		
 		if(!isZooming())
 		{
 			currentLevel = defaultLevel;
+			
+			if(defaultMouseSensitivity != null)
+			{
+				gameSettings.mouseSensitivity = defaultMouseSensitivity;
+				defaultMouseSensitivity = null;
+			}
+			
 			return fov;
 		}
+		
+		if(defaultMouseSensitivity == null)
+			defaultMouseSensitivity = gameSettings.mouseSensitivity;
+			
+		// Adjust mouse sensitivity in relation to zoom level.
+		// (fov / currentLevel) / fov is a value between 0.02 (50x zoom)
+		// and 1 (no zoom).
+		gameSettings.mouseSensitivity =
+			defaultMouseSensitivity * (fov / currentLevel / fov);
 		
 		return fov / currentLevel;
 	}
