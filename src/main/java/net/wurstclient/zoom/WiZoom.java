@@ -21,6 +21,8 @@ public enum WiZoom
 {
 	INSTANCE;
 	
+	public static final MinecraftClient MC = MinecraftClient.getInstance();
+	
 	public static final String VERSION = "1.1";
 	
 	private FabricKeyBinding zoomKey;
@@ -41,7 +43,7 @@ public enum WiZoom
 	
 	public double changeFovBasedOnZoom(double fov)
 	{
-		GameOptions gameOptions = MinecraftClient.getInstance().options;
+		GameOptions gameOptions = MC.options;
 		
 		if(currentLevel == null)
 			currentLevel = defaultLevel;
