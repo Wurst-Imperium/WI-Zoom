@@ -11,6 +11,9 @@ import org.lwjgl.glfw.GLFW;
 
 import net.fabricmc.fabric.api.client.keybinding.FabricKeyBinding;
 import net.fabricmc.fabric.api.client.keybinding.KeyBindingRegistry;
+import net.fabricmc.loader.api.FabricLoader;
+import net.fabricmc.loader.api.ModContainer;
+import net.fabricmc.loader.api.Version;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.options.GameOptions;
 import net.minecraft.client.util.InputUtil;
@@ -23,8 +26,6 @@ public enum WiZoom
 	
 	public static final MinecraftClient MC = MinecraftClient.getInstance();
 	
-	public static final String VERSION = "1.1";
-	
 	private FabricKeyBinding zoomKey;
 	private final double defaultLevel = 3;
 	private Double currentLevel;
@@ -32,7 +33,11 @@ public enum WiZoom
 	
 	public void initialize()
 	{
-		System.out.println("Starting WI Zoom...");
+		FabricLoader fabricLoader = FabricLoader.getInstance();
+		ModContainer modContainer =
+			fabricLoader.getModContainer("wi_zoom").get();
+		Version version = modContainer.getMetadata().getVersion();
+		System.out.println("Starting WI Zoom v" + version.getFriendlyString());
 		
 		zoomKey =
 			FabricKeyBinding.Builder.create(new Identifier("wi_zoom", "zoom"),
