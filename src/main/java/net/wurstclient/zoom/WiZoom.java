@@ -35,7 +35,7 @@ public enum WiZoom
 		System.out.println("Starting WI Zoom...");
 		
 		zoomKey =
-			FabricKeyBinding.Builder.create(new Identifier("wi-zoom", "zoom"),
+			FabricKeyBinding.Builder.create(new Identifier("wi_zoom", "zoom"),
 				InputUtil.Type.KEYSYM, GLFW.GLFW_KEY_V, "WI Zoom").build();
 		
 		KeyBindingRegistry.INSTANCE.addCategory("WI Zoom");
