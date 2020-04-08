@@ -11,6 +11,9 @@ import org.lwjgl.glfw.GLFW;
 
 import net.fabricmc.fabric.api.client.keybinding.FabricKeyBinding;
 import net.fabricmc.fabric.api.client.keybinding.KeyBindingRegistry;
+import net.fabricmc.loader.api.FabricLoader;
+import net.fabricmc.loader.api.ModContainer;
+import net.fabricmc.loader.api.Version;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.options.GameOptions;
 import net.minecraft.client.util.InputUtil;
@@ -21,7 +24,7 @@ public enum WiZoom
 {
 	INSTANCE;
 	
-	public static final String VERSION = "1.1";
+	public static final MinecraftClient MC = MinecraftClient.getInstance();
 	
 	private FabricKeyBinding zoomKey;
 	private final double defaultLevel = 3;
@@ -30,18 +33,23 @@ public enum WiZoom
 	
 	public void initialize()
 	{
-		System.out.println("Starting WI Zoom...");
+		FabricLoader fabricLoader = FabricLoader.getInstance();
+		ModContainer modContainer =
+			fabricLoader.getModContainer("wi_zoom").get();
+		Version version = modContainer.getMetadata().getVersion();
+		System.out.println("Starting WI Zoom v" + version.getFriendlyString());
 		
 		zoomKey =
-			FabricKeyBinding.Builder.create(new Identifier("wi-zoom", "zoom"),
+			FabricKeyBinding.Builder.create(new Identifier("wi_zoom", "zoom"),
 				InputUtil.Type.KEYSYM, GLFW.GLFW_KEY_V, "WI Zoom").build();
 		
+		KeyBindingRegistry.INSTANCE.addCategory("WI Zoom");
 		KeyBindingRegistry.INSTANCE.register(zoomKey);
 	}
 	
 	public double changeFovBasedOnZoom(double fov)
 	{
-		GameOptions gameOptions = MinecraftClient.getInstance().options;
+		GameOptions gameOptions = MC.options;
 		
 		if(currentLevel == null)
 			currentLevel = defaultLevel;
