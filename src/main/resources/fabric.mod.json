@@ -6,11 +6,21 @@
   "name": "WI Zoom",
   "description": "The zoom from the Wurst Client as a standalone mod.",
   "authors": [
-    "Alexander01998"
+  	{
+      "name": "Alexander01998",
+      "contact": {
+        "homepage": "https://www.wurstimperium.net/",
+        "email": "contact.wurstimperium@gmail.com",
+        "twitter": "https://twitter.com/Wurst_Imperium"
+      }
+    }
   ],
   "contact": {
-    "homepage": "https://fabricmc.net/",
-    "sources": "https://github.com/FabricMC/fabric-example-mod"
+    "homepage": "https://www.curseforge.com/minecraft/mc-mods/wi-zoom",
+    "sources": "https://github.com/Wurst-Imperium/WI-Zoom",
+    "issues": "https://github.com/Wurst-Imperium/WI-Zoom/issues",
+    "email": "contact.wurstimperium@gmail.com",
+    "twitter": "https://twitter.com/Wurst_Imperium"
   },
 
   "license": "GPL-3.0-or-later",
