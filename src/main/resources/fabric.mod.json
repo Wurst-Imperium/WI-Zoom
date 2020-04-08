@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "id": "wi-zoom",
+  "id": "wi_zoom",
   "version": "${version}",
 
   "name": "WI Zoom",
