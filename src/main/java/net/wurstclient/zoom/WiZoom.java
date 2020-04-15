@@ -25,7 +25,7 @@ public enum WiZoom
 	INSTANCE;
 	
 	public static final MinecraftClient MC = MinecraftClient.getInstance();
-		
+	
 	private FabricKeyBinding zoomKey;
 	private final double defaultLevel = 3;
 	private Double currentLevel;
