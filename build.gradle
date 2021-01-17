@@ -1,7 +1,10 @@
 plugins {
 	id 'fabric-loom' version '0.5-SNAPSHOT'
 	id 'maven-publish'
+	id 'com.matthewprenger.cursegradle' version '1.4.0'
 }
+
+def ENV = System.getenv()
 
 sourceCompatibility = JavaVersion.VERSION_1_8
 targetCompatibility = JavaVersion.VERSION_1_8
@@ -77,4 +80,36 @@ publishing {
 		// uncomment to publish to the local maven
 		// mavenLocal()
 	}
+}
+
+curseforge {
+	if (ENV.CURSEFORGE_API_KEY) {
+		apiKey = ENV.CURSEFORGE_API_KEY
+	}
+
+	project {
+		id = "349630"
+		changelogType = "html"
+		changelog = file("changelog.txt")
+		releaseType = "release"
+		addGameVersion "1.16.5"
+		addGameVersion "Fabric"
+
+		mainArtifact(file("${project.buildDir}/libs/${archivesBaseName}-${version}.jar"))
+		addArtifact file("${project.buildDir}/libs/${archivesBaseName}-${version}-sources.jar")
+		addArtifact file("${project.buildDir}/libs/${archivesBaseName}-${version}-dev.jar")
+		addArtifact file("${project.buildDir}/libs/${archivesBaseName}-${version}-sources-dev.jar")
+		
+		relations {
+			requiredDependency "fabric-api"
+		}
+	}
+
+	options {
+		forgeGradleIntegration = false
+	}
+}
+
+afterEvaluate {
+	tasks.curseforge349630.dependsOn remapJar
 }
