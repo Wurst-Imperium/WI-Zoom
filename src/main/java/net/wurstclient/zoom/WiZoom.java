@@ -67,10 +67,9 @@ public enum WiZoom
 			defaultMouseSensitivity = gameOptions.mouseSensitivity;
 			
 		// Adjust mouse sensitivity in relation to zoom level.
-		// (fov / currentLevel) / fov is a value between 0.02 (50x zoom)
+		// (1 / currentLevel) is a value between 0.02 (50x zoom)
 		// and 1 (no zoom).
-		gameOptions.mouseSensitivity =
-			defaultMouseSensitivity * (fov / currentLevel / fov);
+		gameOptions.mouseSensitivity = defaultMouseSensitivity / currentLevel;
 		
 		return fov / currentLevel;
 	}
