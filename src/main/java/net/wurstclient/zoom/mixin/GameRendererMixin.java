@@ -16,12 +16,12 @@ import org.spongepowered.asm.mixin.injection.Redirect;
 import net.minecraft.client.option.GameOptions;
 import net.minecraft.client.render.GameRenderer;
 import net.minecraft.resource.ResourceManager;
-import net.minecraft.resource.SynchronousResourceReloadListener;
+import net.minecraft.resource.SynchronousResourceReloader;
 import net.wurstclient.zoom.WiZoom;
 
 @Mixin(GameRenderer.class)
 public class GameRendererMixin
-	implements AutoCloseable, SynchronousResourceReloadListener
+	implements AutoCloseable, SynchronousResourceReloader
 {
 	@Redirect(
 		at = @At(value = "FIELD",
@@ -36,7 +36,7 @@ public class GameRendererMixin
 	
 	@Shadow
 	@Override
-	public void apply(ResourceManager var1)
+	public void reload(ResourceManager var1)
 	{
 		
 	}
