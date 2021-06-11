@@ -13,19 +13,19 @@ import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Redirect;
 
-import net.minecraft.client.options.GameOptions;
+import net.minecraft.client.option.GameOptions;
 import net.minecraft.client.render.GameRenderer;
 import net.minecraft.resource.ResourceManager;
-import net.minecraft.resource.SynchronousResourceReloadListener;
+import net.minecraft.resource.SynchronousResourceReloader;
 import net.wurstclient.zoom.WiZoom;
 
 @Mixin(GameRenderer.class)
 public class GameRendererMixin
-	implements AutoCloseable, SynchronousResourceReloadListener
+	implements AutoCloseable, SynchronousResourceReloader
 {
 	@Redirect(
 		at = @At(value = "FIELD",
-			target = "Lnet/minecraft/client/options/GameOptions;fov:D",
+			target = "Lnet/minecraft/client/option/GameOptions;fov:D",
 			opcode = Opcodes.GETFIELD,
 			ordinal = 0),
 		method = {"getFov(Lnet/minecraft/client/render/Camera;FZ)D"})
@@ -36,7 +36,7 @@ public class GameRendererMixin
 	
 	@Shadow
 	@Override
-	public void apply(ResourceManager var1)
+	public void reload(ResourceManager var1)
 	{
 		
 	}
