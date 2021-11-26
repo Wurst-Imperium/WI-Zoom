@@ -1,2 +1,2 @@
-<p><strong>Note:</strong> Requires <a href="https://www.curseforge.com/minecraft/mc-mods/fabric-api/files/3537005" target="_blank" rel="noopener noreferrer">Fabric API for Minecraft 1.18-rc1</a>.</p>
+<p><strong>Note:</strong> Requires <a href="https://www.curseforge.com/minecraft/mc-mods/fabric-api/files/3537005" target="_blank" rel="noopener noreferrer">Fabric API for Minecraft 1.18-rc3</a>.</p>
 <p>- Added Russian translation. (Thanks to <a href="https://github.com/Romz24" target="_blank" rel="noopener noreferrer">Romz24</a>!)</p>
