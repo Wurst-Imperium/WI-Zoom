@@ -6,8 +6,8 @@ plugins {
 
 def ENV = System.getenv()
 
-sourceCompatibility = JavaVersion.VERSION_16
-targetCompatibility = JavaVersion.VERSION_16
+sourceCompatibility = JavaVersion.VERSION_17
+targetCompatibility = JavaVersion.VERSION_17
 
 archivesBaseName = project.archives_base_name
 version = project.mod_version
@@ -40,8 +40,8 @@ processResources {
 }
 
 tasks.withType(JavaCompile).configureEach {
-	// Minecraft 1.17 (21w19a) upwards uses Java 16.
-	it.options.release = 16
+	// Minecraft 1.18 (1.18-pre2) upwards uses Java 17.
+	it.options.release = 17
 }
 
 java {
@@ -84,7 +84,7 @@ curseforge {
 		changelogType = "html"
 		changelog = file("changelog.txt")
 		releaseType = "release"
-		addGameVersion "1.17.1"
+		addGameVersion "1.18.1"
 		addGameVersion "Fabric"
 
 		mainArtifact(file("${project.buildDir}/libs/${archivesBaseName}-${version}.jar"))
