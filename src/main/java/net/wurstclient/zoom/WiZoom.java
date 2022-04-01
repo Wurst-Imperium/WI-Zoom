@@ -46,7 +46,7 @@ public enum WiZoom
 	public double changeFovBasedOnZoom(double fov)
 	{
 		SimpleOption<Double> mouseSensitivitySetting =
-			MC.options.method_42495();
+			MC.options.getMouseSensitivity();
 		
 		if(currentLevel == null)
 			currentLevel = defaultLevel;
