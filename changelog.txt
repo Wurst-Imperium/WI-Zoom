@@ -1,7 +1,5 @@
 <p><strong>Note:</strong> Requires <a href="https://www.curseforge.com/minecraft/mc-mods/fabric-api/files/3854287" target="_blank" rel="noopener noreferrer">Fabric API for Minecraft 1.19.1-pre3</a>.</p>
 <p>&nbsp;</p>
-<p><strong>Important:</strong> Please <a href="https://feedback.minecraft.net/hc/en-us/search?query=chat+report" target="_blank" rel="noopener noreferrer">vote on the Minecraft Feedback site</a> to stop the planned chat reporting system. The future of Minecraft depends on it!</p>
-<p>&nbsp;</p>
 <p><strong>v1.4 changes:</strong></p>
 <p>- Added Chinese translations (Mainland, Taiwan, Hong Kong, and Classical variants) (Thanks to <a href="https://github.com/HJ-zhtw" target="_blank" rel="noopener noreferrer">HJ-zhtw</a>!)</p>
 <p>- Added French (France) translation (Thanks to <a href="https://github.com/HidroGaming" target="_blank" rel="noopener noreferrer">HidroGaming</a>!)</p>
