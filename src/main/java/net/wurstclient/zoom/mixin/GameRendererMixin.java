@@ -29,8 +29,8 @@ public class GameRendererMixin
 	private void onGetFov(Camera camera, float tickDelta, boolean changingFov,
 		CallbackInfoReturnable<Double> cir)
 	{
-		cir.setReturnValue(
-			WiZoom.INSTANCE.changeFovBasedOnZoom(cir.getReturnValueD()));
+		double fov = WiZoom.INSTANCE.changeFovBasedOnZoom(cir.getReturnValueD());
+		cir.setReturnValue(fov);
 	}
 	
 	@Shadow
