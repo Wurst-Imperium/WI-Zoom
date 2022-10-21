@@ -7,8 +7,7 @@
  */
 package net.wurstclient.zoom;
 
-import org.lwjgl.glfw.GLFW;
-
+import com.google.gson.Gson;
 import net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper;
 import net.fabricmc.loader.api.FabricLoader;
 import net.fabricmc.loader.api.ModContainer;
@@ -18,6 +17,12 @@ import net.minecraft.client.option.KeyBinding;
 import net.minecraft.client.option.SimpleOption;
 import net.minecraft.client.util.InputUtil;
 import net.minecraft.util.math.MathHelper;
+import org.lwjgl.glfw.GLFW;
+
+import java.io.File;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.util.Scanner;
 
 public enum WiZoom
 {
@@ -26,9 +31,13 @@ public enum WiZoom
 	public static final MinecraftClient MC = MinecraftClient.getInstance();
 	
 	private KeyBinding zoomKey;
-	private final double defaultLevel = 3;
+	private static double defaultLevel = 3;
+	private static Double zoomScrollAmount = 0.1;
+	private static int ZoomMin = 1;
+	private static int ZoomMax = 50;
 	private Double currentLevel;
 	private Double defaultMouseSensitivity;
+	private static String configPath = System.getProperty("user.dir") + File.separator + "config" + File.separator + "WiZoom.json";
 	
 	public void initialize()
 	{
@@ -41,6 +50,9 @@ public enum WiZoom
 		zoomKey = new KeyBinding("key.wi_zoom.zoom", InputUtil.Type.KEYSYM,
 			GLFW.GLFW_KEY_V, "WI Zoom");
 		KeyBindingHelper.registerKeyBinding(zoomKey);
+
+		saveConfig();
+		loadConfig();
 	}
 	
 	public double changeFovBasedOnZoom(double fov)
@@ -85,15 +97,78 @@ public enum WiZoom
 			currentLevel = defaultLevel;
 		
 		if(amount > 0)
-			currentLevel *= 1.1;
+			currentLevel *= 1.0 + zoomScrollAmount;
 		else if(amount < 0)
-			currentLevel *= 0.9;
+			currentLevel *= 1.0 - zoomScrollAmount;
 		
-		currentLevel = MathHelper.clamp(currentLevel, 1, 50);
+		currentLevel = MathHelper.clamp(currentLevel, ZoomMin, ZoomMax);
+	}
+
+	//save the changes made to the config
+	public static void saveConfig() {
+		//convert the configs to a json string
+		Gson gson = new Gson();
+		String config = gson.toJson(new Config(defaultLevel, zoomScrollAmount, ZoomMin, ZoomMax));
+		try {
+			//delete the config file if it exists
+			File f = new File(configPath);
+			if (f.exists()) {
+				f.delete();
+			}
+			//save the config
+			FileWriter file = new FileWriter(configPath);
+//			file.write(config.replace(",", ",\n"));
+			file.write(config);
+			file.close();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+
+	public static void loadConfig() {
+		//default config if there is no config file
+		Config config = new Config(3, 0.1, 1, 50);
+		//load the config file and replace the default configs
+		try {
+			//read the contents of the file
+			Scanner scanner = new Scanner(new FileReader(configPath));
+			String content = "";
+			while (scanner.hasNextLine()) {
+				content += scanner.nextLine();
+			}
+			//convert the json string to the config class
+			Gson gson = new Gson();
+			config = gson.fromJson(content, Config.class);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		//override the configs settings
+		defaultLevel = config.defaultLevel;
+		zoomScrollAmount = config.zoomScrollAmount;
+		ZoomMax = config.ZoomMax;
+		ZoomMin = config.ZoomMin;
+		if (ZoomMin < 1) {
+			ZoomMin = 1;
+		}
 	}
 	
 	public KeyBinding getZoomKey()
 	{
 		return zoomKey;
+	}
+}
+
+//class that is just use to store the config options
+class Config {
+	double defaultLevel = 3;
+	Double zoomScrollAmount = 0.1;
+	int ZoomMin = 1;
+	int ZoomMax = 50;
+
+	Config(double defaultLevel, Double zoomScrollAmount, int ZoomMin, int ZoomMax) {
+		this.defaultLevel = defaultLevel;
+		this.zoomScrollAmount = zoomScrollAmount;
+		this.ZoomMin = ZoomMin;
+		this.ZoomMax = ZoomMax;
 	}
 }
