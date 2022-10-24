@@ -33,8 +33,6 @@ public enum WiZoom
 	private KeyBinding zoomKey;
 	private static double defaultLevel = 3;
 	private static Double zoomScrollAmount = 0.1;
-	private static int ZoomMin = 1;
-	private static int ZoomMax = 50;
 	private Double currentLevel;
 	private Double defaultMouseSensitivity;
 	private static String configPath = System.getProperty("user.dir") + File.separator + "config" + File.separator + "WiZoom.json";
@@ -50,8 +48,6 @@ public enum WiZoom
 		zoomKey = new KeyBinding("key.wi_zoom.zoom", InputUtil.Type.KEYSYM,
 			GLFW.GLFW_KEY_V, "WI Zoom");
 		KeyBindingHelper.registerKeyBinding(zoomKey);
-
-		saveConfig();
 		loadConfig();
 	}
 	
@@ -97,18 +93,18 @@ public enum WiZoom
 			currentLevel = defaultLevel;
 		
 		if(amount > 0)
-			currentLevel *= 1.0 + zoomScrollAmount;
+			currentLevel *= 1.1;
 		else if(amount < 0)
-			currentLevel *= 1.0 - zoomScrollAmount;
+			currentLevel *= 0.9;
 		
-		currentLevel = MathHelper.clamp(currentLevel, ZoomMin, ZoomMax);
+		currentLevel = MathHelper.clamp(currentLevel, 1, 50);
 	}
 
 	//save the changes made to the config
 	public static void saveConfig() {
 		//convert the configs to a json string
 		Gson gson = new Gson();
-		String config = gson.toJson(new Config(defaultLevel, zoomScrollAmount, ZoomMin, ZoomMax));
+		String config = gson.toJson(new Config(defaultLevel));
 		try {
 			//delete the config file if it exists
 			File f = new File(configPath);
@@ -127,7 +123,7 @@ public enum WiZoom
 
 	public static void loadConfig() {
 		//default config if there is no config file
-		Config config = new Config(3, 0.1, 1, 50);
+		Config config = new Config(3);
 		//load the config file and replace the default configs
 		try {
 			//read the contents of the file
@@ -144,31 +140,21 @@ public enum WiZoom
 		}
 		//override the configs settings
 		defaultLevel = config.defaultLevel;
-		zoomScrollAmount = config.zoomScrollAmount;
-		ZoomMax = config.ZoomMax;
-		ZoomMin = config.ZoomMin;
-		if (ZoomMin < 1) {
-			ZoomMin = 1;
-		}
 	}
 	
 	public KeyBinding getZoomKey()
 	{
 		return zoomKey;
 	}
+	public double getDefaultLevel() {return defaultLevel;}
+	public void setDefaultLevel(double DefaultLevel) {defaultLevel = DefaultLevel;}
+	public Double getcurrentLevel() {return currentLevel;}
 }
 
 //class that is just use to store the config options
 class Config {
 	double defaultLevel = 3;
-	Double zoomScrollAmount = 0.1;
-	int ZoomMin = 1;
-	int ZoomMax = 50;
-
-	Config(double defaultLevel, Double zoomScrollAmount, int ZoomMin, int ZoomMax) {
+	Config(double defaultLevel) {
 		this.defaultLevel = defaultLevel;
-		this.zoomScrollAmount = zoomScrollAmount;
-		this.ZoomMin = ZoomMin;
-		this.ZoomMax = ZoomMax;
 	}
 }

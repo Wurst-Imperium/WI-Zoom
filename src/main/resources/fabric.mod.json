@@ -28,9 +28,8 @@
 
   "environment": "client",
   "entrypoints": {
-    "main": [
-      "net.wurstclient.zoom.WiZoomInitializer"
-    ]
+    "main": ["net.wurstclient.zoom.WiZoomInitializer"],
+    "modmenu": ["net.wurstclient.zoom.gui.WiZoomModMenu"]
   },
   "mixins": [
     "wi-zoom.mixins.json"
@@ -41,6 +40,9 @@
     "fabric": ">=0.57.3",
     "minecraft": "~1.19.1-beta.5",
     "java": ">=17"
+  },
+  "recommends": {
+    "modmenu": ">=4.0.0"
   },
   "suggests": {
     "flamingo": "*"
