@@ -1,3 +1,5 @@
 {
-  "key.wi_zoom.zoom": "缩放"
+  "key.wi_zoom.zoom": "缩放",
+  "gui.wi_zoom.label": "默认缩放级别",
+  "gui.wi_zoom.button": "保存并退出"
 }

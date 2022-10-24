@@ -1,3 +1,5 @@
 {
-  "key.wi_zoom.zoom": "Приблизить"
+  "key.wi_zoom.zoom": "Приблизить",
+  "gui.wi_zoom.label": "Уровень масштабирования по умолчанию",
+  "gui.wi_zoom.button": "Сохранить и выйти"
 }

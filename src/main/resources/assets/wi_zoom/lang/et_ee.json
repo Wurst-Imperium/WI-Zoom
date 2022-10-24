@@ -1,3 +1,5 @@
 {
-  "key.wi_zoom.zoom": "Suum"
+  "key.wi_zoom.zoom": "Suum",
+  "gui.wi_zoom.label": "Vaikimisi suumitase",
+  "gui.wi_zoom.button": "Salvesta ja välju"
 }

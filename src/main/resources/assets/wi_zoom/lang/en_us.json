@@ -1,3 +1,5 @@
 {
-  "key.wi_zoom.zoom": "Zoom"
+  "key.wi_zoom.zoom": "Zoom",
+  "gui.wi_zoom.label": "Default Zoom Level",
+  "gui.wi_zoom.button": "Save & Exit"
 }
