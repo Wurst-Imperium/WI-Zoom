@@ -32,7 +32,6 @@ public enum WiZoom
 	
 	private KeyBinding zoomKey;
 	private static double defaultLevel = 3;
-	private static Double zoomScrollAmount = 0.1;
 	private Double currentLevel;
 	private Double defaultMouseSensitivity;
 	private static String configPath = System.getProperty("user.dir") + File.separator + "config" + File.separator + "WiZoom.json";
