@@ -1,4 +1,4 @@
-<p><strong>Note:</strong> Requires <a href="https://www.curseforge.com/minecraft/mc-mods/fabric-api/files/4123980" target="_blank" rel="noopener noreferrer">Fabric API for Minecraft 1.19.3-pre3</a>.</p>
+<p><strong>Note:</strong> Requires <a href="https://www.curseforge.com/minecraft/mc-mods/fabric-api/files/4123980" target="_blank" rel="noopener noreferrer">Fabric API for Minecraft 1.19.3-rc1</a>.</p>
 <p>&nbsp;</p>
 <p><strong>v1.4 changes:</strong></p>
 <p>- Added Chinese translations (Mainland, Taiwan, Hong Kong, and Classical variants) (Thanks to <a href="https://github.com/HJ-zhtw" target="_blank" rel="noopener noreferrer">HJ-zhtw</a>!)</p>
