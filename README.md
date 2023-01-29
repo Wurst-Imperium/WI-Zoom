@@ -2,7 +2,7 @@
 
 # WI Zoom (Wurst-Imperium Zoom)
 
-The zoom from the [Wurst Client](https://www.wurstclient.net/) as a standalone mod.
+The zoom from the [Wurst Client](https://www.wurstclient.net/) as a standalone mod. The WI Zoom Minecraft mod lets you zoom in and out with the mouse wheel, providing up to 50x magnification without the need for a spyglass. This mod is fully compatible with OptiFine and Sodium, but unlike OptiFine's zoom, WI Zoom lets the camera move in a logical way, without making it wobble around. WI Zoom supports all of the latest Minecraft versions, including snapshots.
 
 ![Requires Fabric API](https://user-images.githubusercontent.com/10100202/93722968-0aec9180-fb9b-11ea-9983-bc0fc51b47ab.png)
 
@@ -34,7 +34,7 @@ The zoom from the [Wurst Client](https://www.wurstclient.net/) as a standalone m
 - Dynamic mouse sensitivity! (since v1.1)
 - Fully compatible with <a href="https://optifine.net/home" target="_blank">OptiFine</a> / <a href="https://github.com/CaffeineMC/sodium-fabric" target="_blank">Sodium</a>!
 
-## How To Use
+## How To Zoom
 
 Hold down the <kbd>V</kbd> key to activate the zoom (this keybind can be changed).  
 While zooming, you can use the <kbd>mouse wheel</kbd> to zoom in further.
