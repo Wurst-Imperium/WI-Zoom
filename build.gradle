@@ -90,7 +90,7 @@ curseforge {
 		changelogType = "html"
 		changelog = file("changelog.txt")
 		releaseType = "release"
-		addGameVersion "1.19.4"
+		addGameVersion "1.20-Snapshot"
 		addGameVersion "Fabric"
 
 		mainArtifact(file("${project.buildDir}/libs/${archivesBaseName}-${version}.jar"))
