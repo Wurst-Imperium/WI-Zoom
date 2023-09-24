@@ -32,7 +32,7 @@ displayName="${mod_name}" #mandatory
 #updateJSONURL="https://change.me.example.invalid/updates.json" #optional
 
 # A URL for the "homepage" for this mod, displayed in the mod UI
-displayURL="https://www.curseforge.com/minecraft/mc-mods/wi-zoom" #optional
+displayURL="https://www.wimods.net/wi-zoom/?utm_source=WI+Zoom&utm_medium=NeoForge+mod+list&utm_content=WI+Zoom+NeoForge+website+link" #optional
 
 # A file name (in the root of the mod JAR) containing a logo for display
 logoFile="assets/wi_zoom/icon.png" #optional
