@@ -18,10 +18,10 @@ import net.wurstclient.zoom.WiZoom;
 @Mixin(Mouse.class)
 public class MouseMixin
 {
-	@Inject(at = {@At("RETURN")}, method = {"onMouseScroll(JDD)V"})
-	private void onOnMouseScroll(long long_1, double double_1, double double_2,
-		CallbackInfo ci)
+	@Inject(at = @At("RETURN"), method = "onMouseScroll(JDD)V")
+	private void onOnMouseScroll(long window, double horizontal,
+		double vertical, CallbackInfo ci)
 	{
-		WiZoom.INSTANCE.onMouseScroll(double_2);
+		WiZoom.INSTANCE.onMouseScroll(vertical);
 	}
 }

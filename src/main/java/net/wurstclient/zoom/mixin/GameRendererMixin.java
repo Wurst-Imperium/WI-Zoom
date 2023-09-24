@@ -14,15 +14,13 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import net.minecraft.client.render.Camera;
 import net.minecraft.client.render.GameRenderer;
-import net.minecraft.resource.SynchronousResourceReloader;
 import net.wurstclient.zoom.WiZoom;
 
 @Mixin(GameRenderer.class)
-public abstract class GameRendererMixin
-	implements AutoCloseable, SynchronousResourceReloader
+public abstract class GameRendererMixin implements AutoCloseable
 {
 	@Inject(at = @At(value = "RETURN", ordinal = 1),
-		method = {"getFov(Lnet/minecraft/client/render/Camera;FZ)D"},
+		method = "getFov(Lnet/minecraft/client/render/Camera;FZ)D",
 		cancellable = true)
 	private void onGetFov(Camera camera, float tickDelta, boolean changingFov,
 		CallbackInfoReturnable<Double> cir)
