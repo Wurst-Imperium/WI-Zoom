@@ -56,6 +56,7 @@ While zooming, you can use the <kbd>mouse wheel</kbd> to zoom in further.
 </details>
 
 ## Supported Languages
+- Azerbaijani (Azerbaijan) (since v1.5)
 - Chinese (Simplified/Mainland) (since v1.4)
 - Chinese (Traditional/Taiwan) (since v1.4)
 - Cantonese (Hong Kong) (since v1.4)
@@ -64,4 +65,6 @@ While zooming, you can use the <kbd>mouse wheel</kbd> to zoom in further.
 - Estonian (Estonia) (since v1.4)
 - French (France) (since v1.4)
 - German (Germany)
+- Kurdish (since v1.5)
 - Russian (Russia) (since v1.3)
+- Turkish (Turkey) (since v1.5)
