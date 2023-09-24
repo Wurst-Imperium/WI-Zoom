@@ -1,6 +1,2 @@
-<p><strong>Note:</strong> Requires <a href="https://www.curseforge.com/minecraft/mc-mods/fabric-api/files/3817537" target="_blank" rel="noopener noreferrer">Fabric API for Minecraft 1.19</a>.</p>
-<p>&nbsp;</p>
-<p><strong>v1.4 changes:</strong></p>
-<p>- Added Chinese translations (Mainland, Taiwan, Hong Kong, and Classical variants) (Thanks to <a href="https://github.com/HJ-zhtw" target="_blank" rel="noopener noreferrer">HJ-zhtw</a>!)</p>
-<p>- Added French (France) translation (Thanks to <a href="https://github.com/HidroGaming" target="_blank" rel="noopener noreferrer">HidroGaming</a>!)</p>
-<p>- Added Estonian (Estonia) translation (Thanks to <a href="https://github.com/Madis0" target="_blank" rel="noopener noreferrer">Madis0</a>!)</p>
+<p>A changelog can be found at:&nbsp;<a href="https://www.wimods.net/wi-zoom/wi-zoom-1-4/?mc=1.20.2&utm_source=CurseForge&utm_medium=WI+Zoom&utm_campaign=Changelog&utm_content=WI+Zoom+MC1.20.2">https://www.wimods.net/wi-zoom/wi-zoom-1-4/</a></p>
+<p><strong>Note:</strong> This mod requires <a href="https://www.curseforge.com/minecraft/mc-mods/fabric-api/files/4757945" target="_blank" rel="noopener noreferrer">Fabric API for Minecraft 1.20.2</a>.</p>
