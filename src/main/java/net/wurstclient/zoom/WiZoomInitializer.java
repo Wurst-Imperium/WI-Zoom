@@ -33,7 +33,7 @@ public final class WiZoomInitializer
 	}
 	
 	@SubscribeEvent
-	public void registerBindings(RegisterKeyMappingsEvent event)
+	public static void registerBindings(RegisterKeyMappingsEvent event)
 	{
 		event.register(WiZoom.INSTANCE.getZoomKey());
 	}
