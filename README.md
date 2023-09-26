@@ -58,6 +58,7 @@ While zooming, you can use the <kbd>mouse wheel</kbd> to zoom in further.
 </details>
 
 ## Supported Languages
+- Azerbaijani (Azerbaijan) (since v1.5)
 - Chinese (Simplified/Mainland) (since v1.4)
 - Chinese (Traditional/Taiwan) (since v1.4)
 - Cantonese (Hong Kong) (since v1.4)
@@ -66,12 +67,8 @@ While zooming, you can use the <kbd>mouse wheel</kbd> to zoom in further.
 - Estonian (Estonia) (since v1.4)
 - French (France) (since v1.4)
 - German (Germany)
+- Kurdish (since v1.5)
+- Portuguese (Brazil) (since v1.5)
 - Russian (Russia) (since v1.3)
-
-## Will you add Forge support?
-
-Aside from the 1.12.2 Forge version that already exists, no. A modern Forge version is not being considered due to <a href="https://forums.minecraftforge.net/topic/58706-regarding-minecraft-112-and-policy-changes/" target="_blank" rel="noopener noreferrer">Forge's new CoreMod policy</a> (effective since 1.13) as well as issues with the <a href="https://web.archive.org/web/20201125032822/https://gist.github.com/jellysquid3/629eb84a74ab326046faf971150dc6c3" target="_blank" rel="noopener noreferrer">Forge community's treatment of modders</a>.
-
-However, the experimental&nbsp;<a href="https://patchworkmc.net/">Patchwork</a> project can sometimes make Forge mods and Fabric mods work together. Depending on which other mods you use, this might work with WI Zoom.
-
-Also, keep in mind that many former Forge mods now have Fabric versions (or have switched to Fabric entirely due to the above-mentioned issues).
+- Turkish (Turkey) (since v1.5)
+- Ukrainian (Ukraine) (since v1.5)

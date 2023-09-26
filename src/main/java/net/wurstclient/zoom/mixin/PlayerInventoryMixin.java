@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2019 - 2020 | Alexander01998 | All rights reserved.
+ * Copyright (c) 2019-2023 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -18,9 +18,7 @@ import net.wurstclient.zoom.WiZoom;
 @Mixin(PlayerInventory.class)
 public class PlayerInventoryMixin
 {
-	@Inject(at = {@At("HEAD")},
-		method = {"scrollInHotbar(D)V"},
-		cancellable = true)
+	@Inject(at = @At("HEAD"), method = "scrollInHotbar(D)V", cancellable = true)
 	private void onScrollInHotbar(double scrollAmount, CallbackInfo ci)
 	{
 		if(WiZoom.INSTANCE.getZoomKey().isPressed())
