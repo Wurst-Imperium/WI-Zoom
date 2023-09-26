@@ -12,12 +12,11 @@ The zoom from the [Wurst Client](https://www.wurstclient.net/) as a standalone m
 
 (This assumes that you are using Windows with [Eclipse](https://www.eclipse.org/downloads/) and [Java Development Kit 17](https://adoptium.net/?variant=openjdk17&jvmVariant=hotspot) already installed.)
 
-1. Clone / download the repository.
+1. Clone or download the repository.
 
-2. Run these two commands in PowerShell:
+2. Run this command in PowerShell:
 
    ```powershell
-   ./gradlew.bat --stop
    ./gradlew.bat genEclipseRuns eclipse
    ```
 
