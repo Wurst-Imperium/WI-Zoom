@@ -68,6 +68,7 @@ While zooming, you can use the <kbd>mouse wheel</kbd> to zoom in further.
 - French (France) (since v1.4)
 - German (Germany)
 - Kurdish (since v1.5)
+- Portuguese (Brazil) (since v1.5)
 - Russian (Russia) (since v1.3)
 - Turkish (Turkey) (since v1.5)
 - Ukrainian (Ukraine) (since v1.5)
