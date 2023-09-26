@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2019 - 2020 | Alexander01998 | All rights reserved.
+ * Copyright (c) 2019-2023 Wurst-Imperium and contributors.
  *
  * This source code is subject to the terms of the GNU General Public
  * License, version 3. If a copy of the GPL was not distributed with this
@@ -18,10 +18,10 @@ import net.wurstclient.zoom.WiZoom;
 @Mixin(Mouse.class)
 public class MouseMixin
 {
-	@Inject(at = {@At("RETURN")}, method = {"onMouseScroll(JDD)V"})
-	private void onOnMouseScroll(long long_1, double double_1, double double_2,
-		CallbackInfo ci)
+	@Inject(at = @At("RETURN"), method = "onMouseScroll(JDD)V")
+	private void onOnMouseScroll(long window, double horizontal,
+		double vertical, CallbackInfo ci)
 	{
-		WiZoom.INSTANCE.onMouseScroll(double_2);
+		WiZoom.INSTANCE.onMouseScroll(vertical);
 	}
 }

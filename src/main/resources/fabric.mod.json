@@ -6,17 +6,10 @@
   "name": "WI Zoom",
   "description": "The zoom from the Wurst Client as a standalone mod.",
   "authors": [
-  	{
-      "name": "Alexander01998",
-      "contact": {
-        "homepage": "https://www.wurstimperium.net/",
-        "email": "contact.wurstimperium@gmail.com",
-        "twitter": "https://twitter.com/Wurst_Imperium"
-      }
-    }
+  	"Alexander01998"
   ],
   "contact": {
-    "homepage": "https://www.curseforge.com/minecraft/mc-mods/wi-zoom",
+    "homepage": "https://www.wimods.net/wi-zoom/?utm_source=WI+Zoom&utm_medium=ModMenu&utm_content=WI+Zoom+ModMenu+website+link",
     "sources": "https://github.com/Wurst-Imperium/WI-Zoom",
     "issues": "https://github.com/Wurst-Imperium/WI-Zoom/issues",
     "email": "contact.wurstimperium@gmail.com",
@@ -37,15 +30,24 @@
   ],
 
   "depends": {
-    "fabricloader": ">=0.14.18",
+    "fabricloader": ">=0.14.22",
     "fabric-api": ">=0.76.1",
     "minecraft": "~1.20-alpha.23.12.a",
     "java": ">=17"
   },
   "suggests": {
-    "flamingo": "*"
+    "cameranoclip": "*",
+    "chestesp": "*",
+    "mo_glass": "*"
   },
   "breaks": {
     "wurst": "*"
+  },
+  "custom": {
+    "modmenu": {
+      "links": {
+        "Donate": "https://www.wurstclient.net/donate/?utm_source=WI+Zoom&utm_medium=ModMenu&utm_content=WI+Zoom+ModMenu+donate+link"
+      }
+    }
   }
 }
