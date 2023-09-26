@@ -63,6 +63,7 @@ While zooming, you can use the <kbd>mouse wheel</kbd> to zoom in further.
 - Chinese (Traditional/Taiwan) (since v1.4)
 - Cantonese (Hong Kong) (since v1.4)
 - Classical Chinese (since v1.4)
+- Dutch (Netherlands) (since v1.5)
 - English (US)
 - Estonian (Estonia) (since v1.4)
 - French (France) (since v1.4)
