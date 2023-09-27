@@ -1,7 +1,9 @@
 {
   "required": true,
+  "minVersion": "0.8",
   "package": "net.wurstclient.zoom.mixin",
   "compatibilityLevel": "JAVA_17",
+  "refmap": "wi-zoom.refmap.json",
   "mixins": [
   ],
   "client": [
