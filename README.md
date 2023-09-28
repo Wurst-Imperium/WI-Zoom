@@ -6,7 +6,7 @@ The zoom from the [Wurst Client](https://www.wurstclient.net/) as a standalone m
 
 ## Downloads (for users)
 
-[![Download WI Zoom](https://user-images.githubusercontent.com/10100202/214881367-956f0bc9-4dbe-43cb-850a-04d73e00b344.png)](https://www.wurstimperium.net/wi-zoom/download/?utm_source=GitHub&utm_medium=WI+Zoom&utm_campaign=README.md&utm_content=Download+WI+Zoom)
+[![Download WI Zoom](https://user-images.githubusercontent.com/10100202/214881367-956f0bc9-4dbe-43cb-850a-04d73e00b344.png)](https://www.wimods.net/wi-zoom/download/?utm_source=GitHub&utm_medium=WI+Zoom&utm_campaign=README.md&utm_content=WI+Zoom+GitHub+repo+download+button)
 
 ## Setup (for developers)
 
