@@ -8,6 +8,7 @@ plugins {
 	id 'fabric-loom' version '1.4-SNAPSHOT'
 	id 'maven-publish'
 	id 'com.matthewprenger.cursegradle' version '1.4.0'
+	id "com.modrinth.minotaur" version "2.+"
 }
 
 def ENV = System.getenv()
@@ -108,8 +109,28 @@ curseforge {
 	}
 }
 
+modrinth {
+	if (ENV.MODRINTH_TOKEN) {
+		token = ENV.MODRINTH_TOKEN
+	}
+	projectId = "wi-zoom"
+	versionName = "WI Zoom ${version}"
+	versionType = "release"
+	uploadFile = remapJar
+	additionalFiles = [
+		file("${project.buildDir}/libs/${archivesBaseName}-${version}-sources.jar"),
+		file("${project.buildDir}/libs/${archivesBaseName}-${version}-dev.jar"),
+		file("${project.buildDir}/libs/${archivesBaseName}-${version}-sources-dev.jar")
+	]
+	changelog = "A changelog can be found at: [https://www.wimods.net/wi-zoom/wi-zoom-1-5/](https://www.wimods.net/wi-zoom/wi-zoom-1-5/?mc=${project.minecraft_version}&utm_source=Modrinth&utm_medium=WI+Zoom&utm_campaign=Changelog&utm_content=Modrinth+WI+Zoom+MC${project.minecraft_version})"
+	dependencies {
+		required.version "fabric-api", project.fabric_version
+	}
+}
+
 afterEvaluate {
 	tasks.curseforge349630.dependsOn moveDevLibs
+	tasks.modrinth.dependsOn moveDevLibs
 }
 
 task moveDevLibs(dependsOn: [remapJar, remapSourcesJar]) {
