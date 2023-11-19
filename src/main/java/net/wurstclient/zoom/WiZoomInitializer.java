@@ -33,6 +33,7 @@ public final class WiZoomInitializer implements ModInitializer
 					.getMethod("init", String.class, Class.class)
 					.invoke(null,"wi_zoom", WiZoomInitializer.getConfigClass());
 		} catch (ClassNotFoundException | NoSuchMethodException | InvocationTargetException | IllegalAccessException e) {
+			System.err.println(e.getClass().getName() + ": " + e.getMessage());
 			System.err.println("WiZoomInitializer.onInitialize(): MidnightLib not found. Configuration UI will not be available.");
 		}
 
@@ -55,7 +56,7 @@ public final class WiZoomInitializer implements ModInitializer
 		try {
 			Class.forName("eu.midnightdust.lib.config.MidnightConfig");   // Check if MidnightConfig is loaded
 			return Class.forName("net.wurstclient.zoom.config.WiZoomConfig");
-		} catch (ClassNotFoundException e) {
+		} catch (ClassNotFoundException ignored) {
 			return null;
 		}
 	}
@@ -73,7 +74,7 @@ public final class WiZoomInitializer implements ModInitializer
 		else {
 			try {
 				return (int) configClass.getField("maxZoom").get(null);
-			} catch (IllegalAccessException | NoSuchFieldException e) {
+			} catch (IllegalAccessException | NoSuchFieldException ignored) {
 				return 50;
 			}
 		}
@@ -92,7 +93,7 @@ public final class WiZoomInitializer implements ModInitializer
 		else {
 			try {
 				return (double) configClass.getField("minZoom").get(null);
-			} catch (IllegalAccessException | NoSuchFieldException e) {
+			} catch (IllegalAccessException | NoSuchFieldException ignored) {
 				return 1.0;
 			}
 		}
@@ -112,7 +113,7 @@ public final class WiZoomInitializer implements ModInitializer
 		else {
 			try {
 				return (double) configClass.getField("mouseScrollSensitivity").get(null);
-			} catch (IllegalAccessException | NoSuchFieldException e) {
+			} catch (IllegalAccessException | NoSuchFieldException ignored) {
 				return 2D;
 			}
 		}
