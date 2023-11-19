@@ -1,3 +1,7 @@
 {
-  "key.wi_zoom.zoom": "缩放"
+    "key.wi_zoom.zoom": "缩放",
+    "wi_zoom.midnightconfig.title": "WI Zoom - 配置",
+    "wi_zoom.midnightconfig.maxZoom": "最大缩放",
+    "wi_zoom.midnightconfig.minZoom": "最小缩放",
+    "wi_zoom.midnightconfig.mouseScrollZoomSensitivity": "鼠标滚轮缩放灵敏度"
 }

@@ -1,3 +1,7 @@
 {
-  "key.wi_zoom.zoom": "Zoom"
+    "key.wi_zoom.zoom": "Zoom",
+    "wi_zoom.midnightconfig.title": "WI Zoom Options",
+    "wi_zoom.midnightconfig.maxZoom": "Max Zoom",
+    "wi_zoom.midnightconfig.minZoom": "Min Zoom",
+    "wi_zoom.midnightconfig.mouseScrollZoomSensitivity": "Mouse Scroll Zoom Sensitivity"
 }

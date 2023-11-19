@@ -1,3 +1,7 @@
 {
-  "key.wi_zoom.zoom": "凝"
+  "key.wi_zoom.zoom": "凝",
+  "wi_zoom.midnightconfig.title": "放縮改囊之選",
+  "wi_zoom.midnightconfig.maxZoom": "放至極",
+  "wi_zoom.midnightconfig.minZoom": "縮至微",
+  "wi_zoom.midnightconfig.mouseScrollZoomSensitivity": "滑鼠輪放縮之敏"
 }

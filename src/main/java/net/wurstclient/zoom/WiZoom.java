@@ -7,17 +7,17 @@
  */
 package net.wurstclient.zoom;
 
+import net.minecraft.util.math.MathHelper;
 import org.lwjgl.glfw.GLFW;
 
 import net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper;
-import net.fabricmc.loader.api.FabricLoader;
-import net.fabricmc.loader.api.ModContainer;
-import net.fabricmc.loader.api.Version;
+import net.fabricmc.loader.api.*;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.option.KeyBinding;
 import net.minecraft.client.option.SimpleOption;
 import net.minecraft.client.util.InputUtil;
-import net.minecraft.util.math.MathHelper;
+
+import static net.wurstclient.zoom.WiZoomInitializer.*;
 
 public enum WiZoom
 {
@@ -27,7 +27,7 @@ public enum WiZoom
 	
 	private KeyBinding zoomKey;
 	private final double defaultLevel = 3;
-	private Double currentLevel;
+	private Double currentLevel;   // zoom level factor
 	private Double defaultMouseSensitivity;
 	
 	public void initialize()
@@ -68,8 +68,7 @@ public enum WiZoom
 			defaultMouseSensitivity = mouseSensitivitySetting.getValue();
 			
 		// Adjust mouse sensitivity in relation to zoom level.
-		// 1.0 / currentLevel is a value between 0.02 (50x zoom)
-		// and 1 (no zoom).
+		// (1.0 / currentLevel) is a value between 0.02 (50x zoom) and 1 (no zoom).
 		mouseSensitivitySetting
 			.setValue(defaultMouseSensitivity * (1.0 / currentLevel));
 		
@@ -83,13 +82,13 @@ public enum WiZoom
 		
 		if(currentLevel == null)
 			currentLevel = defaultLevel;
-		
+
+		double scrollFactor = 1 + getCfgMouseScrollZoomSensitivity() / 20D;
 		if(amount > 0)
-			currentLevel *= 1.1;
+			currentLevel *= scrollFactor;
 		else if(amount < 0)
-			currentLevel *= 0.9;
-		
-		currentLevel = MathHelper.clamp(currentLevel, 1, 50);
+			currentLevel /= scrollFactor;
+		currentLevel = MathHelper.clamp(currentLevel, getCfgMinZoom(), getCfgMaxZoom());
 	}
 	
 	public KeyBinding getZoomKey()

@@ -8,6 +8,18 @@
   "authors": [
   	"Alexander01998"
   ],
+  "contributors": [
+    "Alexander01998",
+    "HJ-zhtw",
+    "Minionguyjpro",
+    "FITFC",
+    "Altegar",
+    "ohderin",
+    "HidroGaming",
+    "Madis0",
+    "Romz24",
+    "Jaffe2718"
+  ],
   "contact": {
     "homepage": "https://www.wimods.net/wi-zoom/?utm_source=WI+Zoom&utm_medium=ModMenu&utm_content=WI+Zoom+ModMenu+website+link",
     "sources": "https://github.com/Wurst-Imperium/WI-Zoom",
@@ -31,13 +43,15 @@
 
   "depends": {
     "fabricloader": ">=0.14.22",
-    "fabric-api": ">=0.76.1",
+    "fabric-key-binding-api-v1": "*",
     "minecraft": "~1.20-alpha.23.12.a",
     "java": ">=17"
   },
   "suggests": {
     "cameranoclip": "*",
     "chestesp": "*",
+    "midnightlib": "*",
+    "modmenu": "*",
     "mo_glass": "*"
   },
   "breaks": {
