@@ -42,6 +42,9 @@ public final class WiZoomInitializer implements ModInitializer
 
 	/**
 	 * Gets the config class for WiZoom.
+	 * This method is invoked by {@link WiZoomInitializer#getCfgMaxZoom()}, {@link WiZoomInitializer#getCfgMinZoom()}
+	 * and {@link WiZoomInitializer#getCfgMouseScrollZoomSensitivity()}, and these methods will be used inside event loop
+	 * in {@link WiZoom#onMouseScroll(double)}
 	 * @return The config class or <code>null</code> if
 	 * @author Jaffe2718
 	 * @since 1.5.1-MC1.20.2

@@ -11,13 +11,17 @@ import net.minecraft.util.math.MathHelper;
 import org.lwjgl.glfw.GLFW;
 
 import net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper;
-import net.fabricmc.loader.api.*;
+import net.fabricmc.loader.api.FabricLoader;
+import net.fabricmc.loader.api.ModContainer;
+import net.fabricmc.loader.api.Version;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.option.KeyBinding;
 import net.minecraft.client.option.SimpleOption;
 import net.minecraft.client.util.InputUtil;
 
-import static net.wurstclient.zoom.WiZoomInitializer.*;
+import static net.wurstclient.zoom.WiZoomInitializer.getCfgMaxZoom;
+import static net.wurstclient.zoom.WiZoomInitializer.getCfgMinZoom;
+import static net.wurstclient.zoom.WiZoomInitializer.getCfgMouseScrollZoomSensitivity;
 
 public enum WiZoom
 {
