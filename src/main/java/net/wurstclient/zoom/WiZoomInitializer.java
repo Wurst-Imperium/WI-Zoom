@@ -33,8 +33,7 @@ public final class WiZoomInitializer implements ModInitializer
 					.getMethod("init", String.class, Class.class)
 					.invoke(null,"wi_zoom", WiZoomInitializer.getConfigClass());
 		} catch (ClassNotFoundException | NoSuchMethodException | InvocationTargetException | IllegalAccessException e) {
-			System.err.println("WiZoomInitializer.onInitialize(): "
-				+ "WiZoomConfig not found. WiZoom will not work.");
+			System.err.println("WiZoomInitializer.onInitialize(): MidnightLib not found. Configuration UI will not be available.");
 		}
 
         WiZoom.INSTANCE.initialize();
