@@ -19,4 +19,7 @@ public class WiZoomConfig extends MidnightConfig {
     @Entry(min = 1D, max = 10D, isSlider = true)
     public static double mouseScrollZoomSensitivity = 2D;
 
+    @Entry
+    public static boolean showFov = false;
+
 }

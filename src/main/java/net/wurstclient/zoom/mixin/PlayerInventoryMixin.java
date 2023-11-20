@@ -19,8 +19,7 @@ import net.wurstclient.zoom.WiZoom;
 public class PlayerInventoryMixin
 {
 	@Inject(at = @At("HEAD"), method = "scrollInHotbar(D)V", cancellable = true)
-	private void onScrollInHotbar(double scrollAmount, CallbackInfo ci)
-	{
+	private void onScrollInHotbar(double scrollAmount, CallbackInfo ci) {
 		if(WiZoom.INSTANCE.getZoomKey().isPressed())
 			ci.cancel();
 	}

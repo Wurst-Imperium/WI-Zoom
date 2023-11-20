@@ -16,12 +16,9 @@ import net.minecraft.client.Mouse;
 import net.wurstclient.zoom.WiZoom;
 
 @Mixin(Mouse.class)
-public class MouseMixin
-{
-	@Inject(at = @At("RETURN"), method = "onMouseScroll(JDD)V")
-	private void onOnMouseScroll(long window, double horizontal,
-		double vertical, CallbackInfo ci)
-	{
-		WiZoom.INSTANCE.onMouseScroll(vertical);
-	}
+public class MouseMixin {
+    @Inject(at = @At("RETURN"), method = "onMouseScroll(JDD)V")
+    private void onOnMouseScroll(long window, double horizontal, double vertical, CallbackInfo ci) {
+        WiZoom.INSTANCE.onMouseScroll(vertical);
+    }
 }
