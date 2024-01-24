@@ -1,2 +1,2 @@
-<p>A changelog can be found at:&nbsp;<a href="https://www.wimods.net/wi-zoom/wi-zoom-1-5/?mc=23w51b&utm_source=CurseForge&utm_medium=WI+Zoom&utm_campaign=Changelog&utm_content=WI+Zoom+MC23w51b">https://www.wimods.net/wi-zoom/wi-zoom-1-5/</a></p>
-<p><strong>Note:</strong> This mod requires <a href="https://www.curseforge.com/minecraft/mc-mods/fabric-api/files/4966929" target="_blank" rel="noopener noreferrer">Fabric API for Minecraft 23w51b</a>.</p>
+<p>A changelog can be found at:&nbsp;<a href="https://www.wimods.net/wi-zoom/wi-zoom-1-5/?mc=24w03b&utm_source=CurseForge&utm_medium=WI+Zoom&utm_campaign=Changelog&utm_content=WI+Zoom+MC24w03b">https://www.wimods.net/wi-zoom/wi-zoom-1-5/</a></p>
+<p><strong>Note:</strong> This mod requires <a href="https://www.curseforge.com/minecraft/mc-mods/fabric-api/files/5052856" target="_blank" rel="noopener noreferrer">Fabric API for Minecraft 24w03b</a>.</p>
