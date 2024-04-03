@@ -5,7 +5,7 @@ buildscript {
 }
 
 plugins {
-	id 'fabric-loom' version '1.5-SNAPSHOT'
+	id 'fabric-loom' version '1.6-SNAPSHOT'
 	id 'maven-publish'
 	id 'com.matthewprenger.cursegradle' version '1.4.0'
 	id "com.modrinth.minotaur" version "2.+"
@@ -78,7 +78,7 @@ spotless {
 // configure the maven publication
 publishing {
 	publications {
-		mavenJava(MavenPublication) {
+		create("mavenJava", MavenPublication) {
 			from components.java
 		}
 	}
@@ -164,13 +164,13 @@ task github(dependsOn: moveDevLibs) {
 		def repository = github.getRepository("Wurst-Imperium-MCX/WI-Zoom")
 		def ghVersion = "v" + version.substring(0, version.indexOf("-"))
 		
-		def ghRelease = repository.getReleaseByTagName(ghVersion as String);
+		def ghRelease = repository.getReleaseByTagName(ghVersion as String)
 		if(ghRelease == null) {
 			def releaseBuilder = new GHReleaseBuilder(repository, ghVersion as String)
 			ghRelease = releaseBuilder.create()
 		}
 		
-		ghRelease.uploadAsset(remapJar.archiveFile.get().getAsFile(), "application/java-archive");
+		ghRelease.uploadAsset(remapJar.archiveFile.get().getAsFile(), "application/java-archive")
 		ghRelease.uploadAsset(remapSourcesJar.archiveFile.get().getAsFile(), "application/java-archive")
 		ghRelease.uploadAsset(new File("${project.buildDir}/libs/${archivesBaseName}-${version}-dev.jar"), "application/java-archive")
 		ghRelease.uploadAsset(new File("${project.buildDir}/libs/${archivesBaseName}-${version}-sources-dev.jar"), "application/java-archive")
