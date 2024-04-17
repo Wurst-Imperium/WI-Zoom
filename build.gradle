@@ -1,6 +1,6 @@
 buildscript {
 	dependencies {
-		classpath 'org.kohsuke:github-api:1.135'
+		classpath 'org.kohsuke:github-api:1.321'
 	}
 }
 
@@ -9,7 +9,7 @@ plugins {
 	id 'maven-publish'
 	id 'com.matthewprenger.cursegradle' version '1.4.0'
 	id "com.modrinth.minotaur" version "2.+"
-	id 'com.diffplug.spotless' version '6.23.3'
+	id 'com.diffplug.spotless' version '6.25.0'
 }
 
 def ENV = System.getenv()
