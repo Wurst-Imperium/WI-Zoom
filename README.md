@@ -12,7 +12,7 @@ The zoom from the [Wurst Client](https://www.wurstclient.net/) as a standalone m
 
 ## Setup (for developers)
 
-(This assumes that you are using Windows with [Eclipse](https://www.eclipse.org/downloads/) and [Java Development Kit 17](https://adoptium.net/?variant=openjdk17&jvmVariant=hotspot) already installed.)
+(This assumes that you are using Windows with [Eclipse](https://www.eclipse.org/downloads/) and [Java Development Kit 21](https://adoptium.net/?variant=openjdk21&jvmVariant=hotspot) already installed.)
 
 1. Clone or download the repository.
 
