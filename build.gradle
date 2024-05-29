@@ -94,7 +94,7 @@ publishMods {
 		changelog = "A changelog can be found at: [${changelogUrl}](${changelogUrl}?mc=${project.minecraft_version}&utm_source=CurseForge&utm_medium=WI+Zoom&utm_campaign=Changelog&utm_content=CurseForge+WI+Zoom+MC${project.minecraft_version})"
 	}
 	modrinth {
-		projectId = "wi-zoom"
+		projectId = "o7DitHWP"
 		accessToken = providers.environmentVariable("MODRINTH_TOKEN")
 		minecraftVersions.add("${project.minecraft_version}")
 		requires("fabric-api")
