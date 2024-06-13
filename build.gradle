@@ -96,8 +96,7 @@ publishMods {
 	modrinth {
 		projectId = "o7DitHWP"
 		accessToken = providers.environmentVariable("MODRINTH_TOKEN")
-		minecraftVersions.add("1.21-rc1") // XXX: Temporary fix for Modrinth
-		//minecraftVersions.add("${project.minecraft_version}")
+		minecraftVersions.add("${project.minecraft_version}")
 		requires("fabric-api")
 		changelog = "A changelog can be found at: [${changelogUrl}](${changelogUrl}?mc=${project.minecraft_version}&utm_source=Modrinth&utm_medium=WI+Zoom&utm_campaign=Changelog&utm_content=Modrinth+WI+Zoom+MC${project.minecraft_version})"
 	}
