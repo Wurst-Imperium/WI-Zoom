@@ -12,12 +12,12 @@ plugins {
 
 def ENV = System.getenv()
 
-sourceCompatibility = JavaVersion.VERSION_21
-targetCompatibility = JavaVersion.VERSION_21
-
-archivesBaseName = project.archives_base_name
 version = project.mod_version
 group = project.maven_group
+
+base {
+	archivesName = project.archives_base_name
+}
 
 repositories {
 	// Add repositories to retrieve artifacts from in here.
@@ -32,7 +32,7 @@ dependencies {
 	minecraft "com.mojang:minecraft:${project.minecraft_version}"
 	mappings "net.fabricmc:yarn:${project.yarn_mappings}:v2"
 	modImplementation "net.fabricmc:fabric-loader:${project.loader_version}"
-
+	
 	// Fabric API. This is technically optional, but you probably want it anyway.
 	modImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}"
 }
@@ -55,11 +55,14 @@ java {
 	// if it is present.
 	// If you remove this line, sources will not be generated.
 	withSourcesJar()
+	
+	sourceCompatibility = JavaVersion.VERSION_21
+	targetCompatibility = JavaVersion.VERSION_21
 }
 
 jar {
 	from("LICENSE") {
-		rename { "${it}_${project.archivesBaseName}"}
+		rename { "${it}_${project.base.archivesName.get()}"}
 	}
 }
 
@@ -78,14 +81,15 @@ publishMods {
 	def versionString = project.version as String
 	def ghVersion = "v" + versionString.substring(0, versionString.indexOf("-"))
 	def changelogUrl = "https://www.wimods.net/wi-zoom/wi-zoom-1-5/"
+	def archivesName = project.base.archivesName.get() as String
 	additionalFiles.from(
-		file("${project.buildDir}/libs/${archivesBaseName}-${versionString}-sources.jar"),
-		file("${project.buildDir}/libs/${archivesBaseName}-${versionString}-dev.jar"),
-		file("${project.buildDir}/libs/${archivesBaseName}-${versionString}-sources-dev.jar")
+		file("${project.buildDir}/libs/${archivesName}-${versionString}-sources.jar"),
+		file("${project.buildDir}/libs/${archivesName}-${versionString}-dev.jar"),
+		file("${project.buildDir}/libs/${archivesName}-${versionString}-sources-dev.jar")
 	)
 	type = ghVersion.contains("pre") ? BETA : STABLE
 	modLoaders.add("fabric")
-
+	
 	curseforge {
 		projectId = "349630"
 		accessToken = providers.environmentVariable("CURSEFORGE_API_KEY")
@@ -110,8 +114,9 @@ afterEvaluate {
 
 task moveDevLibs(dependsOn: [remapJar, remapSourcesJar]) {
 	doLast {
-		ant.move(file:"${project.buildDir}/devlibs/${archivesBaseName}-${version}-dev.jar", tofile:"${project.buildDir}/libs/${archivesBaseName}-${version}-dev.jar")
-		ant.move(file:"${project.buildDir}/devlibs/${archivesBaseName}-${version}-sources.jar", tofile:"${project.buildDir}/libs/${archivesBaseName}-${version}-sources-dev.jar")
+		def archivesName = project.base.archivesName.get() as String
+		ant.move(file:"${project.buildDir}/devlibs/${archivesName}-${version}-dev.jar", tofile:"${project.buildDir}/libs/${archivesName}-${version}-dev.jar")
+		ant.move(file:"${project.buildDir}/devlibs/${archivesName}-${version}-sources.jar", tofile:"${project.buildDir}/libs/${archivesName}-${version}-sources-dev.jar")
 	}
 }
 
@@ -122,11 +127,12 @@ task github(dependsOn: moveDevLibs) {
 	onlyIf {
 		ENV.GITHUB_TOKEN
 	}
-
+	
 	doLast {
 		def github = GitHub.connectUsingOAuth(ENV.GITHUB_TOKEN as String)
 		def repository = github.getRepository("Wurst-Imperium-MCX/WI-Zoom")
 		def ghVersion = "v" + version.substring(0, version.indexOf("-"))
+		def archivesName = project.base.archivesName.get() as String
 		
 		def ghRelease = repository.getReleaseByTagName(ghVersion as String)
 		if(ghRelease == null) {
@@ -136,7 +142,7 @@ task github(dependsOn: moveDevLibs) {
 		
 		ghRelease.uploadAsset(remapJar.archiveFile.get().getAsFile(), "application/java-archive")
 		ghRelease.uploadAsset(remapSourcesJar.archiveFile.get().getAsFile(), "application/java-archive")
-		ghRelease.uploadAsset(new File("${project.buildDir}/libs/${archivesBaseName}-${version}-dev.jar"), "application/java-archive")
-		ghRelease.uploadAsset(new File("${project.buildDir}/libs/${archivesBaseName}-${version}-sources-dev.jar"), "application/java-archive")
+		ghRelease.uploadAsset(new File("${project.buildDir}/libs/${archivesName}-${version}-dev.jar"), "application/java-archive")
+		ghRelease.uploadAsset(new File("${project.buildDir}/libs/${archivesName}-${version}-sources-dev.jar"), "application/java-archive")
 	}
 }
