@@ -2,11 +2,10 @@
   "schemaVersion": 1,
   "id": "wi_zoom",
   "version": "${version}",
-
   "name": "WI Zoom",
   "description": "The zoom from the Wurst Client as a standalone mod.",
   "authors": [
-  	"Alexander01998"
+    "Alexander01998"
   ],
   "contact": {
     "homepage": "https://www.wimods.net/wi-zoom/?utm_source=WI+Zoom&utm_medium=ModMenu&utm_content=WI+Zoom+ModMenu+website+link",
@@ -15,10 +14,8 @@
     "email": "contact.wurstimperium@gmail.com",
     "twitter": "https://twitter.com/Wurst_Imperium"
   },
-
   "license": "GPL-3.0-or-later",
   "icon": "assets/wi_zoom/icon.png",
-
   "environment": "client",
   "entrypoints": {
     "main": [
@@ -28,7 +25,6 @@
   "mixins": [
     "wi-zoom.mixins.json"
   ],
-
   "depends": {
     "fabricloader": ">=0.15.9",
     "fabric-api": ">=0.97.9",
