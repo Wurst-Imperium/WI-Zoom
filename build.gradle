@@ -67,12 +67,16 @@ jar {
 }
 
 spotless {
+	lineEndings("WINDOWS")
 	java {
 		removeUnusedImports()
 		indentWithTabs()
 		trimTrailingWhitespace()
 		eclipse().configFile(file("codestyle/formatter.xml"))
-		lineEndings('WINDOWS')
+	}
+	json {
+		target "src/**/*.json"
+		gson().indentWithSpaces(2).version("2.10.1")
 	}
 }
 
