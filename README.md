@@ -27,7 +27,7 @@ The zoom from the [Wurst Client](https://www.wurstclient.net/) as a standalone m
 ## Features
 
 - Up to 50x zoom!
-- No <a href="https://minecraft.fandom.com/wiki/Spyglass" target="_blank">spyglass</a> needed!
+- No <a href="https://minecraft.wiki/w/Spyglass" target="_blank">spyglass</a> needed!
 - Zoom in and out with the mouse wheel!
 - No wobbly camera nonsense!
 - Dynamic mouse sensitivity! (since v1.1)
