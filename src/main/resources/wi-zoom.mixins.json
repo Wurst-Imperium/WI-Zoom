@@ -5,8 +5,7 @@
   "mixins": [],
   "client": [
     "GameRendererMixin",
-    "MouseMixin",
-    "PlayerInventoryMixin"
+    "MouseMixin"
   ],
   "injectors": {
     "defaultRequire": 1

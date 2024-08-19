@@ -43,7 +43,7 @@ public enum WiZoom
 		KeyBindingHelper.registerKeyBinding(zoomKey);
 	}
 	
-	public double changeFovBasedOnZoom(double fov)
+	public float changeFovBasedOnZoom(float fov)
 	{
 		SimpleOption<Double> mouseSensitivitySetting =
 			MC.options.getMouseSensitivity();
@@ -73,7 +73,7 @@ public enum WiZoom
 		mouseSensitivitySetting
 			.setValue(defaultMouseSensitivity * (1.0 / currentLevel));
 		
-		return fov / currentLevel;
+		return (float)(fov / currentLevel);
 	}
 	
 	public void onMouseScroll(double amount)
