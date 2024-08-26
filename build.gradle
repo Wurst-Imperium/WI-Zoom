@@ -1,12 +1,12 @@
 buildscript {
 	dependencies {
-		classpath 'org.kohsuke:github-api:1.322'
+		classpath 'org.kohsuke:github-api:1.324'
 	}
 }
 
 plugins {
 	id "fabric-loom" version "1.7-SNAPSHOT"
-	id "me.modmuss50.mod-publish-plugin" version "0.5.1"
+	id "me.modmuss50.mod-publish-plugin" version "0.5.2"
 	id "com.diffplug.spotless" version "6.25.0"
 }
 
