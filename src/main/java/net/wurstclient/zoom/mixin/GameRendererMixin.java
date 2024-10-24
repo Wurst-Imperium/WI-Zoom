@@ -20,12 +20,12 @@ import net.wurstclient.zoom.WiZoom;
 public abstract class GameRendererMixin implements AutoCloseable
 {
 	@Inject(at = @At(value = "RETURN", ordinal = 1),
-		method = "getFov(Lnet/minecraft/client/render/Camera;FZ)D",
+		method = "getFov(Lnet/minecraft/client/render/Camera;FZ)F",
 		cancellable = true)
 	private void onGetFov(Camera camera, float tickDelta, boolean changingFov,
-		CallbackInfoReturnable<Double> cir)
+		CallbackInfoReturnable<Float> cir)
 	{
 		cir.setReturnValue(
-			WiZoom.INSTANCE.changeFovBasedOnZoom(cir.getReturnValueD()));
+			WiZoom.INSTANCE.changeFovBasedOnZoom(cir.getReturnValueF()));
 	}
 }

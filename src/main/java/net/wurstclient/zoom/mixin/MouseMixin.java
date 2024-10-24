@@ -12,7 +12,10 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
+import com.llamalad7.mixinextras.injector.v2.WrapWithCondition;
+
 import net.minecraft.client.Mouse;
+import net.minecraft.entity.player.PlayerInventory;
 import net.wurstclient.zoom.WiZoom;
 
 @Mixin(Mouse.class)
@@ -23,5 +26,13 @@ public class MouseMixin
 		double vertical, CallbackInfo ci)
 	{
 		WiZoom.INSTANCE.onMouseScroll(vertical);
+	}
+	
+	@WrapWithCondition(at = @At(value = "INVOKE",
+		target = "Lnet/minecraft/entity/player/PlayerInventory;setSelectedSlot(I)V"),
+		method = "onMouseScroll(JDD)V")
+	private boolean wrapOnMouseScroll(PlayerInventory inventory, int slot)
+	{
+		return !WiZoom.INSTANCE.getZoomKey().isPressed();
 	}
 }
