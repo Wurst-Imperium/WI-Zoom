@@ -8,8 +8,8 @@ plugins {
 	id "java-library"
 	id "eclipse"
 	id "idea"
-	id "net.neoforged.gradle.userdev" version "7.0.145"
-	id "net.neoforged.gradle.mixin" version "7.0.145"
+	id "net.neoforged.gradle.userdev" version "7.0.146"
+	id "net.neoforged.gradle.mixin" version "7.0.146"
 	id "me.modmuss50.mod-publish-plugin" version "0.5.2"
 	id "com.diffplug.spotless" version "6.25.0"
 }
@@ -96,6 +96,23 @@ sourceSets.main.resources { srcDir 'src/generated/resources' }
 // "optional", meaning it will not be pulled by dependents of this mod.
 configurations {
 	runtimeClasspath.extendsFrom localRuntime
+}
+
+configurations.all {
+	resolutionStrategy {
+		// Override vulnerable msal4j dependency until Minecraft updates to a
+		// newer version. v1.15.0, used by Minecraft 1.21.3, is vulnerable to
+		// CVE-2024-35255.
+		force "com.microsoft.azure:msal4j:1.17.2"
+		
+		// Fixes a weird issue in NeoForge 21.3 where it tries to load both
+		// ASM 9.7 and ASM 9.5 at the same time.
+		force "org.ow2.asm:asm-analysis:9.7"
+		force "org.ow2.asm:asm:9.7"
+		force "org.ow2.asm:asm-tree:9.7"
+		force "org.ow2.asm:asm-commons:9.7"
+		force "org.ow2.asm:asm-util:9.7"
+	}
 }
 
 dependencies {

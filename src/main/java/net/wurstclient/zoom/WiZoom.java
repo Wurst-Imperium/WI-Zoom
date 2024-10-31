@@ -56,7 +56,7 @@ public final class WiZoom
 		event.register(zoomKey.get());
 	}
 	
-	public static double changeFovBasedOnZoom(double fov)
+	public static float changeFovBasedOnZoom(float fov)
 	{
 		OptionInstance<Double> mouseSensitivitySetting =
 			MC.options.sensitivity();
@@ -86,7 +86,7 @@ public final class WiZoom
 		mouseSensitivitySetting
 			.set(defaultMouseSensitivity * (1.0 / currentLevel));
 		
-		return fov / currentLevel;
+		return (float)(fov / currentLevel);
 	}
 	
 	public static void onMouseScroll(double amount)
