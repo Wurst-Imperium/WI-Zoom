@@ -19,7 +19,7 @@ The zoom from the [Wurst Client](https://www.wurstclient.net/) as a standalone m
 2. Run this command in PowerShell:
 
    ```powershell
-   ./gradlew.bat genSources eclipse
+   ./gradlew.bat eclipse
    ```
 
 3. In Eclipse, go to `Import...` > `Existing Projects into Workspace` and select this project.
