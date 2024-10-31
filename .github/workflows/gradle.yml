@@ -42,6 +42,8 @@ jobs:
         build-scan-publish: true
         build-scan-terms-of-use-url: "https://gradle.com/help/legal-terms-of-use"
         build-scan-terms-of-use-agree: "yes"
+        # Enable cache writing for NeoForge branches, since they don't benefit from the Fabric cache on master
+        cache-read-only: ${{ github.ref != 'refs/heads/master' && !contains(github.ref, 'neoforge') }}
 
     - name: Generate and submit dependency graph
       if: ${{ github.event_name == 'push' }}
