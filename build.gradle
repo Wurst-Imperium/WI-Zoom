@@ -96,8 +96,6 @@ publishMods {
 	def archivesName = project.base.archivesName.get() as String
 	additionalFiles.from(
 		file("${project.buildDir}/libs/${archivesName}-${versionString}-sources.jar"),
-		file("${project.buildDir}/libs/${archivesName}-${versionString}-dev.jar"),
-		file("${project.buildDir}/libs/${archivesName}-${versionString}-sources-dev.jar")
 	)
 	type = ghVersion.contains("pre") ? BETA : STABLE
 	modLoaders.add("fabric")
