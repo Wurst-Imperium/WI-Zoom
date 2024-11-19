@@ -1,6 +1,6 @@
 buildscript {
 	dependencies {
-		classpath 'org.kohsuke:github-api:1.326'
+		classpath "org.kohsuke:github-api:1.326"
 	}
 }
 
@@ -72,7 +72,7 @@ java {
 
 jar {
 	from("LICENSE") {
-		rename { "${it}_${project.base.archivesName.get()}"}
+		rename {"${it}_${base.archivesName.get()}"}
 	}
 }
 
@@ -90,17 +90,25 @@ spotless {
 	}
 }
 
+def getGhVersion() {
+	return "v" + version.substring(0, version.indexOf("-MC"))
+}
+
+def getChangelogUrl() {
+	def modSlug = archives_base_name.toLowerCase()
+	def versionSlug = version.substring(0, version.indexOf("-MC")).replace(".", "-")
+	return "https://www.wimods.net/${modSlug}/${modSlug}-${versionSlug}/"
+}
+
 publishMods {
 	file = remapJar.archiveFile
-	def versionString = project.version as String
-	def ghVersion = "v" + versionString.substring(0, versionString.indexOf("-"))
-	def changelogUrl = "https://www.wimods.net/wi-zoom/wi-zoom-1-5/"
-	def archivesName = project.base.archivesName.get() as String
+	def archivesName = base.archivesName.get() as String
 	additionalFiles.from(
-		file("${project.buildDir}/libs/${archivesName}-${versionString}-sources.jar"),
+		file("${project.buildDir}/libs/${archivesName}-${version}-sources.jar"),
 	)
-	type = ghVersion.contains("pre") ? BETA : STABLE
+	type = getGhVersion().contains("pre") ? BETA : STABLE
 	modLoaders.add("fabric")
+	def changelogUrl = getChangelogUrl()
 	
 	curseforge {
 		projectId = "349630"
@@ -135,7 +143,7 @@ task github(dependsOn: build) {
 	doLast {
 		def github = GitHub.connectUsingOAuth(ENV.GITHUB_TOKEN as String)
 		def repository = github.getRepository("Wurst-Imperium-MCX/WI-Zoom")
-		def ghVersion = "v" + version.substring(0, version.indexOf("-"))
+		def ghVersion = getGhVersion()
 		
 		def ghRelease = repository.getReleaseByTagName(ghVersion as String)
 		if(ghRelease == null) {
@@ -161,8 +169,7 @@ task closeMilestone {
 	doLast {
 		def github = GitHub.connectUsingOAuth(ENV.GITHUB_TOKEN as String)
 		def repository = github.getRepository("Wurst-Imperium/WI-Zoom")
-		def ghVersion = "v" + version.substring(0, version.indexOf("-MC"))
-		def versionSlug = ghVersion.substring(1).replace('.', '-')
+		def ghVersion = getGhVersion()
 		
 		// Weird API design: listMilestones() requires GHIssueState while everything else uses GHMilestoneState.
 		def milestone = repository.listMilestones(GHIssueState.ALL).find { it.title == ghVersion }
@@ -172,7 +179,7 @@ task closeMilestone {
 		
 		if (milestone.getState() != GHMilestoneState.CLOSED) {
 			milestone.setDueOn(Date.from(LocalDate.now().atStartOfDay(ZoneId.systemDefault()).toInstant()))
-			milestone.setDescription("https://wimods.net/wi-zoom/wi-zoom-${versionSlug}/")
+			milestone.setDescription(getChangelogUrl())
 			milestone.close()
 		}
 	}
@@ -186,7 +193,7 @@ task uploadBackups {
 	}
 	
 	doLast {
-		def shortVersion = version.substring(0, version.indexOf("-MC"))
+		def shortVersion = getGhVersion().substring(1)
 		def backupUrl = "https://api.wurstclient.net/artifact-backups/WI-Zoom/${shortVersion}"
 		
 		def connection = new URL(backupUrl).openConnection() as HttpURLConnection
