@@ -104,7 +104,7 @@ publishMods {
 	file = remapJar.archiveFile
 	def archivesName = base.archivesName.get() as String
 	additionalFiles.from(
-		file("${project.buildDir}/libs/${archivesName}-${version}-sources.jar"),
+		file("${project.buildDir}/libs/${archivesName}-${project.version}-sources.jar"),
 	)
 	type = getGhVersion().contains("pre") ? BETA : STABLE
 	modLoaders.add("fabric")
