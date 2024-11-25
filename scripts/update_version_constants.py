@@ -6,6 +6,7 @@ if __name__ == "__main__":
 	parser.add_argument("yarn_mappings", help="Yarn mappings version")
 	parser.add_argument("fabric_loader", help="Fabric Loader version")
 	parser.add_argument("fapi_version", help="Fabric API version")
+	parser.add_argument("cf_game_version", help="CurseForge GameVersion")
 	args = parser.parse_args()
 
 	# Read gradle.properties
@@ -20,6 +21,7 @@ if __name__ == "__main__":
 		"loader_version": lambda v: args.fabric_loader,
 		"fabric_version": lambda v: args.fapi_version,
 		"mod_version": lambda v: v[: v.index("MC") + 2] + args.mc_version,
+		"cf_game_version": lambda v: args.cf_game_version,
 	}
 
 	# Update lines
