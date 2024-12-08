@@ -116,10 +116,21 @@ publishMods {
 	}
 }
 
+import groovy.json.JsonSlurper
+
+tasks.register("getCurseforgeId") {
+	inputs.file publishCurseforge.result
+	doLast {
+		def result = new JsonSlurper().parseText(publishCurseforge.result.get().asFile.text)
+		println "CURSEFORGE_FILE_ID=${result.fileId}"
+	}
+}
+
 afterEvaluate {
 	tasks.publishMods.dependsOn build
 	tasks.publishCurseforge.dependsOn build
 	tasks.publishModrinth.dependsOn build
+	tasks.getCurseforgeId.dependsOn publishCurseforge
 }
 
 import org.kohsuke.github.GHReleaseBuilder
