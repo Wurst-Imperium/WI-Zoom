@@ -6,7 +6,7 @@ buildscript {
 
 plugins {
 	id "fabric-loom" version "1.9-SNAPSHOT"
-	id "me.modmuss50.mod-publish-plugin" version "0.8.1"
+	id "me.modmuss50.mod-publish-plugin" version "0.8.4"
 	id "com.diffplug.spotless" version "6.25.0"
 }
 
