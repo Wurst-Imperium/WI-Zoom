@@ -5,8 +5,8 @@ buildscript {
 }
 
 plugins {
-	id "fabric-loom" version "1.8-SNAPSHOT"
-	id "me.modmuss50.mod-publish-plugin" version "0.5.2"
+	id "fabric-loom" version "1.9-SNAPSHOT"
+	id "me.modmuss50.mod-publish-plugin" version "0.8.1"
 	id "com.diffplug.spotless" version "6.25.0"
 }
 
@@ -25,16 +25,6 @@ repositories {
 	// Loom adds the essential maven repositories to download Minecraft and libraries from automatically.
 	// See https://docs.gradle.org/current/userguide/declaring_repositories.html
 	// for more information about repositories.
-}
-
-// Override vulnerable dependencies until Minecraft updates to newer versions
-configurations.all {
-	resolutionStrategy {
-		// v1.15.0, used by Minecraft 1.21.2 and 1.21.3, is vulnerable to CVE-2024-35255
-		force "com.microsoft.azure:msal4j:1.17.2"
-		// v4.1.97.Final, used by Minecraft 1.21 - 1.21.3, is vulnerable to CVE-2024-47535
-		force "io.netty:netty-common:4.1.115.Final"
-	}
 }
 
 dependencies {
@@ -76,6 +66,7 @@ jar {
 	}
 }
 
+import com.diffplug.spotless.generic.LicenseHeaderStep
 spotless {
 	lineEndings("WINDOWS")
 	java {
@@ -84,9 +75,15 @@ spotless {
 		trimTrailingWhitespace()
 		eclipse().configFile(file("codestyle/formatter.xml"))
 	}
+	format("licenseHeader") {
+		target("src/*/java/**/*.java", "src/test/java/**/*.java")
+		def header_file = file("codestyle/license_header.txt")
+		def delimiter = LicenseHeaderStep.DEFAULT_JAVA_HEADER_DELIMITER
+		licenseHeaderFile(header_file, delimiter).updateYearWithLatest(true)
+	}
 	json {
 		target "src/**/*.json"
-		gson().indentWithSpaces(2).version("2.10.1")
+		gson().indentWithSpaces(2).version("2.11.0")
 	}
 }
 
@@ -104,7 +101,7 @@ publishMods {
 	file = remapJar.archiveFile
 	def archivesName = base.archivesName.get() as String
 	additionalFiles.from(
-		file("${project.buildDir}/libs/${archivesName}-${version}-sources.jar"),
+		file("${project.buildDir}/libs/${archivesName}-${project.version}-sources.jar"),
 	)
 	type = getGhVersion().contains("pre") ? BETA : STABLE
 	modLoaders.add("fabric")
@@ -126,10 +123,21 @@ publishMods {
 	}
 }
 
+import groovy.json.JsonSlurper
+
+tasks.register("getCurseforgeId") {
+	inputs.file publishCurseforge.result
+	doLast {
+		def result = new JsonSlurper().parseText(publishCurseforge.result.get().asFile.text)
+		println "CURSEFORGE_FILE_ID=${result.fileId}"
+	}
+}
+
 afterEvaluate {
 	tasks.publishMods.dependsOn build
 	tasks.publishCurseforge.dependsOn build
 	tasks.publishModrinth.dependsOn build
+	tasks.getCurseforgeId.dependsOn publishCurseforge
 }
 
 import org.kohsuke.github.GHReleaseBuilder
