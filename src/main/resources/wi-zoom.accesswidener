@@ -1,0 +1,4 @@
+accessWidener	v1	named
+accessible	field	net/minecraft/client/gui/screen/Screen	drawables	Ljava/util/List;
+accessible	field	net/minecraft/client/gui/screen/TitleScreen	doBackgroundFade	Z
+accessible	field	net/minecraft/client/gui/widget/CyclingButtonWidget	optionText	Lnet/minecraft/text/Text;

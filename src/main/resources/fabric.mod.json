@@ -20,11 +20,15 @@
   "entrypoints": {
     "main": [
       "net.wurstclient.zoom.WiZoomInitializer"
+    ],
+    "client": [
+      "net.wurstclient.zoom.test.WiZoomTestClient"
     ]
   },
   "mixins": [
     "wi-zoom.mixins.json"
   ],
+  "accessWidener": "wi-zoom.accesswidener",
   "depends": {
     "fabricloader": ">=0.16.2",
     "fabric-api": ">=0.102.2",
