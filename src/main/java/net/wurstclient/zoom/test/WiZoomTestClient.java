@@ -11,6 +11,7 @@ import static net.wurstclient.zoom.test.WiModsTestHelper.*;
 
 import java.time.Duration;
 
+import org.lwjgl.glfw.GLFW;
 import org.spongepowered.asm.mixin.MixinEnvironment;
 
 import net.fabricmc.api.ClientModInitializer;
@@ -19,6 +20,7 @@ import net.minecraft.client.gui.screen.AccessibilityOnboardingScreen;
 import net.minecraft.client.gui.screen.TitleScreen;
 import net.minecraft.client.gui.screen.world.CreateWorldScreen;
 import net.minecraft.client.gui.screen.world.SelectWorldScreen;
+import net.minecraft.util.math.MathHelper;
 
 public final class WiZoomTestClient implements ClientModInitializer
 {
@@ -105,14 +107,14 @@ public final class WiZoomTestClient implements ClientModInitializer
 		closeScreen();
 		
 		// Build a test platform and clear out the space above it
-		runChatCommand("fill ~-5 ~-1 ~-5 ~5 ~-1 ~5 stone");
-		runChatCommand("fill ~-5 ~ ~-5 ~5 ~30 ~5 air");
+		runChatCommand("fill ~-1 ~-1 ~-1 ~1 ~-1 ~15 stone");
+		runChatCommand("fill ~-1 ~ ~-1 ~1 ~30 ~15 air");
 		
 		// Clear inventory and chat before running tests
 		runChatCommand("clear");
 		clearChat();
 		
-		// TODO: Add WI Zoom-specific test code here
+		testZoomInWorld();
 		
 		System.out.println("Opening game menu");
 		openGameMenu();
@@ -124,5 +126,48 @@ public final class WiZoomTestClient implements ClientModInitializer
 		
 		System.out.println("Stopping the game");
 		clickButton("menu.quit");
+	}
+	
+	private void testZoomInWorld()
+	{
+		// Spawn a chicken in front of the player
+		runChatCommand(
+			"summon minecraft:chicken ~ ~0.85 ~15 {NoAI:1,NoGravity:1,Rotation:[180f,0f]}");
+		waitForWorldTicks(5);
+		takeScreenshot("chicken_no_zoom");
+		
+		// Press V to enable zoom
+		setKeyPressState(GLFW.GLFW_KEY_V, true);
+		waitForWorldTicks(1);
+		takeScreenshot("chicken_3x_zoom");
+		
+		// Scroll up to increase zoom
+		int scrollsNeededFor50x =
+			MathHelper.ceil(Math.log(50 / 3) / Math.log(1.1));
+		for(int i = 0; i < scrollsNeededFor50x; i++)
+			scrollUp();
+		waitForWorldTicks(1);
+		takeScreenshot("chicken_50x_zoom");
+		
+		// Confirm selected slot is still zero
+		if(submitAndGet(mc -> mc.player.getInventory().selectedSlot != 0))
+			throw new RuntimeException(
+				"Scrolling up while zooming changed the selected slot");
+		
+		// Release V to disable zoom
+		setKeyPressState(GLFW.GLFW_KEY_V, false);
+		waitForWorldTicks(1);
+	}
+	
+	private void setKeyPressState(int key, boolean pressed)
+	{
+		submitAndWait(mc -> mc.keyboard.onKey(mc.getWindow().getHandle(), key,
+			0, pressed ? 1 : 0, 0));
+	}
+	
+	private void scrollUp()
+	{
+		submitAndWait(
+			mc -> mc.mouse.onMouseScroll(mc.getWindow().getHandle(), 0, 1));
 	}
 }
