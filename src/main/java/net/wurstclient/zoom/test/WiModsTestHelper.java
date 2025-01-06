@@ -19,6 +19,7 @@ import com.mojang.brigadier.ParseResults;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 
 import net.fabricmc.loader.api.FabricLoader;
+import net.minecraft.block.Block;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.Drawable;
 import net.minecraft.client.gui.screen.GameMenuScreen;
@@ -37,6 +38,7 @@ import net.minecraft.client.tutorial.TutorialStep;
 import net.minecraft.client.util.ScreenshotRecorder;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import net.minecraft.util.math.BlockPos;
 
 public enum WiModsTestHelper
 {
@@ -102,7 +104,7 @@ public enum WiModsTestHelper
 				break;
 			}
 			
-			if(startTime.isAfter(timeout))
+			if(LocalDateTime.now().isAfter(timeout))
 				throw new RuntimeException(
 					"Waiting until " + event + " took too long");
 			
@@ -166,6 +168,16 @@ public enum WiModsTestHelper
 		waitUntil(ticks + " world ticks have passed",
 			mc -> mc.world.getTime() >= startTicks + ticks,
 			Duration.ofMillis(ticks * 100).plusMinutes(5));
+	}
+	
+	public static void waitForBlock(int relX, int relY, int relZ, Block block)
+	{
+		BlockPos pos =
+			submitAndGet(mc -> mc.player.getBlockPos().add(relX, relY, relZ));
+		waitUntil(
+			"block at ~" + relX + " ~" + relY + " ~" + relZ + " ("
+				+ pos.toShortString() + ") is " + block,
+			mc -> mc.world.getBlockState(pos).getBlock() == block);
 	}
 	
 	/**
@@ -303,6 +315,18 @@ public enum WiModsTestHelper
 			
 			return false;
 		});
+	}
+	
+	public static void setKeyPressState(int key, boolean pressed)
+	{
+		submitAndWait(mc -> mc.keyboard.onKey(mc.getWindow().getHandle(), key,
+			0, pressed ? 1 : 0, 0));
+	}
+	
+	public static void scrollMouse(int horizontal, int vertical)
+	{
+		submitAndWait(mc -> mc.mouse.onMouseScroll(mc.getWindow().getHandle(),
+			horizontal, vertical));
 	}
 	
 	public static void closeScreen()

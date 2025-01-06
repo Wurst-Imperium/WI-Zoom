@@ -145,7 +145,7 @@ public final class WiZoomTestClient implements ClientModInitializer
 		int scrollsNeededFor50x =
 			MathHelper.ceil(Math.log(50 / 3) / Math.log(1.1));
 		for(int i = 0; i < scrollsNeededFor50x; i++)
-			scrollUp();
+			scrollMouse(0, 1);
 		waitForWorldTicks(1);
 		takeScreenshot("chicken_50x_zoom");
 		
@@ -157,17 +157,5 @@ public final class WiZoomTestClient implements ClientModInitializer
 		// Release V to disable zoom
 		setKeyPressState(GLFW.GLFW_KEY_V, false);
 		waitForWorldTicks(1);
-	}
-	
-	private void setKeyPressState(int key, boolean pressed)
-	{
-		submitAndWait(mc -> mc.keyboard.onKey(mc.getWindow().getHandle(), key,
-			0, pressed ? 1 : 0, 0));
-	}
-	
-	private void scrollUp()
-	{
-		submitAndWait(
-			mc -> mc.mouse.onMouseScroll(mc.getWindow().getHandle(), 0, 1));
 	}
 }
