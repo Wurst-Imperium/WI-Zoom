@@ -30,6 +30,7 @@ import net.minecraft.client.gui.screen.world.LevelLoadingScreen;
 import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.client.gui.widget.ClickableWidget;
 import net.minecraft.client.gui.widget.CyclingButtonWidget;
+import net.minecraft.client.gui.widget.OptionListWidget;
 import net.minecraft.client.gui.widget.TextFieldWidget;
 import net.minecraft.client.network.ClientPlayNetworkHandler;
 import net.minecraft.client.option.Perspective;
@@ -69,7 +70,7 @@ public enum WiModsTestHelper
 	/**
 	 * Waits for the given duration.
 	 */
-	public static void wait(Duration duration)
+	public static void waitFor(Duration duration)
 	{
 		try
 		{
@@ -108,7 +109,7 @@ public enum WiModsTestHelper
 				throw new RuntimeException(
 					"Waiting until " + event + " took too long");
 			
-			wait(Duration.ofMillis(50));
+			waitFor(Duration.ofMillis(50));
 		}
 	}
 	
@@ -194,7 +195,7 @@ public enum WiModsTestHelper
 	 */
 	public static void takeScreenshot(String name, Duration delay)
 	{
-		wait(delay);
+		waitFor(delay);
 		
 		String count =
 			String.format("%02d", screenshotCounter.incrementAndGet());
@@ -265,26 +266,39 @@ public enum WiModsTestHelper
 			
 			for(Drawable drawable : screen.drawables)
 			{
-				if(!(drawable instanceof ClickableWidget widget))
-					continue;
-				
-				if(widget instanceof ButtonWidget button
-					&& buttonText.equals(button.getMessage().getString()))
-				{
-					button.onPress();
-					return true;
-				}
-				
-				if(widget instanceof CyclingButtonWidget<?> button
-					&& buttonText.equals(button.optionText.getString()))
-				{
-					button.onPress();
-					return true;
-				}
+				if(drawable instanceof ClickableWidget widget)
+					if(clickButtonInWidget(widget, buttonText))
+						return true;
+					
+				if(drawable instanceof OptionListWidget list)
+					for(OptionListWidget.WidgetEntry entry : list.children())
+						for(ClickableWidget widget : entry.widgets)
+							if(clickButtonInWidget(widget, buttonText))
+								return true;
 			}
 			
 			return false;
 		});
+	}
+	
+	private static boolean clickButtonInWidget(ClickableWidget widget,
+		String buttonText)
+	{
+		if(widget instanceof ButtonWidget button
+			&& buttonText.equals(button.getMessage().getString()))
+		{
+			button.onPress();
+			return true;
+		}
+		
+		if(widget instanceof CyclingButtonWidget<?> button
+			&& buttonText.equals(button.optionText.getString()))
+		{
+			button.onPress();
+			return true;
+		}
+		
+		return false;
 	}
 	
 	/**

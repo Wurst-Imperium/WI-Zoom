@@ -1,5 +1,7 @@
 accessWidener	v1	named
+accessible	class	net/minecraft/client/gui/widget/OptionListWidget$WidgetEntry
+accessible	method	net/minecraft/client/Mouse	onMouseScroll	(JDD)V
 accessible	field	net/minecraft/client/gui/screen/Screen	drawables	Ljava/util/List;
 accessible	field	net/minecraft/client/gui/screen/TitleScreen	doBackgroundFade	Z
 accessible	field	net/minecraft/client/gui/widget/CyclingButtonWidget	optionText	Lnet/minecraft/text/Text;
-accessible	method	net/minecraft/client/Mouse	onMouseScroll	(JDD)V
+accessible	field	net/minecraft/client/gui/widget/OptionListWidget$WidgetEntry	widgets	Ljava/util/List;

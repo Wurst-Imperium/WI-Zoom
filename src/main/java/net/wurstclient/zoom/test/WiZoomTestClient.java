@@ -18,6 +18,9 @@ import net.fabricmc.api.ClientModInitializer;
 import net.minecraft.SharedConstants;
 import net.minecraft.client.gui.screen.AccessibilityOnboardingScreen;
 import net.minecraft.client.gui.screen.TitleScreen;
+import net.minecraft.client.gui.screen.option.ControlsOptionsScreen;
+import net.minecraft.client.gui.screen.option.KeybindsScreen;
+import net.minecraft.client.gui.screen.option.OptionsScreen;
 import net.minecraft.client.gui.screen.world.CreateWorldScreen;
 import net.minecraft.client.gui.screen.world.SelectWorldScreen;
 import net.minecraft.util.math.MathHelper;
@@ -120,7 +123,31 @@ public final class WiZoomTestClient implements ClientModInitializer
 		openGameMenu();
 		takeScreenshot("game_menu");
 		
+		System.out.println("Clicking Options button");
+		clickButton("menu.options");
+		waitForScreen(OptionsScreen.class);
+		System.out.println("Reached options screen");
+		takeScreenshot("options_screen", Duration.ZERO);
+		
+		System.out.println("Clicking Controls button");
+		clickButton("options.controls");
+		waitForScreen(ControlsOptionsScreen.class);
+		System.out.println("Reached controls screen");
+		takeScreenshot("controls_screen", Duration.ZERO);
+		
+		System.out.println("Clicking Key Binds button");
+		clickButton("controls.keybinds");
+		waitForScreen(KeybindsScreen.class);
+		System.out.println("Reached keybinds screen");
+		// Scroll down to the bottom
+		for(int i = 0; i < 100; i++)
+			scrollMouse(0, -1);
+		takeScreenshot("key_binds_screen", Duration.ZERO);
+		
 		System.out.println("Returning to title screen");
+		clickButton("gui.done");
+		clickButton("gui.done");
+		clickButton("gui.done");
 		clickButton("menu.returnToMenu");
 		waitForScreen(TitleScreen.class);
 		
