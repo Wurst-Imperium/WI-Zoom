@@ -148,7 +148,7 @@ public final class WiZoomTestClient implements ClientModInitializer
 		// Scroll down to the bottom
 		for(int i = 0; i < 100; i++)
 			scrollMouse(0, -1);
-		takeScreenshot("key_binds_screen", Duration.ZERO);
+		takeScreenshot("key_binds_screen");
 		
 		System.out.println("Changing zoom keybind to B");
 		clickEditKeybindButton("key.wi_zoom.zoom");
