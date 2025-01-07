@@ -24,6 +24,7 @@ import net.minecraft.client.gui.screen.option.OptionsScreen;
 import net.minecraft.client.gui.screen.world.CreateWorldScreen;
 import net.minecraft.client.gui.screen.world.SelectWorldScreen;
 import net.minecraft.util.math.MathHelper;
+import net.wurstclient.zoom.WiZoom;
 
 public final class WiZoomTestClient implements ClientModInitializer
 {
@@ -104,7 +105,12 @@ public final class WiZoomTestClient implements ClientModInitializer
 		
 		System.out.println("Opening inventory");
 		openInventory();
+		// Try to zoom in inventory to confirm it does nothing
+		setKeyPressState(GLFW.GLFW_KEY_V, true);
+		waitForWorldTicks(1);
 		takeScreenshot("inventory");
+		setKeyPressState(GLFW.GLFW_KEY_V, false);
+		waitForWorldTicks(1);
 		
 		System.out.println("Closing inventory");
 		closeScreen();
@@ -144,12 +150,29 @@ public final class WiZoomTestClient implements ClientModInitializer
 			scrollMouse(0, -1);
 		takeScreenshot("key_binds_screen", Duration.ZERO);
 		
+		System.out.println("Changing zoom keybind to B");
+		clickEditKeybindButton("key.wi_zoom.zoom");
+		setKeyPressState(GLFW.GLFW_KEY_B, true);
+		setKeyPressState(GLFW.GLFW_KEY_B, false);
+		takeScreenshot("zoom_keybind_changed");
+		
+		System.out.println("Closing screens");
+		clickButton("gui.done");
+		clickButton("gui.done");
+		clickButton("gui.done");
+		clickButton("menu.returnToGame");
+		
+		testZoomWithChangedKeybind();
+		
 		System.out.println("Returning to title screen");
-		clickButton("gui.done");
-		clickButton("gui.done");
-		clickButton("gui.done");
+		openGameMenu();
 		clickButton("menu.returnToMenu");
 		waitForScreen(TitleScreen.class);
+		
+		System.out.println("Changing zoom keybind back to V");
+		submitAndWait(mc -> WiZoom.INSTANCE.getZoomKey()
+			.setBoundKey(WiZoom.INSTANCE.getZoomKey().getDefaultKey()));
+		submitAndWait(mc -> mc.options.write());
 		
 		System.out.println("Stopping the game");
 		clickButton("menu.quit");
@@ -168,21 +191,42 @@ public final class WiZoomTestClient implements ClientModInitializer
 		waitForWorldTicks(1);
 		takeScreenshot("chicken_3x_zoom");
 		
-		// Scroll up to increase zoom
+		scrollUpToMaxZoom();
+		takeScreenshot("chicken_50x_zoom");
+		
+		assertSelectedSlotIsZero();
+		
+		// Release V to disable zoom
+		setKeyPressState(GLFW.GLFW_KEY_V, false);
+		waitForWorldTicks(1);
+	}
+	
+	private void testZoomWithChangedKeybind()
+	{
+		setKeyPressState(GLFW.GLFW_KEY_B, true);
+		waitForWorldTicks(1);
+		
+		scrollUpToMaxZoom();
+		takeScreenshot("custom_keybind_50x_zoom");
+		assertSelectedSlotIsZero();
+		
+		setKeyPressState(GLFW.GLFW_KEY_B, false);
+		waitForWorldTicks(1);
+	}
+	
+	private void scrollUpToMaxZoom()
+	{
 		int scrollsNeededFor50x =
 			MathHelper.ceil(Math.log(50 / 3) / Math.log(1.1));
 		for(int i = 0; i < scrollsNeededFor50x; i++)
 			scrollMouse(0, 1);
 		waitForWorldTicks(1);
-		takeScreenshot("chicken_50x_zoom");
-		
-		// Confirm selected slot is still zero
+	}
+	
+	private void assertSelectedSlotIsZero()
+	{
 		if(submitAndGet(mc -> mc.player.getInventory().selectedSlot != 0))
 			throw new RuntimeException(
 				"Scrolling up while zooming changed the selected slot");
-		
-		// Release V to disable zoom
-		setKeyPressState(GLFW.GLFW_KEY_V, false);
-		waitForWorldTicks(1);
 	}
 }

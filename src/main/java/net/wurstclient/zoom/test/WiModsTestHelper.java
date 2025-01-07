@@ -26,6 +26,9 @@ import net.minecraft.client.gui.screen.GameMenuScreen;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.screen.TitleScreen;
 import net.minecraft.client.gui.screen.ingame.InventoryScreen;
+import net.minecraft.client.gui.screen.option.ControlsListWidget;
+import net.minecraft.client.gui.screen.option.ControlsListWidget.Entry;
+import net.minecraft.client.gui.screen.option.KeybindsScreen;
 import net.minecraft.client.gui.screen.world.LevelLoadingScreen;
 import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.client.gui.widget.ClickableWidget;
@@ -275,6 +278,51 @@ public enum WiModsTestHelper
 						for(ClickableWidget widget : entry.widgets)
 							if(clickButtonInWidget(widget, buttonText))
 								return true;
+			}
+			
+			return false;
+		});
+	}
+	
+	/**
+	 * Clicks the edit button for the key bind with the given translation key,
+	 * or fails after 10 seconds.
+	 *
+	 * <p>
+	 * Must be called from the key binds screen.
+	 */
+	public static void clickEditKeybindButton(String translationKey)
+	{
+		waitUntil("edit button for " + translationKey + " is visible", mc -> {
+			Screen screen = mc.currentScreen;
+			if(!(screen instanceof KeybindsScreen))
+				throw new RuntimeException(
+					"clickEditKeybindButton() must be called from the Key Binds screen. Current screen: "
+						+ screen);
+			
+			for(Drawable drawable : screen.drawables)
+			{
+				if(!(drawable instanceof ControlsListWidget list))
+					continue;
+				
+				for(Entry entry : list.children())
+				{
+					if(!(entry instanceof ControlsListWidget.KeyBindingEntry kbEntry))
+						continue;
+					
+					if(!translationKey
+						.equals(kbEntry.binding.getTranslationKey()))
+						continue;
+					
+					int x = kbEntry.editButton.getX() + list.getX()
+						+ kbEntry.editButton.getWidth() / 2;
+					int y = kbEntry.editButton.getY()
+						+ kbEntry.editButton.getHeight() / 2;
+					System.out.println("Clicking at " + x + ", " + y);
+					screen.mouseClicked(x, y, 0);
+					screen.mouseReleased(x, y, 0);
+					return true;
+				}
 			}
 			
 			return false;
