@@ -40,6 +40,9 @@ on:
         required: false
         type: boolean
         default: false
+      distinct_id:
+        description: "Automatically set by the return-dispatch action (leave blank if running manually)"
+        required: false
 
 jobs:
   publish:
@@ -50,6 +53,9 @@ jobs:
       CURSEFORGE_API_KEY: ${{ secrets.CURSEFORGE_API_KEY }}
       MODRINTH_TOKEN: ${{ secrets.MODRINTH_TOKEN }}
     steps:
+
+      - name: Echo distinct ID ${{ github.event.inputs.distinct_id }}
+        run: echo ${{ github.event.inputs.distinct_id }}
 
       - name: Checkout repository
         uses: actions/checkout@v4
