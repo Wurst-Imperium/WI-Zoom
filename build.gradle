@@ -113,6 +113,8 @@ jar {
 	from("LICENSE") {
 		rename {"${it}_${base.archivesName.get()}"}
 	}
+	
+	exclude("intentionally_untranslated.json")
 }
 
 import com.diffplug.spotless.generic.LicenseHeaderStep
