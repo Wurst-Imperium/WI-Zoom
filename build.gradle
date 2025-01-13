@@ -8,10 +8,12 @@ plugins {
 	id "java-library"
 	id "eclipse"
 	id "idea"
-	id "net.neoforged.gradle.userdev" version "7.0.146"
-	id "net.neoforged.gradle.mixin" version "7.0.146"
-	id "me.modmuss50.mod-publish-plugin" version "0.5.2"
-	id "com.diffplug.spotless" version "6.25.0"
+	// NeoGradle. Check the latest version at:
+	// https://projects.neoforged.net/neoforged/neogradle
+	id "net.neoforged.gradle.userdev" version "7.0.178"
+	id "net.neoforged.gradle.mixin" version "7.0.178"
+	id "me.modmuss50.mod-publish-plugin" version "0.8.4"
+	id "com.diffplug.spotless" version "7.0.1"
 }
 
 tasks.named('wrapper', Wrapper).configure {
@@ -38,7 +40,7 @@ mixin {
 	config 'wi-zoom.mixins.json'
 }
 
-//minecraft.accessTransformers.file rootProject.file('src/main/resources/META-INF/accesstransformer.cfg')
+minecraft.accessTransformers.file rootProject.file('src/main/resources/META-INF/accesstransformer.cfg')
 //minecraft.accessTransformers.entry public net.minecraft.client.Minecraft textureManager # textureManager
 
 // Default run configurations.
@@ -109,8 +111,8 @@ configurations.all {
 		// is vulnerable to CVE-2024-47535.
 		force "io.netty:netty-common:4.1.115.Final"
 		
-		// Fixes a weird issue in NeoForge 21.3 where it tries to load both
-		// ASM 9.7 and ASM 9.5 at the same time.
+		// Fixes a weird issue in NeoForge 21.3-21.4 where it tries to load
+		// both ASM 9.7 and ASM 9.5 at the same time.
 		force "org.ow2.asm:asm-analysis:9.7"
 		force "org.ow2.asm:asm:9.7"
 		force "org.ow2.asm:asm-tree:9.7"
@@ -176,6 +178,35 @@ tasks.withType(ProcessResources).configureEach {
 	}
 }
 
+tasks.register('runEndToEndTest') {
+	group = 'NeoGradle/Runs'
+	description = 'Runs the game with end-to-end tests enabled'
+	dependsOn 'runClient'
+}
+
+// Modify runClient if it's running as a dependency of runEndToEndTest.
+// Since NeoGradle doesn't allow custom run types yet, this is the only way to
+// make runEndToEndTest work for now.
+tasks.withType(JavaExec).configureEach {
+	doFirst {
+		if (gradle.startParameter.taskNames.contains('runEndToEndTest')) {
+			jvmArgs += [
+				'-Dwi_zoom.e2eTest',
+				'-Dmixin.debug.verify=true',
+				'-Dmixin.debug.countInjections=true'
+			]
+		}
+	}
+}
+
+processResources {
+	inputs.property "version", project.version
+	
+	filesMatching("fabric.mod.json") {
+		expand "version": project.version
+	}
+}
+
 tasks.withType(JavaCompile).configureEach {
 	options.encoding = 'UTF-8' // Use the UTF-8 charset for Java compilation
 }
@@ -188,13 +219,24 @@ idea {
 	}
 }
 
+jar {
+	exclude("intentionally_untranslated.json")
+}
+
+import com.diffplug.spotless.generic.LicenseHeaderStep
 spotless {
 	lineEndings("WINDOWS")
 	java {
 		removeUnusedImports()
-		indentWithTabs()
+		leadingSpacesToTabs()
 		trimTrailingWhitespace()
 		eclipse().configFile(file("codestyle/formatter.xml"))
+	}
+	format("licenseHeader") {
+		target("src/*/java/**/*.java", "src/test/java/**/*.java")
+		def header_file = file("codestyle/license_header.txt")
+		def delimiter = LicenseHeaderStep.DEFAULT_JAVA_HEADER_DELIMITER
+		licenseHeaderFile(header_file, delimiter).updateYearWithLatest(true)
 	}
 	json {
 		target "src/**/*.json"
@@ -236,6 +278,15 @@ publishMods {
 	}
 }
 
+import groovy.json.JsonSlurper
+tasks.register("getCurseforgeId") {
+	inputs.file publishCurseforge.result
+	doLast {
+		def result = new JsonSlurper().parseText(publishCurseforge.result.get().asFile.text)
+		println "CURSEFORGE_FILE_ID=${result.fileId}"
+	}
+}
+
 tasks.named("publishMods").configure {
 	dependsOn(tasks.named("build"))
 }
@@ -246,6 +297,10 @@ tasks.named("publishCurseforge").configure {
 
 tasks.named("publishModrinth").configure {
 	dependsOn(tasks.named("build"))
+}
+
+tasks.named("getCurseforgeId").configure {
+	dependsOn(tasks.named("publishCurseforge"))
 }
 
 import org.kohsuke.github.GHReleaseBuilder

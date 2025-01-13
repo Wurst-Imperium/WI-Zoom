@@ -1,28 +1,28 @@
-![comparison of no zoom, 3x zoom, and 50x zoom](https://user-images.githubusercontent.com/10100202/67816432-973d2400-fab2-11e9-8699-e05eb5ba6551.jpg)
-
 # WI Zoom (Wurst-Imperium Zoom)
 
-The zoom from the [Wurst Client](https://www.wurstclient.net/) as a standalone mod. The WI Zoom Minecraft mod lets you zoom in and out with the mouse wheel, providing up to 50x magnification without the need for a spyglass. This mod is fully compatible with OptiFine and Sodium, but unlike OptiFine's zoom, WI Zoom lets the camera move in a logical way, without making it wobble around. WI Zoom supports all of the latest Minecraft versions, including snapshots.
+WI Zoom is the zoom from the [Wurst Client](https://www.wurstclient.net/) as a standalone Minecraft mod, letting you zoom in and out with the mouse wheel and providing up to 50x magnification without the need for a spyglass. This mod is fully compatible with OptiFine and Sodium, but unlike OptiFine's zoom, WI Zoom lets the camera move in a logical way, without making it wobble around. WI Zoom supports all of the latest Minecraft versions, including snapshots.
 
-![Requires Fabric API](https://user-images.githubusercontent.com/10100202/93722968-0aec9180-fb9b-11ea-9983-bc0fc51b47ab.png)
+![comparison of no zoom, 3x zoom, and 50x zoom](https://user-images.githubusercontent.com/10100202/67816432-973d2400-fab2-11e9-8699-e05eb5ba6551.jpg)
 
-## Downloads (for users)
+## Downloads
 
 [![Download WI Zoom](https://user-images.githubusercontent.com/10100202/214881367-956f0bc9-4dbe-43cb-850a-04d73e00b344.png)](https://www.wimods.net/wi-zoom/download/?utm_source=GitHub&utm_medium=WI+Zoom&utm_campaign=README.md&utm_content=WI+Zoom+GitHub+repo+download+button)
 
-## Setup (for developers)
+## Installation
 
-(This assumes that you are using Windows with [Eclipse](https://www.eclipse.org/downloads/) and [Java Development Kit 21](https://adoptium.net/?variant=openjdk21&jvmVariant=hotspot) already installed.)
+> [!IMPORTANT]
+> Always make sure that your modloader and all of your mods are made for the same Minecraft version. Your game will crash if you mix different versions.
 
-1. Clone or download the repository.
+### Installation using Fabric
 
-2. Run this command in PowerShell:
+1. Install [Fabric Loader](https://fabricmc.net/use/installer/).
+2. Add [Fabric API](https://modrinth.com/mod/fabric-api) to your mods folder.
+3. Add WI Zoom to your mods folder.
 
-   ```powershell
-   ./gradlew.bat eclipse
-   ```
+### Installation using NeoForge
 
-3. In Eclipse, go to `Import...` > `Existing Projects into Workspace` and select this project.
+1. Install [NeoForge](https://neoforged.net/).
+2. Add WI Zoom to your mods folder.
 
 ## Features
 
@@ -33,30 +33,31 @@ The zoom from the [Wurst Client](https://www.wurstclient.net/) as a standalone m
 - Dynamic mouse sensitivity! (since v1.1)
 - Fully compatible with <a href="https://optifine.net/home" target="_blank">OptiFine</a> / <a href="https://github.com/CaffeineMC/sodium-fabric" target="_blank">Sodium</a>!
 
-## How To Zoom
+## How to zoom
 
 Hold down the <kbd>V</kbd> key to activate the zoom (this keybind can be changed).  
 While zooming, you can use the <kbd>mouse wheel</kbd> to zoom in further.
 
-## Changing The Zoom Keybind
+## Changing the zoom keybind
 
 <details>
   <summary>How to change the keybind (click to expand)</summary>
 
   In the pause menu, click on "Options...".
 
-  <img src="https://user-images.githubusercontent.com/10100202/67876632-e0d45000-fb40-11e9-88a5-6d5d22cdb33a.png" alt="screenshot of the Game Menu with the Options button highlighted" width="1113" height="832" />
+  ![screenshot of the Game Menu with the Options button highlighted](https://user-images.githubusercontent.com/10100202/67876632-e0d45000-fb40-11e9-88a5-6d5d22cdb33a.png)
 
   In the Options menu, click on "Controls...".
 
-  <img src="https://user-images.githubusercontent.com/10100202/67876634-e0d45000-fb40-11e9-8e81-ef677755e1c3.png" alt="screenshot of the Options menu with the Controls button highlighted" width="1113" height="779" />
+  ![screenshot of the Options menu with the Controls button highlighted](https://user-images.githubusercontent.com/10100202/67876634-e0d45000-fb40-11e9-8e81-ef677755e1c3.png)
   
   In the Controls menu, scroll down to the "WI Zoom" section. If you don't have any other mods installed, you will find this section at the very bottom.
 
-  <img src="https://user-images.githubusercontent.com/10100202/67876636-e16ce680-fb40-11e9-8934-ad65580dc91a.png" alt="screenshot of the Controls menu with the WI Zoom keybind highlighted at the bottom" width="1113" height="599" />
+  ![screenshot of the Controls menu with the WI Zoom keybind highlighted at the bottom](https://user-images.githubusercontent.com/10100202/67876636-e16ce680-fb40-11e9-8934-ad65580dc91a.png)
 </details>
 
-## Supported Languages
+## Supported languages
+
 - Azerbaijani (Azerbaijan) (since v1.5)
 - Chinese (Simplified/Mainland) (since v1.4)
 - Chinese (Traditional/Taiwan) (since v1.4)
@@ -72,3 +73,72 @@ While zooming, you can use the <kbd>mouse wheel</kbd> to zoom in further.
 - Russian (Russia) (since v1.3)
 - Turkish (Turkey) (since v1.5)
 - Ukrainian (Ukraine) (since v1.5)
+
+## Development Setup
+
+> [!IMPORTANT]
+> Make sure you have [Java Development Kit 21](https://adoptium.net/?variant=openjdk21&jvmVariant=hotspot) installed. It won't work with other versions.
+
+### Development using Eclipse
+
+1. Clone the repository:
+
+   ```pwsh
+   git clone https://github.com/Wurst-Imperium/WI-Zoom.git
+   cd WI-Zoom
+   ```
+
+2. Generate the sources:
+
+   In Fabric versions:
+   ```pwsh
+   ./gradlew genSources eclipse
+   ```
+
+   In NeoForge versions:
+   ```pwsh
+   ./gradlew eclipse
+   ```
+
+3. In Eclipse, go to `Import...` > `Existing Projects into Workspace` and select this project.
+
+4. **Optional:** Right-click on the project and select `Properties` > `Java Code Style`. Then under `Clean Up`, `Code Templates`, `Formatter`, import the respective files in the `codestyle` folder.
+
+### Development using VSCode / Cursor
+
+> [!TIP]
+> You'll probably want to install the [Extension Pack for Java](https://marketplace.visualstudio.com/items?itemName=vscjava.vscode-java-pack) to make development easier.
+
+1. Clone the repository:
+
+   ```pwsh
+   git clone https://github.com/Wurst-Imperium/WI-Zoom.git
+   cd WI-Zoom
+   ```
+
+2. Generate the sources:
+
+   In Fabric versions:
+   ```pwsh
+   ./gradlew genSources vscode
+   ```
+
+   In NeoForge versions:
+   ```pwsh
+   ./gradlew eclipse
+   ```
+   (That's not a typo. NeoForge doesn't have `vscode`, but `eclipse` works fine.)
+
+3. Open the `WI-Zoom` folder in VSCode / Cursor.
+
+4. **Optional:** In the VSCode settings, set `java.format.settings.url` to `https://raw.githubusercontent.com/Wurst-Imperium/WI-Zoom/master/codestyle/formatter.xml` and `java.format.settings.profile` to `Wurst-Imperium`.
+
+### Development using IntelliJ IDEA
+
+I don't use or recommend IntelliJ, but the commands to run would be:
+
+```pwsh
+git clone https://github.com/Wurst-Imperium/WI-Zoom.git
+cd WI-Zoom
+./gradlew genSources idea
+```
