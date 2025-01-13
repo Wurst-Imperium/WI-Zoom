@@ -4,6 +4,8 @@ run-name: "Publish release from ${{ github.ref_name }} branch"
 permissions:
   # Needed to push the tag.
   contents: write
+  # Needed to close the milestone.
+  issues: write
 
 on:
   workflow_dispatch:
@@ -33,6 +35,14 @@ on:
         required: true
         type: boolean
         default: true
+      update_website:
+        description: "Update wimods.net post (only works if there already is one and publish_curseforge is true)"
+        required: false
+        type: boolean
+        default: false
+      distinct_id:
+        description: "Automatically set by the return-dispatch action (leave blank if running manually)"
+        required: false
 
 jobs:
   publish:
@@ -44,55 +54,107 @@ jobs:
       MODRINTH_TOKEN: ${{ secrets.MODRINTH_TOKEN }}
     steps:
 
-      - name: Checkout repository
-        uses: actions/checkout@v4
-        with:
-          # Include all tags in case the new tag already exists.
-          fetch-tags: true
+    - name: Echo distinct ID ${{ github.event.inputs.distinct_id }}
+      run: echo ${{ github.event.inputs.distinct_id }}
 
-      - name: Set up Java 21
-        uses: actions/setup-java@v4
-        with:
-          java-version: "21"
-          distribution: "microsoft"
+    - name: Checkout repository
+      uses: actions/checkout@v4
+      with:
+        # Include all tags in case the new tag already exists.
+        fetch-tags: true
 
-      - name: Grant execute permission for gradlew
-        run: chmod +x gradlew
+    - name: Set up Java 21
+      uses: actions/setup-java@v4
+      with:
+        java-version: "21"
+        distribution: "microsoft"
 
-      - name: Setup Gradle
-        uses: gradle/actions/setup-gradle@v4
+    - name: Grant execute permission for gradlew
+      run: chmod +x gradlew
 
-      - name: Build
-        run: ./gradlew build --stacktrace --warning-mode=fail
+    - name: Setup Gradle
+      uses: gradle/actions/setup-gradle@v4
 
-      - name: Create and push tag
-        run: |
-          MOD_VERSION=$(grep "mod_version" gradle.properties | cut -d'=' -f2 | tr -d ' \r')
-          git config --global user.name "Wurst-Bot"
-          git config --global user.email "contact.wurstimperium@gmail.com"
-          git tag "v$MOD_VERSION"
-          git push origin "v$MOD_VERSION"
+    - name: Build
+      run: ./gradlew build --stacktrace --warning-mode=fail
 
-      - name: Close milestone
-        if: ${{ inputs.close_milestone }}
-        run: ./gradlew closeMilestone --stacktrace
+    - name: Create and push tag
+      run: |
+        MOD_VERSION=$(grep "^mod_version=" gradle.properties | cut -d'=' -f2 | tr -d ' \r')
+        git config --global user.name "Wurst-Bot"
+        git config --global user.email "contact.wurstimperium@gmail.com"
+        git tag "v$MOD_VERSION"
+        git push origin "v$MOD_VERSION"
 
-      - name: Upload backups
-        if: ${{ inputs.upload_backups }}
-        run: ./gradlew uploadBackups --stacktrace
+    - name: Close milestone
+      if: ${{ inputs.close_milestone }}
+      run: ./gradlew closeMilestone --stacktrace
 
-      - name: Publish to GitHub
-        if: ${{ inputs.publish_github }}
-        env:
-          GITHUB_TOKEN: ${{ secrets.MCX_PUBLISH_TOKEN }}
-        run: ./gradlew github --stacktrace
+    - name: Upload backups
+      if: ${{ inputs.upload_backups }}
+      run: ./gradlew uploadBackups --stacktrace
 
-      - name: Publish to CurseForge  
-        if: ${{ inputs.publish_curseforge }}
-        run: ./gradlew publishCurseforge --stacktrace
+    - name: Publish to GitHub
+      if: ${{ inputs.publish_github }}
+      env:
+        GITHUB_TOKEN: ${{ secrets.MCX_PUBLISH_TOKEN }}
+      run: ./gradlew github --stacktrace
 
-      - name: Publish to Modrinth
-        if: ${{ inputs.publish_modrinth }}
-        run: ./gradlew publishModrinth --stacktrace
+    - name: Publish to CurseForge
+      if: ${{ inputs.publish_curseforge }}
+      run: ./gradlew publishCurseforge --stacktrace
 
-# TODO: Trigger website update
+    - name: Get CurseForge file ID
+      id: cf_file_id
+      if: ${{ inputs.publish_curseforge }}
+      run: |
+        file_id=$(./gradlew getCurseforgeId -x publishCurseforge | grep -o 'CURSEFORGE_FILE_ID=[0-9]*' | grep -o '[0-9]*')
+        echo "file_id=$file_id" >> "$GITHUB_OUTPUT"
+        echo "CurseForge file ID: \`$file_id\`" >> $GITHUB_STEP_SUMMARY
+
+    - name: Publish to Modrinth
+      if: ${{ inputs.publish_modrinth }}
+      run: ./gradlew publishModrinth --stacktrace
+
+    - name: Build website update inputs
+      id: website_inputs
+      if: ${{ inputs.update_website && inputs.publish_curseforge }}
+      run: |
+        MOD_VERSION=$(grep "^mod_version=" gradle.properties | cut -d'=' -f2 | tr -d ' \r' | sed 's/-MC.*$//')
+        MC_VERSION=$(grep "^minecraft_version=" gradle.properties | cut -d'=' -f2 | tr -d ' \r')
+        FAPI_VERSION=$(grep "^fabric_version=" gradle.properties | cut -d'=' -f2 | tr -d ' \r')
+        JSON_STRING=$(cat << EOF
+        {
+          "mod": "wi-zoom",
+          "modloader": "fabric",
+          "mod_version": "$MOD_VERSION",
+          "mc_version": "$MC_VERSION",
+          "fapi_version": "$FAPI_VERSION",
+          "file_id": "${{ steps.cf_file_id.outputs.file_id }}"
+        }
+        EOF
+        )
+        # Convert to single line and escape quotes
+        echo "json=${JSON_STRING//$'\n'/}" >> "$GITHUB_OUTPUT"
+
+    - name: Trigger website update
+      id: website_dispatch
+      if: ${{ inputs.update_website && inputs.publish_curseforge }}
+      uses: codex-/return-dispatch@v2
+      with:
+        token: ${{ secrets.WIMODS_NET_PUBLISH_TOKEN }}
+        owner: Wurst-Imperium
+        repo: wimods.net
+        ref: master
+        workflow: add_mod_port.yml
+        workflow_inputs: ${{ steps.website_inputs.outputs.json }}
+
+    - name: Wait for website update to finish (run ${{ steps.website_dispatch.outputs.run_id }})
+      if: ${{ inputs.update_website && inputs.publish_curseforge }}
+      uses: codex-/await-remote-run@v1
+      with:
+        token: ${{ secrets.WIMODS_NET_PUBLISH_TOKEN }}
+        owner: Wurst-Imperium
+        repo: wimods.net
+        run_id: ${{ steps.website_dispatch.outputs.run_id }}
+        run_timeout_seconds: 600  # 10 minutes

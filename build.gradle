@@ -5,9 +5,9 @@ buildscript {
 }
 
 plugins {
-	id "fabric-loom" version "1.8-SNAPSHOT"
-	id "me.modmuss50.mod-publish-plugin" version "0.8.1"
-	id "com.diffplug.spotless" version "6.25.0"
+	id "fabric-loom" version "1.9-SNAPSHOT"
+	id "me.modmuss50.mod-publish-plugin" version "0.8.4"
+	id "com.diffplug.spotless" version "7.0.1"
 }
 
 def ENV = System.getenv()
@@ -47,6 +47,55 @@ dependencies {
 	modImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}"
 }
 
+loom {
+	accessWidenerPath = file("src/main/resources/wi-zoom.accesswidener")
+}
+
+configurations {
+	productionRuntime {
+		extendsFrom configurations.minecraftLibraries
+		extendsFrom configurations.loaderLibraries
+		extendsFrom configurations.minecraftRuntimeLibraries
+	}
+}
+
+dependencies {
+	productionRuntime "net.fabricmc:fabric-loader:${project.loader_version}"
+	productionRuntime "net.fabricmc:intermediary:${project.minecraft_version}"
+}
+
+import net.fabricmc.loom.util.Platform
+tasks.register('runEndToEndTest', JavaExec) {
+	dependsOn remapJar, downloadAssets
+	classpath.from configurations.productionRuntime
+	mainClass = "net.fabricmc.loader.impl.launch.knot.KnotClient"
+	workingDir = file("run")
+	
+	doFirst {
+		classpath.from loom.minecraftProvider.minecraftClientJar
+		workingDir.mkdirs()
+		
+		args(
+			"--assetIndex", loom.minecraftProvider.versionInfo.assetIndex().fabricId(loom.minecraftProvider.minecraftVersion()),
+			"--assetsDir", new File(loom.files.userCache, "assets").absolutePath,
+			"--gameDir", workingDir.absolutePath
+		)
+		
+		if (Platform.CURRENT.operatingSystem.isMacOS()) {
+			jvmArgs("-XstartOnFirstThread")
+		}
+		
+		jvmArgs(
+			"-Dfabric.addMods=${configurations.modImplementation.find { it.name.contains('fabric-api') }.absolutePath}${File.pathSeparator}${remapJar.archiveFile.get().asFile.absolutePath}",
+			"-Dwi_zoom.e2eTest",
+			"-Dfabric-tag-conventions-v2.missingTagTranslationWarning=fail",
+			"-Dfabric-tag-conventions-v1.legacyTagWarning=fail",
+			"-Dmixin.debug.verify=true",
+			"-Dmixin.debug.countInjections=true"
+		)
+	}
+}
+
 processResources {
 	inputs.property "version", project.version
 	
@@ -74,15 +123,24 @@ jar {
 	from("LICENSE") {
 		rename {"${it}_${base.archivesName.get()}"}
 	}
+	
+	exclude("intentionally_untranslated.json")
 }
 
+import com.diffplug.spotless.generic.LicenseHeaderStep
 spotless {
 	lineEndings("WINDOWS")
 	java {
 		removeUnusedImports()
-		indentWithTabs()
+		leadingSpacesToTabs()
 		trimTrailingWhitespace()
 		eclipse().configFile(file("codestyle/formatter.xml"))
+	}
+	format("licenseHeader") {
+		target("src/*/java/**/*.java", "src/test/java/**/*.java")
+		def header_file = file("codestyle/license_header.txt")
+		def delimiter = LicenseHeaderStep.DEFAULT_JAVA_HEADER_DELIMITER
+		licenseHeaderFile(header_file, delimiter).updateYearWithLatest(true)
 	}
 	json {
 		target "src/**/*.json"
@@ -104,7 +162,7 @@ publishMods {
 	file = remapJar.archiveFile
 	def archivesName = base.archivesName.get() as String
 	additionalFiles.from(
-		file("${project.buildDir}/libs/${archivesName}-${version}-sources.jar"),
+		file("${project.buildDir}/libs/${archivesName}-${project.version}-sources.jar"),
 	)
 	type = getGhVersion().contains("pre") ? BETA : STABLE
 	modLoaders.add("fabric")
@@ -126,10 +184,21 @@ publishMods {
 	}
 }
 
+import groovy.json.JsonSlurper
+
+tasks.register("getCurseforgeId") {
+	inputs.file publishCurseforge.result
+	doLast {
+		def result = new JsonSlurper().parseText(publishCurseforge.result.get().asFile.text)
+		println "CURSEFORGE_FILE_ID=${result.fileId}"
+	}
+}
+
 afterEvaluate {
 	tasks.publishMods.dependsOn build
 	tasks.publishCurseforge.dependsOn build
 	tasks.publishModrinth.dependsOn build
+	tasks.getCurseforgeId.dependsOn publishCurseforge
 }
 
 import org.kohsuke.github.GHReleaseBuilder
