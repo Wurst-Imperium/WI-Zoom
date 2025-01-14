@@ -80,7 +80,7 @@ runs {
 		systemProperty 'forge.enabledGameTestNamespaces', project.mod_id
 	}
 	
-	data {
+	clientData {
 		// example of overriding the workingDirectory set in configureEach above, uncomment if you want to use it
 		// workingDirectory project.file('run-data')
 		
@@ -102,15 +102,6 @@ configurations {
 
 configurations.all {
 	resolutionStrategy {
-		// Override vulnerable msal4j dependency until Minecraft updates to a
-		// newer version. v1.15.0, used by Minecraft 1.21.3, is vulnerable to
-		// CVE-2024-35255.
-		force "com.microsoft.azure:msal4j:1.17.2"
-		// Override vulnerable netty-common dependency until Minecraft updates
-		// to a newer version. v4.1.97.Final, used by Minecraft 1.21 - 1.21.3,
-		// is vulnerable to CVE-2024-47535.
-		force "io.netty:netty-common:4.1.115.Final"
-		
 		// Fixes a weird issue in NeoForge 21.3-21.4 where it tries to load
 		// both ASM 9.7 and ASM 9.5 at the same time.
 		force "org.ow2.asm:asm-analysis:9.7"
@@ -240,7 +231,7 @@ spotless {
 	}
 	json {
 		target "src/**/*.json"
-		gson().indentWithSpaces(2).version("2.10.1")
+		gson().indentWithSpaces(2).version("2.11.0")
 	}
 }
 
