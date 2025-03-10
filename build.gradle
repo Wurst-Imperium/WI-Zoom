@@ -1,23 +1,23 @@
 buildscript {
 	dependencies {
-		classpath 'org.kohsuke:github-api:1.135'
+		classpath "org.kohsuke:github-api:1.327"
 	}
 }
 
 plugins {
-	id 'fabric-loom' version '1.2-SNAPSHOT'
-	id 'maven-publish'
-	id 'com.matthewprenger.cursegradle' version '1.4.0'
+	id "fabric-loom" version "1.10-SNAPSHOT"
+	id "me.modmuss50.mod-publish-plugin" version "0.8.4"
+	id "com.diffplug.spotless" version "7.0.2"
 }
 
 def ENV = System.getenv()
 
-sourceCompatibility = JavaVersion.VERSION_17
-targetCompatibility = JavaVersion.VERSION_17
-
-archivesBaseName = project.archives_base_name
 version = project.mod_version
 group = project.maven_group
+
+base {
+	archivesName = project.archives_base_name
+}
 
 repositories {
 	// Add repositories to retrieve artifacts from in here.
@@ -37,11 +37,60 @@ dependencies {
 	modImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}"
 }
 
+loom {
+	accessWidenerPath = file("src/main/resources/wi-zoom.accesswidener")
+}
+
+configurations {
+	productionRuntime {
+		extendsFrom configurations.minecraftLibraries
+		extendsFrom configurations.loaderLibraries
+		extendsFrom configurations.minecraftRuntimeLibraries
+	}
+}
+
+dependencies {
+	productionRuntime "net.fabricmc:fabric-loader:${project.loader_version}"
+	productionRuntime "net.fabricmc:intermediary:${project.minecraft_version}"
+}
+
+import net.fabricmc.loom.util.Platform
+tasks.register('runEndToEndTest', JavaExec) {
+	dependsOn remapJar, downloadAssets
+	classpath.from configurations.productionRuntime
+	mainClass = "net.fabricmc.loader.impl.launch.knot.KnotClient"
+	workingDir = file("run")
+	
+	doFirst {
+		classpath.from loom.minecraftProvider.minecraftClientJar
+		workingDir.mkdirs()
+		
+		args(
+			"--assetIndex", loom.minecraftProvider.versionInfo.assetIndex().fabricId(loom.minecraftProvider.minecraftVersion()),
+			"--assetsDir", new File(loom.files.userCache, "assets").absolutePath,
+			"--gameDir", workingDir.absolutePath
+		)
+		
+		if (Platform.CURRENT.operatingSystem.isMacOS()) {
+			jvmArgs("-XstartOnFirstThread")
+		}
+		
+		jvmArgs(
+			"-Dfabric.addMods=${configurations.modImplementation.find { it.name.contains('fabric-api') }.absolutePath}${File.pathSeparator}${remapJar.archiveFile.get().asFile.absolutePath}",
+			"-Dwi_zoom.e2eTest",
+			"-Dfabric-tag-conventions-v2.missingTagTranslationWarning=fail",
+			"-Dfabric-tag-conventions-v1.legacyTagWarning=fail",
+			"-Dmixin.debug.verify=true",
+			"-Dmixin.debug.countInjections=true"
+		)
+	}
+}
+
 processResources {
 	inputs.property "version", project.version
 	
 	filesMatching("fabric.mod.json") {
-		expand "version": project.version
+		expand "version": inputs.properties.version
 	}
 }
 
@@ -55,74 +104,100 @@ java {
 	// if it is present.
 	// If you remove this line, sources will not be generated.
 	withSourcesJar()
+	
+	sourceCompatibility = JavaVersion.VERSION_17
+	targetCompatibility = JavaVersion.VERSION_17
 }
 
 jar {
+	inputs.property "archivesName", project.base.archivesName
+	
 	from("LICENSE") {
-		rename { "${it}_${project.archivesBaseName}"}
-	}
-}
-
-// configure the maven publication
-publishing {
-	publications {
-		mavenJava(MavenPublication) {
-			from components.java
-		}
+		rename {"${it}_${inputs.properties.archivesName}"}
 	}
 	
-	// See https://docs.gradle.org/current/userguide/publishing_maven.html for information on how to set up publishing.
-	repositories {
-		// Add repositories to publish to here.
-		// Notice: This block does NOT have the same function as the block in the top level.
-		// The repositories here will be used for publishing your artifact, not for
-		// retrieving dependencies.
+	exclude("intentionally_untranslated.json")
+}
+
+import com.diffplug.spotless.generic.LicenseHeaderStep
+spotless {
+	lineEndings = "WINDOWS"
+	java {
+		removeUnusedImports()
+		leadingSpacesToTabs()
+		trimTrailingWhitespace()
+		eclipse().configFile(file("codestyle/formatter.xml"))
+		}
+	format("licenseHeader") {
+		target("src/*/java/**/*.java", "src/test/java/**/*.java")
+		def header_file = file("codestyle/license_header.txt")
+		def delimiter = LicenseHeaderStep.DEFAULT_JAVA_HEADER_DELIMITER
+		licenseHeaderFile(header_file, delimiter).updateYearWithLatest(true)
+	}
+	json {
+		target "src/**/*.json"
+		gson().indentWithSpaces(2).version("2.10.1")
 	}
 }
 
-curseforge {
-	if (ENV.CURSEFORGE_API_KEY) {
-		apiKey = ENV.CURSEFORGE_API_KEY
+
+def getGhVersion() {
+	return "v" + version.substring(0, version.indexOf("-MC"))
+}
+
+def getChangelogUrl() {
+	def modSlug = archives_base_name.toLowerCase()
+	def versionSlug = version.substring(0, version.indexOf("-MC")).replace(".", "-")
+	return "https://www.wimods.net/${modSlug}/${modSlug}-${versionSlug}/"
+}
+
+publishMods {
+	file = remapJar.archiveFile
+	def archivesName = base.archivesName.get() as String
+	additionalFiles.from(
+		file("${project.buildDir}/libs/${archivesName}-${project.version}-sources.jar"),
+	)
+	type = getGhVersion().contains("pre") ? BETA : STABLE
+	modLoaders.add("fabric")
+	def changelogUrl = getChangelogUrl()
+	
+	curseforge {
+		projectId = "349630"
+		accessToken = providers.environmentVariable("CURSEFORGE_API_KEY")
+		minecraftVersions.add("${project.cf_game_version}")
+		requires("fabric-api")
+		changelog = "A changelog can be found at: [${changelogUrl}](${changelogUrl}?mc=${project.minecraft_version}&utm_source=CurseForge&utm_medium=WI+Zoom&utm_campaign=Changelog&utm_content=CurseForge+WI+Zoom+MC${project.minecraft_version})"
 	}
-
-	project {
-		id = "349630"
-		changelogType = "html"
-		changelog = file("changelog.txt")
-		releaseType = "release"
-		addGameVersion "1.20.1"
-		addGameVersion "Fabric"
-
-		mainArtifact(file("${project.buildDir}/libs/${archivesBaseName}-${version}.jar"))
-		addArtifact file("${project.buildDir}/libs/${archivesBaseName}-${version}-sources.jar")
-		addArtifact file("${project.buildDir}/libs/${archivesBaseName}-${version}-dev.jar")
-		addArtifact file("${project.buildDir}/libs/${archivesBaseName}-${version}-sources-dev.jar")
-		
-		relations {
-			requiredDependency "fabric-api"
+	modrinth {
+		projectId = "o7DitHWP"
+		accessToken = providers.environmentVariable("MODRINTH_TOKEN")
+		minecraftVersions.add("${project.minecraft_version}")
+		requires("fabric-api")
+		changelog = "A changelog can be found at: [${changelogUrl}](${changelogUrl}?mc=${project.minecraft_version}&utm_source=Modrinth&utm_medium=WI+Zoom&utm_campaign=Changelog&utm_content=Modrinth+WI+Zoom+MC${project.minecraft_version})"
 		}
 	}
 
-	options {
-		forgeGradleIntegration = false
+import groovy.json.JsonSlurper
+
+tasks.register("getCurseforgeId") {
+	inputs.file publishCurseforge.result
+	doLast {
+		def result = new JsonSlurper().parseText(publishCurseforge.result.get().asFile.text)
+		println "CURSEFORGE_FILE_ID=${result.fileId}"
 	}
 }
 
 afterEvaluate {
-	tasks.curseforge349630.dependsOn moveDevLibs
-}
-
-task moveDevLibs(dependsOn: [remapJar, remapSourcesJar]) {
-	doLast {
-		ant.move(file:"${project.buildDir}/devlibs/${archivesBaseName}-${version}-dev.jar", tofile:"${project.buildDir}/libs/${archivesBaseName}-${version}-dev.jar")
-		ant.move(file:"${project.buildDir}/devlibs/${archivesBaseName}-${version}-sources.jar", tofile:"${project.buildDir}/libs/${archivesBaseName}-${version}-sources-dev.jar")
-	}
+	tasks.publishMods.dependsOn build
+	tasks.publishCurseforge.dependsOn build
+	tasks.publishModrinth.dependsOn build
+	tasks.getCurseforgeId.dependsOn publishCurseforge
 }
 
 import org.kohsuke.github.GHReleaseBuilder
 import org.kohsuke.github.GitHub
 
-task github(dependsOn: moveDevLibs) {
+task github(dependsOn: build) {
 	onlyIf {
 		ENV.GITHUB_TOKEN
 	}
@@ -130,17 +205,100 @@ task github(dependsOn: moveDevLibs) {
 	doLast {
 		def github = GitHub.connectUsingOAuth(ENV.GITHUB_TOKEN as String)
 		def repository = github.getRepository("Wurst-Imperium-MCX/WI-Zoom")
-		def ghVersion = "v" + version.substring(0, version.indexOf("-"))
+		def ghVersion = getGhVersion()
 		
-		def ghRelease = repository.getReleaseByTagName(ghVersion as String);
+		def ghRelease = repository.getReleaseByTagName(ghVersion as String)
 		if(ghRelease == null) {
 			def releaseBuilder = new GHReleaseBuilder(repository, ghVersion as String)
 			ghRelease = releaseBuilder.create()
 		}
 		
-		ghRelease.uploadAsset(remapJar.archiveFile.get().getAsFile(), "application/java-archive");
+		ghRelease.uploadAsset(remapJar.archiveFile.get().getAsFile(), "application/java-archive")
 		ghRelease.uploadAsset(remapSourcesJar.archiveFile.get().getAsFile(), "application/java-archive")
-		ghRelease.uploadAsset(new File("${project.buildDir}/libs/${archivesBaseName}-${version}-dev.jar"), "application/java-archive")
-		ghRelease.uploadAsset(new File("${project.buildDir}/libs/${archivesBaseName}-${version}-sources-dev.jar"), "application/java-archive")
+	}
+}
+import java.time.LocalDate
+import org.kohsuke.github.GHIssueState
+import org.kohsuke.github.GHMilestoneState
+import java.time.ZoneId
+
+task closeMilestone {
+	onlyIf {
+		ENV.GITHUB_TOKEN
+	}
+	
+	doLast {
+		def github = GitHub.connectUsingOAuth(ENV.GITHUB_TOKEN as String)
+		def repository = github.getRepository("Wurst-Imperium/WI-Zoom")
+		def ghVersion = getGhVersion()
+		
+		// Weird API design: listMilestones() requires GHIssueState while everything else uses GHMilestoneState.
+		def milestone = repository.listMilestones(GHIssueState.ALL).find { it.title == ghVersion }
+		if (milestone == null) {
+			milestone = repository.createMilestone(ghVersion, "")
+		}
+		
+		if (milestone.getState() != GHMilestoneState.CLOSED) {
+			milestone.setDueOn(Date.from(LocalDate.now().atStartOfDay(ZoneId.systemDefault()).toInstant()))
+			milestone.setDescription(getChangelogUrl())
+			milestone.close()
+		}
+	}
+}
+
+task uploadBackups {
+	dependsOn build
+	
+	onlyIf {
+		ENV.WI_BACKUPS_API_KEY
+	}
+	
+	doLast {
+		def shortVersion = getGhVersion().substring(1)
+		def backupUrl = "https://api.wurstclient.net/artifact-backups/WI-Zoom/${shortVersion}"
+		
+		def maxRetries = 3
+		def retryCount = 0
+		def success = false
+		
+		while (!success && retryCount < maxRetries) {
+			try {
+				def connection = new URL(backupUrl).openConnection() as HttpURLConnection
+				def boundary = UUID.randomUUID().toString()
+				connection.setRequestMethod("POST")
+				connection.setRequestProperty("X-API-Key", ENV.WI_BACKUPS_API_KEY)
+				connection.setRequestProperty("Accept", "application/json")
+				connection.setRequestProperty("Content-Type", "multipart/form-data; boundary=$boundary")
+				connection.doOutput = true
+				
+				def output = connection.outputStream
+				[remapJar, remapSourcesJar].each { jarTask ->
+					def file = jarTask.archiveFile.get().asFile
+					output << "--${boundary}\r\n"
+					output << "Content-Disposition: form-data; name=\"files\"; filename=\"${file.name}\"\r\n"
+					output << "Content-Type: application/java-archive\r\n\r\n"
+					file.withInputStream { input -> 
+						output << input
+					}
+					output << "\r\n"
+				}
+				output << "--${boundary}--\r\n"
+				output.flush()
+				
+				if(connection.responseCode != 200) {
+					throw new IOException("HTTP ${connection.responseCode}: ${connection.responseMessage}")
+				}
+				
+				success = true
+				
+			} catch (Exception e) {
+				retryCount++
+				if (retryCount >= maxRetries) {
+					throw new GradleException("Failed to upload backups after ${maxRetries} attempts: ${e.message}")
+				}
+				println "Upload attempt ${retryCount} failed: ${e.message}. Retrying in 5 seconds..."
+				Thread.sleep(5000)
+			}
+		}
 	}
 }
