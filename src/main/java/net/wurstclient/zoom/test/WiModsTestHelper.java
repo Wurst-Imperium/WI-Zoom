@@ -146,7 +146,7 @@ public enum WiModsTestHelper
 				return false;
 			
 			return !titleScreen.doBackgroundFade || Util
-				.getMeasuringTimeMs() > titleScreen.backgroundFadeStart + 1000;
+				.getMeasuringTimeMs() > titleScreen.backgroundFadeStart + 2000;
 		});
 	}
 	
