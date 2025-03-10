@@ -1,13 +1,13 @@
 buildscript {
 	dependencies {
-		classpath 'org.kohsuke:github-api:1.326'
+		classpath "org.kohsuke:github-api:1.327"
 	}
 }
 
 plugins {
-	id "fabric-loom" version "1.8-SNAPSHOT"
-	id "me.modmuss50.mod-publish-plugin" version "0.5.2"
-	id "com.diffplug.spotless" version "6.25.0"
+	id "fabric-loom" version "1.10-SNAPSHOT"
+	id "me.modmuss50.mod-publish-plugin" version "0.8.4"
+	id "com.diffplug.spotless" version "7.0.2"
 }
 
 def ENV = System.getenv()
@@ -27,6 +27,16 @@ repositories {
 	// for more information about repositories.
 }
 
+// Override vulnerable dependencies until Minecraft updates to newer versions
+configurations.all {
+	resolutionStrategy {
+		// v4.1.97.Final, used by Minecraft 1.21 - 1.21.3, is vulnerable to CVE-2024-47535
+		force "io.netty:netty-common:4.1.118.Final"
+		// v4.1.97.Final, used by Minecraft 1.21 - 1.21.3, is vulnerable to CVE-2025-24970
+		force "io.netty:netty-handler:4.1.118.Final"
+	}
+}
+
 dependencies {
 	// To change the versions see the gradle.properties file
 	minecraft "com.mojang:minecraft:${project.minecraft_version}"
@@ -37,11 +47,60 @@ dependencies {
 	modImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}"
 }
 
+loom {
+	accessWidenerPath = file("src/main/resources/wi-zoom.accesswidener")
+}
+
+configurations {
+	productionRuntime {
+		extendsFrom configurations.minecraftLibraries
+		extendsFrom configurations.loaderLibraries
+		extendsFrom configurations.minecraftRuntimeLibraries
+	}
+}
+
+dependencies {
+	productionRuntime "net.fabricmc:fabric-loader:${project.loader_version}"
+	productionRuntime "net.fabricmc:intermediary:${project.minecraft_version}"
+}
+
+import net.fabricmc.loom.util.Platform
+tasks.register('runEndToEndTest', JavaExec) {
+	dependsOn remapJar, downloadAssets
+	classpath.from configurations.productionRuntime
+	mainClass = "net.fabricmc.loader.impl.launch.knot.KnotClient"
+	workingDir = file("run")
+	
+	doFirst {
+		classpath.from loom.minecraftProvider.minecraftClientJar
+		workingDir.mkdirs()
+		
+		args(
+			"--assetIndex", loom.minecraftProvider.versionInfo.assetIndex().fabricId(loom.minecraftProvider.minecraftVersion()),
+			"--assetsDir", new File(loom.files.userCache, "assets").absolutePath,
+			"--gameDir", workingDir.absolutePath
+		)
+		
+		if (Platform.CURRENT.operatingSystem.isMacOS()) {
+			jvmArgs("-XstartOnFirstThread")
+		}
+		
+		jvmArgs(
+			"-Dfabric.addMods=${configurations.modImplementation.find { it.name.contains('fabric-api') }.absolutePath}${File.pathSeparator}${remapJar.archiveFile.get().asFile.absolutePath}",
+			"-Dwi_zoom.e2eTest",
+			"-Dfabric-tag-conventions-v2.missingTagTranslationWarning=fail",
+			"-Dfabric-tag-conventions-v1.legacyTagWarning=fail",
+			"-Dmixin.debug.verify=true",
+			"-Dmixin.debug.countInjections=true"
+		)
+	}
+}
+
 processResources {
 	inputs.property "version", project.version
 	
 	filesMatching("fabric.mod.json") {
-		expand "version": project.version
+		expand "version": inputs.properties.version
 	}
 }
 
@@ -61,18 +120,29 @@ java {
 }
 
 jar {
+	inputs.property "archivesName", project.base.archivesName
+	
 	from("LICENSE") {
-		rename { "${it}_${project.base.archivesName.get()}"}
+		rename {"${it}_${inputs.properties.archivesName}"}
 	}
+	
+	exclude("intentionally_untranslated.json")
 }
 
+import com.diffplug.spotless.generic.LicenseHeaderStep
 spotless {
-	lineEndings("WINDOWS")
+	lineEndings = "WINDOWS"
 	java {
 		removeUnusedImports()
-		indentWithTabs()
+		leadingSpacesToTabs()
 		trimTrailingWhitespace()
 		eclipse().configFile(file("codestyle/formatter.xml"))
+	}
+	format("licenseHeader") {
+		target("src/*/java/**/*.java", "src/test/java/**/*.java")
+		def header_file = file("codestyle/license_header.txt")
+		def delimiter = LicenseHeaderStep.DEFAULT_JAVA_HEADER_DELIMITER
+		licenseHeaderFile(header_file, delimiter).updateYearWithLatest(true)
 	}
 	json {
 		target "src/**/*.json"
@@ -80,19 +150,25 @@ spotless {
 	}
 }
 
+def getGhVersion() {
+	return "v" + version.substring(0, version.indexOf("-MC"))
+}
+
+def getChangelogUrl() {
+	def modSlug = archives_base_name.toLowerCase()
+	def versionSlug = version.substring(0, version.indexOf("-MC")).replace(".", "-")
+	return "https://www.wimods.net/${modSlug}/${modSlug}-${versionSlug}/"
+}
+
 publishMods {
 	file = remapJar.archiveFile
-	def versionString = project.version as String
-	def ghVersion = "v" + versionString.substring(0, versionString.indexOf("-"))
-	def changelogUrl = "https://www.wimods.net/wi-zoom/wi-zoom-1-5/"
-	def archivesName = project.base.archivesName.get() as String
+	def archivesName = base.archivesName.get() as String
 	additionalFiles.from(
-		file("${project.buildDir}/libs/${archivesName}-${versionString}-sources.jar"),
-		file("${project.buildDir}/libs/${archivesName}-${versionString}-dev.jar"),
-		file("${project.buildDir}/libs/${archivesName}-${versionString}-sources-dev.jar")
+		file("${project.buildDir}/libs/${archivesName}-${project.version}-sources.jar"),
 	)
-	type = ghVersion.contains("pre") ? BETA : STABLE
+	type = getGhVersion().contains("pre") ? BETA : STABLE
 	modLoaders.add("fabric")
+	def changelogUrl = getChangelogUrl()
 	
 	curseforge {
 		projectId = "349630"
@@ -110,24 +186,27 @@ publishMods {
 	}
 }
 
-afterEvaluate {
-	tasks.publishMods.dependsOn moveDevLibs
-	tasks.publishCurseforge.dependsOn moveDevLibs
-	tasks.publishModrinth.dependsOn moveDevLibs
+import groovy.json.JsonSlurper
+
+tasks.register("getCurseforgeId") {
+	inputs.file publishCurseforge.result
+	doLast {
+		def result = new JsonSlurper().parseText(publishCurseforge.result.get().asFile.text)
+		println "CURSEFORGE_FILE_ID=${result.fileId}"
+	}
 }
 
-task moveDevLibs(dependsOn: [remapJar, remapSourcesJar]) {
-	doLast {
-		def archivesName = project.base.archivesName.get() as String
-		ant.move(file:"${project.buildDir}/devlibs/${archivesName}-${version}-dev.jar", tofile:"${project.buildDir}/libs/${archivesName}-${version}-dev.jar")
-		ant.move(file:"${project.buildDir}/devlibs/${archivesName}-${version}-sources.jar", tofile:"${project.buildDir}/libs/${archivesName}-${version}-sources-dev.jar")
-	}
+afterEvaluate {
+	tasks.publishMods.dependsOn build
+	tasks.publishCurseforge.dependsOn build
+	tasks.publishModrinth.dependsOn build
+	tasks.getCurseforgeId.dependsOn publishCurseforge
 }
 
 import org.kohsuke.github.GHReleaseBuilder
 import org.kohsuke.github.GitHub
 
-task github(dependsOn: moveDevLibs) {
+task github(dependsOn: build) {
 	onlyIf {
 		ENV.GITHUB_TOKEN
 	}
@@ -135,8 +214,7 @@ task github(dependsOn: moveDevLibs) {
 	doLast {
 		def github = GitHub.connectUsingOAuth(ENV.GITHUB_TOKEN as String)
 		def repository = github.getRepository("Wurst-Imperium-MCX/WI-Zoom")
-		def ghVersion = "v" + version.substring(0, version.indexOf("-"))
-		def archivesName = project.base.archivesName.get() as String
+		def ghVersion = getGhVersion()
 		
 		def ghRelease = repository.getReleaseByTagName(ghVersion as String)
 		if(ghRelease == null) {
@@ -146,7 +224,90 @@ task github(dependsOn: moveDevLibs) {
 		
 		ghRelease.uploadAsset(remapJar.archiveFile.get().getAsFile(), "application/java-archive")
 		ghRelease.uploadAsset(remapSourcesJar.archiveFile.get().getAsFile(), "application/java-archive")
-		ghRelease.uploadAsset(new File("${project.buildDir}/libs/${archivesName}-${version}-dev.jar"), "application/java-archive")
-		ghRelease.uploadAsset(new File("${project.buildDir}/libs/${archivesName}-${version}-sources-dev.jar"), "application/java-archive")
+	}
+}
+import java.time.LocalDate
+import org.kohsuke.github.GHIssueState
+import org.kohsuke.github.GHMilestoneState
+import java.time.ZoneId
+
+task closeMilestone {
+	onlyIf {
+		ENV.GITHUB_TOKEN
+	}
+	
+	doLast {
+		def github = GitHub.connectUsingOAuth(ENV.GITHUB_TOKEN as String)
+		def repository = github.getRepository("Wurst-Imperium/WI-Zoom")
+		def ghVersion = getGhVersion()
+		
+		// Weird API design: listMilestones() requires GHIssueState while everything else uses GHMilestoneState.
+		def milestone = repository.listMilestones(GHIssueState.ALL).find { it.title == ghVersion }
+		if (milestone == null) {
+			milestone = repository.createMilestone(ghVersion, "")
+		}
+		
+		if (milestone.getState() != GHMilestoneState.CLOSED) {
+			milestone.setDueOn(Date.from(LocalDate.now().atStartOfDay(ZoneId.systemDefault()).toInstant()))
+			milestone.setDescription(getChangelogUrl())
+			milestone.close()
+		}
+	}
+}
+
+task uploadBackups {
+	dependsOn build
+	
+	onlyIf {
+		ENV.WI_BACKUPS_API_KEY
+	}
+	
+	doLast {
+		def shortVersion = getGhVersion().substring(1)
+		def backupUrl = "https://api.wurstclient.net/artifact-backups/WI-Zoom/${shortVersion}"
+		
+		def maxRetries = 3
+		def retryCount = 0
+		def success = false
+		
+		while (!success && retryCount < maxRetries) {
+			try {
+				def connection = new URL(backupUrl).openConnection() as HttpURLConnection
+				def boundary = UUID.randomUUID().toString()
+				connection.setRequestMethod("POST")
+				connection.setRequestProperty("X-API-Key", ENV.WI_BACKUPS_API_KEY)
+				connection.setRequestProperty("Accept", "application/json")
+				connection.setRequestProperty("Content-Type", "multipart/form-data; boundary=$boundary")
+				connection.doOutput = true
+				
+				def output = connection.outputStream
+				[remapJar, remapSourcesJar].each { jarTask ->
+					def file = jarTask.archiveFile.get().asFile
+					output << "--${boundary}\r\n"
+					output << "Content-Disposition: form-data; name=\"files\"; filename=\"${file.name}\"\r\n"
+					output << "Content-Type: application/java-archive\r\n\r\n"
+					file.withInputStream { input -> 
+						output << input
+					}
+					output << "\r\n"
+				}
+				output << "--${boundary}--\r\n"
+				output.flush()
+				
+				if(connection.responseCode != 200) {
+					throw new IOException("HTTP ${connection.responseCode}: ${connection.responseMessage}")
+				}
+				
+				success = true
+				
+			} catch (Exception e) {
+				retryCount++
+				if (retryCount >= maxRetries) {
+					throw new GradleException("Failed to upload backups after ${maxRetries} attempts: ${e.message}")
+				}
+				println "Upload attempt ${retryCount} failed: ${e.message}. Retrying in 5 seconds..."
+				Thread.sleep(5000)
+			}
+		}
 	}
 }
