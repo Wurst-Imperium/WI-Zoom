@@ -31,10 +31,9 @@ import net.minecraft.client.gui.screens.LevelLoadingScreen;
 import net.minecraft.client.gui.screens.PauseScreen;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.gui.screens.TitleScreen;
+import net.minecraft.client.gui.screens.controls.KeyBindsList;
+import net.minecraft.client.gui.screens.controls.KeyBindsScreen;
 import net.minecraft.client.gui.screens.inventory.InventoryScreen;
-import net.minecraft.client.gui.screens.options.controls.KeyBindsList;
-import net.minecraft.client.gui.screens.options.controls.KeyBindsList.Entry;
-import net.minecraft.client.gui.screens.options.controls.KeyBindsScreen;
 import net.minecraft.client.multiplayer.ClientPacketListener;
 import net.minecraft.client.resources.language.I18n;
 import net.minecraft.client.tutorial.TutorialSteps;
@@ -302,7 +301,7 @@ public enum WiModsTestHelper
 				if(!(drawable instanceof KeyBindsList list))
 					continue;
 				
-				for(Entry entry : list.children())
+				for(KeyBindsList.Entry entry : list.children())
 				{
 					if(!(entry instanceof KeyBindsList.KeyEntry kbEntry))
 						continue;

@@ -100,16 +100,6 @@ configurations {
 	runtimeClasspath.extendsFrom localRuntime
 }
 
-configurations.all {
-	resolutionStrategy {
-		force "com.microsoft.azure:msal4j:1.17.2"
-		// Override vulnerable netty-common dependency until Minecraft updates
-		// to a newer version. v4.1.97.Final, used by Minecraft 1.21 - 1.21.3,
-		// is vulnerable to CVE-2024-47535.
-		force "io.netty:netty-common:4.1.115.Final"
-	}
-}
-
 dependencies {
 	// Specify the version of Minecraft to use.
 	// Depending on the plugin applied there are several options. We will assume you applied the userdev plugin as shown above.
