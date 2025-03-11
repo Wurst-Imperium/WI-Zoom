@@ -293,33 +293,28 @@ public enum WiModsTestHelper
 	{
 		waitUntil("edit button for " + translationKey + " is visible", mc -> {
 			Screen screen = mc.screen;
-			if(!(screen instanceof KeyBindsScreen))
+			if(!(screen instanceof KeyBindsScreen kbScreen))
 				throw new RuntimeException(
 					"clickEditKeybindButton() must be called from the Key Binds screen. Current screen: "
 						+ screen);
 			
-			for(Renderable drawable : screen.renderables)
+			KeyBindsList list = kbScreen.keyBindsList;
+			for(KeyBindsList.Entry entry : list.children())
 			{
-				if(!(drawable instanceof KeyBindsList list))
+				if(!(entry instanceof KeyBindsList.KeyEntry kbEntry))
 					continue;
 				
-				for(KeyBindsList.Entry entry : list.children())
-				{
-					if(!(entry instanceof KeyBindsList.KeyEntry kbEntry))
-						continue;
-					
-					if(!translationKey.equals(kbEntry.key.getName()))
-						continue;
-					
-					int x = kbEntry.changeButton.getX() + list.getX()
-						+ kbEntry.changeButton.getWidth() / 2;
-					int y = kbEntry.changeButton.getY()
-						+ kbEntry.changeButton.getHeight() / 2;
-					System.out.println("Clicking at " + x + ", " + y);
-					screen.mouseClicked(x, y, 0);
-					screen.mouseReleased(x, y, 0);
-					return true;
-				}
+				if(!translationKey.equals(kbEntry.key.getName()))
+					continue;
+				
+				int x = kbEntry.changeButton.getX()
+					+ kbEntry.changeButton.getWidth() / 2;
+				int y = kbEntry.changeButton.getY()
+					+ kbEntry.changeButton.getHeight() / 2;
+				System.out.println("Clicking at " + x + ", " + y);
+				screen.mouseClicked(x, y, 0);
+				screen.mouseReleased(x, y, 0);
+				return true;
 			}
 			
 			return false;
