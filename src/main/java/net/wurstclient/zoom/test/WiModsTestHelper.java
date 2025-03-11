@@ -18,6 +18,7 @@ import java.util.function.Predicate;
 import com.mojang.brigadier.ParseResults;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 
+import net.minecraft.Util;
 import net.minecraft.client.CameraType;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.Screenshot;
@@ -141,7 +142,8 @@ public enum WiModsTestHelper
 			if(!(mc.screen instanceof TitleScreen titleScreen))
 				return false;
 			
-			return !titleScreen.fading;
+			return !titleScreen.fading
+				|| Util.getMillis() > titleScreen.fadeInStart + 2000;
 		});
 	}
 	

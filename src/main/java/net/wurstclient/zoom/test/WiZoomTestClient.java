@@ -16,7 +16,6 @@ import org.spongepowered.asm.mixin.MixinEnvironment;
 
 import net.minecraft.SharedConstants;
 import net.minecraft.client.gui.screens.AccessibilityOnboardingScreen;
-import net.minecraft.client.gui.screens.ConfirmScreen;
 import net.minecraft.client.gui.screens.OptionsScreen;
 import net.minecraft.client.gui.screens.TitleScreen;
 import net.minecraft.client.gui.screens.controls.ControlsScreen;
@@ -30,11 +29,13 @@ public final class WiZoomTestClient
 {
 	public static void start()
 	{
-		Thread.ofVirtual().name("WI Zoom End-to-End Test")
-			.uncaughtExceptionHandler((t, e) -> {
-				e.printStackTrace();
-				System.exit(1);
-			}).start(new WiZoomTestClient()::runTests);
+		Thread thread = new Thread(new WiZoomTestClient()::runTests,
+			"WI Zoom End-to-End Test");
+		thread.setUncaughtExceptionHandler((t, e) -> {
+			e.printStackTrace();
+			System.exit(1);
+		});
+		thread.start();
 	}
 	
 	private void runTests()
@@ -81,10 +82,6 @@ public final class WiZoomTestClient
 		
 		System.out.println("Creating test world");
 		clickButton("selectWorld.create");
-		
-		// NeoForge for 1.20.5 uses experimental features
-		waitForScreen(ConfirmScreen.class);
-		clickButton("gui.yes");
 		
 		waitForWorldLoad();
 		dismissTutorialToasts();
@@ -161,6 +158,7 @@ public final class WiZoomTestClient
 		clickButton("gui.done");
 		clickButton("gui.done");
 		clickButton("gui.done");
+		clickButton("menu.returnToGame");
 		
 		testZoomWithChangedKeybind();
 		
