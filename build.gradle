@@ -156,10 +156,23 @@ def getGhVersion() {
 	return "v" + version.substring(0, version.indexOf("-MC"))
 }
 
-def getChangelogUrl() {
-	def modSlug = archives_base_name.toLowerCase()
-	def versionSlug = version.substring(0, version.indexOf("-MC")).replace(".", "-")
-	return "https://www.wimods.net/${modSlug}/${modSlug}-${versionSlug}/"
+def getChangelog(String platform) {
+	def modName = "WI+Zoom"
+	def modLoader = "Fabric"
+	def shortVersion = version.substring(0, version.indexOf("-MC"))
+	def mcVersion = project.minecraft_version
+	
+	def modSlug = modName.toLowerCase().replace("+", "-")
+	def versionSlug = shortVersion.replace(".", "-")
+	def shortUrl = "https://www.wimods.net/${modSlug}/${modSlug}-${versionSlug}/"
+	def fullUrl = "${shortUrl}?mc=${mcVersion}&utm_source=${platform}&utm_medium=${modName}"
+	
+	def from = platform == "CurseForge" ? "curseforge.com/minecraft/mc-mods/wi-zoom/version/${version}" : "modrinth.com/mod/wi-zoom/version/${version}"
+	def to = java.net.URLEncoder.encode(fullUrl, "UTF-8")
+	
+	def goUrl = "https://go.wimods.net/from/${from}?to=${to}"
+	def imgUrl = "https://img.wimods.net/${from}?mc=${mcVersion}&mod_loader=${modLoader}"
+	return "A changelog can be found at: [${shortUrl}](${goUrl})![](${imgUrl})"
 }
 
 publishMods {
@@ -170,21 +183,20 @@ publishMods {
 	)
 	type = getGhVersion().contains("pre") ? BETA : STABLE
 	modLoaders.add("fabric")
-	def changelogUrl = getChangelogUrl()
 	
 	curseforge {
 		projectId = "349630"
 		accessToken = providers.environmentVariable("CURSEFORGE_API_KEY")
 		minecraftVersions.add("${project.cf_game_version}")
 		requires("fabric-api")
-		changelog = "A changelog can be found at: [${changelogUrl}](${changelogUrl}?mc=${project.minecraft_version}&utm_source=CurseForge&utm_medium=WI+Zoom&utm_campaign=Changelog&utm_content=CurseForge+WI+Zoom+MC${project.minecraft_version})"
+		changelog = getChangelog("CurseForge")
 	}
 	modrinth {
 		projectId = "o7DitHWP"
 		accessToken = providers.environmentVariable("MODRINTH_TOKEN")
 		minecraftVersions.add("${project.minecraft_version}")
 		requires("fabric-api")
-		changelog = "A changelog can be found at: [${changelogUrl}](${changelogUrl}?mc=${project.minecraft_version}&utm_source=Modrinth&utm_medium=WI+Zoom&utm_campaign=Changelog&utm_content=Modrinth+WI+Zoom+MC${project.minecraft_version})"
+		changelog = getChangelog("Modrinth")
 	}
 }
 
