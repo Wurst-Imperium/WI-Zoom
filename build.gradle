@@ -156,15 +156,18 @@ def getGhVersion() {
 	return "v" + version.substring(0, version.indexOf("-MC"))
 }
 
+def getChangelogUrl() {
+	def modSlug = archives_base_name.toLowerCase()
+	def versionSlug = version.substring(0, version.indexOf("-MC")).replace(".", "-")
+	return "https://www.wimods.net/${modSlug}/${modSlug}-${versionSlug}/"
+}
+
 def getChangelog(String platform) {
 	def modName = "WI+Zoom"
 	def modLoader = "Fabric"
-	def shortVersion = version.substring(0, version.indexOf("-MC"))
 	def mcVersion = project.minecraft_version
 	
-	def modSlug = modName.toLowerCase().replace("+", "-")
-	def versionSlug = shortVersion.replace(".", "-")
-	def shortUrl = "https://www.wimods.net/${modSlug}/${modSlug}-${versionSlug}/"
+	def shortUrl = getChangelogUrl()
 	def fullUrl = "${shortUrl}?mc=${mcVersion}&utm_source=${platform}&utm_medium=${modName}"
 	
 	def from = platform == "CurseForge" ? "curseforge.com/minecraft/mc-mods/wi-zoom/version/${version}" : "modrinth.com/mod/wi-zoom/version/${version}"
