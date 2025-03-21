@@ -1,6 +1,6 @@
 buildscript {
 	dependencies {
-		classpath "org.kohsuke:github-api:1.326"
+		classpath "org.kohsuke:github-api:1.327"
 	}
 }
 
@@ -10,8 +10,8 @@ plugins {
 	id "idea"
 	// NeoGradle. Check the latest version at:
 	// https://projects.neoforged.net/neoforged/neogradle
-	id "net.neoforged.gradle.userdev" version "7.0.180"
-	id "net.neoforged.gradle.mixin" version "7.0.180"
+	id "net.neoforged.gradle.userdev" version "7.0.183"
+	id "net.neoforged.gradle.mixin" version "7.0.183"
 	id "me.modmuss50.mod-publish-plugin" version "0.8.4"
 	id "com.diffplug.spotless" version "7.0.2"
 }
@@ -194,7 +194,7 @@ processResources {
 	inputs.property "version", project.version
 	
 	filesMatching("fabric.mod.json") {
-		expand "version": project.version
+		expand "version": inputs.properties.version
 	}
 }
 
@@ -216,7 +216,7 @@ jar {
 
 import com.diffplug.spotless.generic.LicenseHeaderStep
 spotless {
-	lineEndings("WINDOWS")
+	lineEndings = "WINDOWS"
 	java {
 		removeUnusedImports()
 		leadingSpacesToTabs()
@@ -239,10 +239,23 @@ def getGhVersion() {
 	return "v" + version.substring(0, version.indexOf("-MC"))
 }
 
-def getChangelogUrl() {
-	def modSlug = mod_name.toLowerCase().replace(" ", "-")
-	def versionSlug = version.substring(0, version.indexOf("-MC")).replace(".", "-")
-	return "https://www.wimods.net/${modSlug}/${modSlug}-${versionSlug}/"
+def getChangelog(String platform) {
+	def modName = "WI+Zoom"
+	def modLoader = "NeoForge"
+	def shortVersion = version.substring(0, version.indexOf("-MC"))
+	def mcVersion = project.minecraft_version
+	
+	def modSlug = modName.toLowerCase().replace("+", "-")
+	def versionSlug = shortVersion.replace(".", "-")
+	def shortUrl = "https://www.wimods.net/${modSlug}/${modSlug}-${versionSlug}/"
+	def fullUrl = "${shortUrl}?mc=${mcVersion}&utm_source=${platform}&utm_medium=${modName}"
+	
+	def from = platform == "CurseForge" ? "curseforge.com/minecraft/mc-mods/wi-zoom/version/${version}" : "modrinth.com/mod/wi-zoom/version/${version}"
+	def to = java.net.URLEncoder.encode(fullUrl, "UTF-8")
+	
+	def goUrl = "https://go.wimods.net/from/${from}?to=${to}"
+	def imgUrl = "https://img.wimods.net/${from}?mc=${mcVersion}&mod_loader=${modLoader}"
+	return "A changelog can be found at: [${shortUrl}](${goUrl})![](${imgUrl})"
 }
 
 publishMods {
@@ -253,19 +266,20 @@ publishMods {
 	}
 	type = getGhVersion().contains("pre") ? BETA : STABLE
 	modLoaders.add("neoforge")
-	def changelogUrl = getChangelogUrl()
 	
 	curseforge {
 		projectId = "349630"
 		accessToken = providers.environmentVariable("CURSEFORGE_API_KEY")
 		minecraftVersions.add("${project.cf_game_version}")
-		changelog = "A changelog can be found at: [${changelogUrl}](${changelogUrl}?mc=${project.minecraft_version}&utm_source=CurseForge&utm_medium=WI+Zoom&utm_campaign=Changelog&utm_content=CurseForge+WI+Zoom+MC${project.minecraft_version}-NeoForge)"
+		requires("fabric-api")
+		changelog = getChangelog("CurseForge")
 	}
 	modrinth {
 		projectId = "o7DitHWP"
 		accessToken = providers.environmentVariable("MODRINTH_TOKEN")
 		minecraftVersions.add("${project.minecraft_version}")
-		changelog = "A changelog can be found at: [${changelogUrl}](${changelogUrl}?mc=${project.minecraft_version}&utm_source=Modrinth&utm_medium=WI+Zoom&utm_campaign=Changelog&utm_content=Modrinth+WI+Zoom+MC${project.minecraft_version}-NeoForge)"
+		requires("fabric-api")
+		changelog = getChangelog("Modrinth")
 	}
 }
 
@@ -364,31 +378,50 @@ task uploadBackups {
 		def shortVersion = getGhVersion().substring(1)
 		def backupUrl = "https://api.wurstclient.net/artifact-backups/WI-Zoom/${shortVersion}"
 		
-		def connection = new URL(backupUrl).openConnection() as HttpURLConnection
-		def boundary = UUID.randomUUID().toString()
-		connection.setRequestMethod("POST")
-		connection.setRequestProperty("X-API-Key", ENV.WI_BACKUPS_API_KEY)
-		connection.setRequestProperty("Accept", "application/json")
-		connection.setRequestProperty("Content-Type", "multipart/form-data; boundary=$boundary")
-		connection.doOutput = true
+		def maxRetries = 3
+		def retryCount = 0
+		def success = false
 		
-		def output = connection.outputStream
-		def libsDir = layout.buildDirectory.dir("libs").get().asFile
-		def jarFiles = libsDir.listFiles().findAll { it.name.endsWith(".jar") }
-		
-		jarFiles.each { file ->
-			output << "--${boundary}\r\n"
-			output << "Content-Disposition: form-data; name=\"files\"; filename=\"${file.name}\"\r\n"
-			output << "Content-Type: application/java-archive\r\n\r\n"
-			file.withInputStream { input -> 
-				output << input
+		while (!success && retryCount < maxRetries) {
+			try {
+				def connection = new URL(backupUrl).openConnection() as HttpURLConnection
+				def boundary = UUID.randomUUID().toString()
+				connection.setRequestMethod("POST")
+				connection.setRequestProperty("X-API-Key", ENV.WI_BACKUPS_API_KEY)
+				connection.setRequestProperty("Accept", "application/json")
+				connection.setRequestProperty("Content-Type", "multipart/form-data; boundary=$boundary")
+				connection.doOutput = true
+				
+				def output = connection.outputStream
+				def libsDir = layout.buildDirectory.dir("libs").get().asFile
+				def jarFiles = libsDir.listFiles().findAll { it.name.endsWith(".jar") }
+				
+				jarFiles.each { file ->
+					output << "--${boundary}\r\n"
+					output << "Content-Disposition: form-data; name=\"files\"; filename=\"${file.name}\"\r\n"
+					output << "Content-Type: application/java-archive\r\n\r\n"
+					file.withInputStream { input -> 
+						output << input
+					}
+					output << "\r\n"
+				}
+				output << "--${boundary}--\r\n"
+				output.flush()
+				
+				if(connection.responseCode != 200) {
+					throw new IOException("HTTP ${connection.responseCode}: ${connection.responseMessage}")
+				}
+				
+				success = true
+				
+			} catch (Exception e) {
+				retryCount++
+				if (retryCount >= maxRetries) {
+					throw new GradleException("Failed to upload backups after ${maxRetries} attempts: ${e.message}")
+				}
+				println "Upload attempt ${retryCount} failed: ${e.message}. Retrying in 5 seconds..."
+				Thread.sleep(5000)
 			}
-			output << "\r\n"
 		}
-		output << "--${boundary}--\r\n"
-		output.flush()
-		
-		if(connection.responseCode != 200)
-			throw new GradleException("Failed to upload backups: ${connection.responseCode} ${connection.responseMessage}")
 	}
 }
