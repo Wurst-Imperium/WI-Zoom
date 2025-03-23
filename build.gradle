@@ -181,7 +181,6 @@ def getChangelog(String platform, String from) {
 }
 
 publishMods {
-	dryRun = true
 	def version = project.version
 	def archivesName = base.archivesName.get()
 	def modSlug = archivesName.toLowerCase()
