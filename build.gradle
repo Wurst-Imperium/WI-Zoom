@@ -156,50 +156,56 @@ def getGhVersion() {
 	return "v" + version.substring(0, version.indexOf("-MC"))
 }
 
-def getChangelogUrl() {
-	def modSlug = archives_base_name.toLowerCase()
-	def versionSlug = version.substring(0, version.indexOf("-MC")).replace(".", "-")
-	return "https://www.wimods.net/${modSlug}/${modSlug}-${versionSlug}/"
+def getChangelogLink(String platform, String from) {
+	def modSlug = project.archives_base_name.toLowerCase()
+	def versionSlug = getGhVersion().substring(1).replace(".", "-")
+	def shortURL = "https://www.wimods.net/${modSlug}/${modSlug}-${versionSlug}/"
+	def query = []
+	if (platform != "GitHub")
+		query.add("mc=${project.minecraft_version}")
+	query.add("utm_source=${platform}")
+	query.add("utm_medium=" + project.archives_base_name.replace("-", "+"))
+	def fullURL = shortURL + (query.isEmpty() ? "" : "?" + query.join("&"))
+	def encodedURL = java.net.URLEncoder.encode(fullURL, "UTF-8")
+	return "[${shortURL}](https://go.wimods.net/from/${from}?to=${encodedURL})"
 }
 
-def getChangelog(String platform) {
-	def modName = "WI+Zoom"
-	def modLoader = "Fabric"
-	def mcVersion = project.minecraft_version
-	
-	def shortUrl = getChangelogUrl()
-	def fullUrl = "${shortUrl}?mc=${mcVersion}&utm_source=${platform}&utm_medium=${modName}"
-	
-	def from = platform == "CurseForge" ? "curseforge.com/minecraft/mc-mods/wi-zoom/version/${version}" : "modrinth.com/mod/wi-zoom/version/${version}"
-	def to = java.net.URLEncoder.encode(fullUrl, "UTF-8")
-	
-	def goUrl = "https://go.wimods.net/from/${from}?to=${to}"
-	def imgUrl = "https://img.wimods.net/${from}?mc=${mcVersion}&mod_loader=${modLoader}"
-	return "A changelog can be found at: [${shortUrl}](${goUrl})![](${imgUrl})"
+def getChangelogImage(String from) {
+	return "![](https://img.wimods.net/${from})"
+}
+
+def getChangelog(String platform, String from) {
+	def prefix = platform == "GitHub" ? "" : "A changelog can be found at: "
+	def imgQuery = platform == "GitHub" ? "" : "?mc_version=${project.minecraft_version}&mod_loader=${project.mod_loader}"
+	return prefix + getChangelogLink(platform, from) + getChangelogImage(from + imgQuery)
 }
 
 publishMods {
-	file = remapJar.archiveFile
-	def archivesName = base.archivesName.get() as String
-	additionalFiles.from(
-		file("${project.buildDir}/libs/${archivesName}-${project.version}-sources.jar"),
-	)
+	dryRun = true
+	def version = project.version
+	def archivesName = base.archivesName.get()
+	def modSlug = archivesName.toLowerCase()
+	
 	type = getGhVersion().contains("pre") ? BETA : STABLE
-	modLoaders.add("fabric")
+	modLoaders.add(project.mod_loader.toLowerCase())
+	file = remapJar.archiveFile
+	additionalFiles.from(
+		file("${project.buildDir}/libs/${archivesName}-${version}-sources.jar"),
+	)
 	
 	curseforge {
-		projectId = "349630"
+		projectId = project.cf_project_id
 		accessToken = providers.environmentVariable("CURSEFORGE_API_KEY")
-		minecraftVersions.add("${project.cf_game_version}")
+		minecraftVersions.add(project.cf_game_version)
 		requires("fabric-api")
-		changelog = getChangelog("CurseForge")
+		changelog = getChangelog("CurseForge", "curseforge.com/minecraft/mc-mods/${modSlug}/version/${version}")
 	}
 	modrinth {
-		projectId = "o7DitHWP"
+		projectId = project.mr_project_id
 		accessToken = providers.environmentVariable("MODRINTH_TOKEN")
-		minecraftVersions.add("${project.minecraft_version}")
+		minecraftVersions.add(project.minecraft_version)
 		requires("fabric-api")
-		changelog = getChangelog("Modrinth")
+		changelog = getChangelog("Modrinth", "modrinth.com/mod/${modSlug}/version/${version}")
 	}
 }
 
@@ -230,12 +236,14 @@ task github(dependsOn: build) {
 	
 	doLast {
 		def github = GitHub.connectUsingOAuth(ENV.GITHUB_TOKEN as String)
-		def repository = github.getRepository("Wurst-Imperium-MCX/WI-Zoom")
+		def repoId = project.mcx_repo_id
+		def repository = github.getRepository(repoId)
 		def ghVersion = getGhVersion()
 		
 		def ghRelease = repository.getReleaseByTagName(ghVersion as String)
 		if(ghRelease == null) {
 			def releaseBuilder = new GHReleaseBuilder(repository, ghVersion as String)
+			releaseBuilder.setBody(getChangelogImage("github.com/${repoId}/releases/tag/${ghVersion}"))
 			ghRelease = releaseBuilder.create()
 		}
 		
@@ -256,7 +264,8 @@ task closeMilestone {
 	
 	doLast {
 		def github = GitHub.connectUsingOAuth(ENV.GITHUB_TOKEN as String)
-		def repository = github.getRepository("Wurst-Imperium/WI-Zoom")
+		def repoId = project.gh_repo_id
+		def repository = github.getRepository(repoId)
 		def ghVersion = getGhVersion()
 		
 		// Weird API design: listMilestones() requires GHIssueState while everything else uses GHMilestoneState.
@@ -267,7 +276,7 @@ task closeMilestone {
 		
 		if (milestone.getState() != GHMilestoneState.CLOSED) {
 			milestone.setDueOn(Date.from(LocalDate.now().atStartOfDay(ZoneId.systemDefault()).toInstant()))
-			milestone.setDescription(getChangelogUrl())
+			milestone.setDescription(getChangelog("GitHub", "github.com/${repoId}/milestone/${ghVersion}"))
 			milestone.close()
 		}
 	}
