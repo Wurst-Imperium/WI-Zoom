@@ -225,7 +225,7 @@ public final class WiZoomTestClient implements ClientModInitializer
 	
 	private void assertSelectedSlotIsZero()
 	{
-		if(submitAndGet(mc -> mc.player.getInventory().selectedSlot != 0))
+		if(submitAndGet(mc -> mc.player.getInventory().getSelectedSlot() != 0))
 			throw new RuntimeException(
 				"Scrolling up while zooming changed the selected slot");
 	}
