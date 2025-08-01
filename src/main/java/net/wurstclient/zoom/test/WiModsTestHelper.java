@@ -319,7 +319,7 @@ public enum WiModsTestHelper
 					int y = kbEntry.editButton.getY()
 						+ kbEntry.editButton.getHeight() / 2;
 					System.out.println("Clicking at " + x + ", " + y);
-					screen.mouseClicked(x, y, 0);
+					screen.mouseClicked(x, y, 0, false);
 					screen.mouseReleased(x, y, 0);
 					return true;
 				}
@@ -408,7 +408,7 @@ public enum WiModsTestHelper
 	
 	public static void toggleDebugHud()
 	{
-		submitAndWait(mc -> mc.inGameHud.getDebugHud().toggleDebugHud());
+		submitAndWait(mc -> mc.debugHudEntryList.toggleF3Enabled());
 	}
 	
 	public static void setPerspective(Perspective perspective)
