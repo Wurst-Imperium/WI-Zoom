@@ -1,0 +1,103 @@
+name: Test if old Fabric API works with new Snapshot
+
+on:
+  workflow_dispatch:
+    inputs:
+      mc_version:
+        description: "Minecraft version to test"
+        required: true
+      yarn_mappings:
+        description: "Yarn mappings version"
+        required: true
+      fabric_loader:
+        description: "Fabric Loader version"
+        required: true
+      fapi_version:
+        description: "Fabric API version"
+        required: true
+      cf_game_version:
+        description: "CurseForge GameVersion"
+        required: true
+      distinct_id:
+        description: "Automatically set by the return-dispatch action (leave blank if running manually)"
+        required: false
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+
+    - name: Echo distinct ID ${{ github.event.inputs.distinct_id }}
+      run: echo ${{ github.event.inputs.distinct_id }}
+
+    - name: Checkout repository
+      uses: actions/checkout@v4
+
+    - name: Set up Python 3.12
+      uses: actions/setup-python@v5
+      with:
+        python-version: "3.12"
+
+    - name: Set up Java 21
+      uses: actions/setup-java@v4
+      with:
+        java-version: "21"
+        distribution: "microsoft"
+
+    - name: Grant execute permission for gradlew
+      run: chmod +x gradlew
+
+    - name: Setup Gradle
+      uses: gradle/actions/setup-gradle@v4
+      with:
+        build-scan-publish: true
+        build-scan-terms-of-use-url: "https://gradle.com/help/legal-terms-of-use"
+        build-scan-terms-of-use-agree: "yes"
+
+    - name: Run migrateMappings task
+      run: |
+        ./gradlew migrateMappings --mappings ${{ github.event.inputs.yarn_mappings }}
+
+    - name: Replace src/main/java with remapped files
+      run: |
+        rm -rf ./src/main/java
+        mv ./remappedSrc ./src/main/java
+
+    - name: Update version constants
+      run: |
+        python scripts/update_version_constants.py \
+          "${{ github.event.inputs.mc_version }}" \
+          "${{ github.event.inputs.yarn_mappings }}" \
+          "${{ github.event.inputs.fabric_loader }}" \
+          "${{ github.event.inputs.fapi_version }}" \
+          "${{ github.event.inputs.cf_game_version }}"
+
+    # To fix any style issues that the migration scripts might cause
+    - name: Run spotlessApply task
+      run: ./gradlew spotlessApply
+
+    - name: Compile Java code
+      run: ./gradlew remapJar --stacktrace --warning-mode=fail
+
+    - name: Validate JSON files
+      run: ./gradlew spotlessJsonCheck || (echo "::error::JSON validation failed! Run './gradlew spotlessApply' to fix style issues, or check the full error message for syntax errors." && exit 1)
+
+    - name: Validate Java code style
+      run: ./gradlew spotlessJavaCheck || (echo "::error::Java code style validation failed! To fix, run 'Clean Up' and then 'Format' in Eclipse, or './gradlew spotlessApply' in the terminal." && exit 1)
+
+    - name: Validate license headers
+      run: ./gradlew spotlessLicenseHeaderCheck || (echo "::error::License headers are missing or malformed in some files! Run './gradlew spotlessApply' to fix this, or check the full error message for details." && exit 1)
+
+    - name: Run unit tests
+      run: ./gradlew test --stacktrace --warning-mode=fail
+
+    - name: Validate access widener
+      run: ./gradlew validateAccessWidener --stacktrace --warning-mode=fail
+
+    - name: Build
+      run: ./gradlew build --stacktrace --warning-mode=fail
+
+    - name: Run the mod and take screenshots
+      uses: GabrielBB/xvfb-action@v1.7
+      with:
+        run: ./gradlew runEndToEndTest --stacktrace --warning-mode=fail
