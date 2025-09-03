@@ -39,7 +39,7 @@ public enum WiZoom
 		System.out.println("Starting WI Zoom v" + version.getFriendlyString());
 		
 		zoomKey = new KeyBinding("key.wi_zoom.zoom", InputUtil.Type.KEYSYM,
-			GLFW.GLFW_KEY_V, "WI Zoom");
+			GLFW.GLFW_KEY_V, KeyBinding.class_11900.MISC);
 		KeyBindingHelper.registerKeyBinding(zoomKey);
 	}
 	
