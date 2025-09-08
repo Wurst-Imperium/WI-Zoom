@@ -21,8 +21,6 @@ import com.mojang.brigadier.ParseResults;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 
 import net.fabricmc.loader.api.FabricLoader;
-import net.minecraft.class_11908;
-import net.minecraft.class_11910;
 import net.minecraft.block.Block;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.Drawable;
@@ -36,6 +34,8 @@ import net.minecraft.client.gui.widget.ClickableWidget;
 import net.minecraft.client.gui.widget.CyclingButtonWidget;
 import net.minecraft.client.gui.widget.OptionListWidget;
 import net.minecraft.client.gui.widget.TextFieldWidget;
+import net.minecraft.client.input.KeyInput;
+import net.minecraft.client.input.MouseInput;
 import net.minecraft.client.network.ClientPlayNetworkHandler;
 import net.minecraft.client.option.Perspective;
 import net.minecraft.client.resource.language.I18n;
@@ -288,7 +288,7 @@ public enum WiModsTestHelper
 	private static boolean clickButtonInWidget(ClickableWidget widget,
 		String buttonText)
 	{
-		class_11910 pressContext = new class_11910(GLFW.GLFW_KEY_UNKNOWN, 0);
+		MouseInput pressContext = new MouseInput(GLFW.GLFW_KEY_UNKNOWN, 0);
 		
 		if(widget instanceof ButtonWidget button
 			&& buttonText.equals(button.getMessage().getString()))
@@ -344,7 +344,7 @@ public enum WiModsTestHelper
 			int action = pressed ? 1 : 0;
 			int scancode = 0;
 			int modifiers = 0;
-			class_11908 context = new class_11908(key, scancode, modifiers);
+			KeyInput context = new KeyInput(key, scancode, modifiers);
 			mc.keyboard.onKey(window, action, context);
 		});
 	}
