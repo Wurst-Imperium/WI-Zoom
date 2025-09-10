@@ -15,8 +15,10 @@ import net.fabricmc.loader.api.ModContainer;
 import net.fabricmc.loader.api.Version;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.option.KeyBinding;
+import net.minecraft.client.option.KeyBinding.Category;
 import net.minecraft.client.option.SimpleOption;
 import net.minecraft.client.util.InputUtil;
+import net.minecraft.util.Identifier;
 import net.minecraft.util.math.MathHelper;
 
 public enum WiZoom
@@ -38,8 +40,10 @@ public enum WiZoom
 		Version version = modContainer.getMetadata().getVersion();
 		System.out.println("Starting WI Zoom v" + version.getFriendlyString());
 		
+		Category zoomCategory = KeyBinding.Category
+			.method_74698(Identifier.of("wi_zoom", "wi_zoom"));
 		zoomKey = new KeyBinding("key.wi_zoom.zoom", InputUtil.Type.KEYSYM,
-			GLFW.GLFW_KEY_V, KeyBinding.Category.MISC);
+			GLFW.GLFW_KEY_V, zoomCategory);
 		KeyBindingHelper.registerKeyBinding(zoomKey);
 	}
 	

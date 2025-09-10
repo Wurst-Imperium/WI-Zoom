@@ -339,11 +339,15 @@ public enum WiModsTestHelper
 	
 	public static void setKeyPressState(int key, boolean pressed)
 	{
+		setKeyPressState(key, pressed, 0);
+	}
+	
+	public static void setKeyPressState(int key, boolean pressed, int modifiers)
+	{
 		submitAndWait(mc -> {
 			long window = mc.getWindow().getHandle();
 			int action = pressed ? 1 : 0;
 			int scancode = 0;
-			int modifiers = 0;
 			KeyInput context = new KeyInput(key, scancode, modifiers);
 			mc.keyboard.onKey(window, action, context);
 		});

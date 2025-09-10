@@ -145,9 +145,10 @@ public final class WiZoomTestClient implements ClientModInitializer
 		clickButton("controls.keybinds");
 		waitForScreen(KeybindsScreen.class);
 		System.out.println("Reached keybinds screen");
-		for(int i = 0; i < 16; i++)
+		// Select the last keybind in the list
+		for(int i = 0; i < 2; i++)
 		{
-			setKeyPressState(GLFW.GLFW_KEY_TAB, true);
+			setKeyPressState(GLFW.GLFW_KEY_TAB, true, 1);// shift+tab
 			setKeyPressState(GLFW.GLFW_KEY_TAB, false);
 		}
 		takeScreenshot("key_binds_screen");
