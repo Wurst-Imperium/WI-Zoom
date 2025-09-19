@@ -40,8 +40,8 @@ public enum WiZoom
 		Version version = modContainer.getMetadata().getVersion();
 		System.out.println("Starting WI Zoom v" + version.getFriendlyString());
 		
-		Category zoomCategory = KeyBinding.Category
-			.method_74698(Identifier.of("wi_zoom", "wi_zoom"));
+		Category zoomCategory =
+			KeyBinding.Category.create(Identifier.of("wi_zoom", "wi_zoom"));
 		zoomKey = new KeyBinding("key.wi_zoom.zoom", InputUtil.Type.KEYSYM,
 			GLFW.GLFW_KEY_V, zoomCategory);
 		KeyBindingHelper.registerKeyBinding(zoomKey);
