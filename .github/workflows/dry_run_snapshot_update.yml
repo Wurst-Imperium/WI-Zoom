@@ -19,7 +19,6 @@ on:
         description: "CurseForge GameVersion"
         required: true
       distinct_id:
-        description: "Automatically set by the return-dispatch action (leave blank if running manually)"
         required: false
 
 jobs:
