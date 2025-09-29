@@ -103,10 +103,11 @@ tasks.register('runEndToEndTest', JavaExec) {
 }
 
 processResources {
-	inputs.property "version", project.version
+	def modVersion = project.version
+	inputs.property("version", modVersion)
 	
 	filesMatching("fabric.mod.json") {
-		expand "version": inputs.properties.version
+		expand(version: modVersion)
 	}
 }
 
@@ -126,10 +127,11 @@ java {
 }
 
 jar {
-	inputs.property "archivesName", project.base.archivesName
+	def archivesName = project.base.archivesName
+	inputs.property("archivesName", archivesName)
 	
-	from("LICENSE") {
-		rename {"${it}_${inputs.properties.archivesName}"}
+	from("LICENSE.txt") {
+		rename { "LICENSE-${archivesName}.txt" }
 	}
 	
 	exclude("intentionally_untranslated.json")
