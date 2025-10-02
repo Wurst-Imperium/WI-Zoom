@@ -145,13 +145,17 @@ public final class WiZoomTestClient implements ClientModInitializer
 		clickButton("controls.keybinds");
 		waitForScreen(KeybindsScreen.class);
 		System.out.println("Reached keybinds screen");
-		// Scroll down to the bottom
-		for(int i = 0; i < 100; i++)
-			scrollMouse(0, -1);
+		// Select the last keybind in the list
+		for(int i = 0; i < 2; i++)
+		{
+			setKeyPressState(GLFW.GLFW_KEY_TAB, true, 1);// shift+tab
+			setKeyPressState(GLFW.GLFW_KEY_TAB, false);
+		}
 		takeScreenshot("key_binds_screen");
 		
 		System.out.println("Changing zoom keybind to B");
-		clickEditKeybindButton("key.wi_zoom.zoom");
+		setKeyPressState(GLFW.GLFW_KEY_ENTER, true);
+		setKeyPressState(GLFW.GLFW_KEY_ENTER, false);
 		setKeyPressState(GLFW.GLFW_KEY_B, true);
 		setKeyPressState(GLFW.GLFW_KEY_B, false);
 		takeScreenshot("zoom_keybind_changed");

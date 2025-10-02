@@ -15,6 +15,8 @@ import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Predicate;
 
+import org.lwjgl.glfw.GLFW;
+
 import com.mojang.brigadier.ParseResults;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 
@@ -26,15 +28,14 @@ import net.minecraft.client.gui.screen.GameMenuScreen;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.screen.TitleScreen;
 import net.minecraft.client.gui.screen.ingame.InventoryScreen;
-import net.minecraft.client.gui.screen.option.ControlsListWidget;
-import net.minecraft.client.gui.screen.option.ControlsListWidget.Entry;
-import net.minecraft.client.gui.screen.option.KeybindsScreen;
 import net.minecraft.client.gui.screen.world.LevelLoadingScreen;
 import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.client.gui.widget.ClickableWidget;
 import net.minecraft.client.gui.widget.CyclingButtonWidget;
 import net.minecraft.client.gui.widget.OptionListWidget;
 import net.minecraft.client.gui.widget.TextFieldWidget;
+import net.minecraft.client.input.KeyInput;
+import net.minecraft.client.input.MouseInput;
 import net.minecraft.client.network.ClientPlayNetworkHandler;
 import net.minecraft.client.option.Perspective;
 import net.minecraft.client.resource.language.I18n;
@@ -284,65 +285,22 @@ public enum WiModsTestHelper
 		});
 	}
 	
-	/**
-	 * Clicks the edit button for the key bind with the given translation key,
-	 * or fails after 10 seconds.
-	 *
-	 * <p>
-	 * Must be called from the key binds screen.
-	 */
-	public static void clickEditKeybindButton(String translationKey)
-	{
-		waitUntil("edit button for " + translationKey + " is visible", mc -> {
-			Screen screen = mc.currentScreen;
-			if(!(screen instanceof KeybindsScreen))
-				throw new RuntimeException(
-					"clickEditKeybindButton() must be called from the Key Binds screen. Current screen: "
-						+ screen);
-			
-			for(Drawable drawable : screen.drawables)
-			{
-				if(!(drawable instanceof ControlsListWidget list))
-					continue;
-				
-				for(Entry entry : list.children())
-				{
-					if(!(entry instanceof ControlsListWidget.KeyBindingEntry kbEntry))
-						continue;
-					
-					if(!translationKey
-						.equals(kbEntry.binding.getTranslationKey()))
-						continue;
-					
-					int x = kbEntry.editButton.getX() + list.getX()
-						+ kbEntry.editButton.getWidth() / 2;
-					int y = kbEntry.editButton.getY()
-						+ kbEntry.editButton.getHeight() / 2;
-					System.out.println("Clicking at " + x + ", " + y);
-					screen.mouseClicked(x, y, 0);
-					screen.mouseReleased(x, y, 0);
-					return true;
-				}
-			}
-			
-			return false;
-		});
-	}
-	
 	private static boolean clickButtonInWidget(ClickableWidget widget,
 		String buttonText)
 	{
+		MouseInput pressContext = new MouseInput(GLFW.GLFW_KEY_UNKNOWN, 0);
+		
 		if(widget instanceof ButtonWidget button
 			&& buttonText.equals(button.getMessage().getString()))
 		{
-			button.onPress();
+			button.onPress(pressContext);
 			return true;
 		}
 		
 		if(widget instanceof CyclingButtonWidget<?> button
 			&& buttonText.equals(button.optionText.getString()))
 		{
-			button.onPress();
+			button.onPress(pressContext);
 			return true;
 		}
 		
@@ -381,8 +339,18 @@ public enum WiModsTestHelper
 	
 	public static void setKeyPressState(int key, boolean pressed)
 	{
-		submitAndWait(mc -> mc.keyboard.onKey(mc.getWindow().getHandle(), key,
-			0, pressed ? 1 : 0, 0));
+		setKeyPressState(key, pressed, 0);
+	}
+	
+	public static void setKeyPressState(int key, boolean pressed, int modifiers)
+	{
+		submitAndWait(mc -> {
+			long window = mc.getWindow().getHandle();
+			int action = pressed ? 1 : 0;
+			int scancode = 0;
+			KeyInput context = new KeyInput(key, scancode, modifiers);
+			mc.keyboard.onKey(window, action, context);
+		});
 	}
 	
 	public static void scrollMouse(int horizontal, int vertical)
@@ -408,7 +376,7 @@ public enum WiModsTestHelper
 	
 	public static void toggleDebugHud()
 	{
-		submitAndWait(mc -> mc.inGameHud.getDebugHud().toggleDebugHud());
+		submitAndWait(mc -> mc.debugHudEntryList.toggleF3Enabled());
 	}
 	
 	public static void setPerspective(Perspective perspective)
