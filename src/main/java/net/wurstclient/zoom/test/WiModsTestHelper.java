@@ -32,7 +32,6 @@ import net.minecraft.client.gui.screen.world.LevelLoadingScreen;
 import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.client.gui.widget.ClickableWidget;
 import net.minecraft.client.gui.widget.CyclingButtonWidget;
-import net.minecraft.client.gui.widget.OptionListWidget;
 import net.minecraft.client.gui.widget.TextFieldWidget;
 import net.minecraft.client.input.KeyInput;
 import net.minecraft.client.input.MouseInput;
@@ -169,9 +168,9 @@ public enum WiModsTestHelper
 	
 	public static void waitForWorldTicks(int ticks)
 	{
-		long startTicks = submitAndGet(mc -> mc.world.getTime());
+		long startTicks = submitAndGet(mc -> mc.world.method_75260());
 		waitUntil(ticks + " world ticks have passed",
-			mc -> mc.world.getTime() >= startTicks + ticks,
+			mc -> mc.world.method_75260() >= startTicks + ticks,
 			Duration.ofMillis(ticks * 100).plusMinutes(5));
 	}
 	
@@ -273,12 +272,6 @@ public enum WiModsTestHelper
 				if(drawable instanceof ClickableWidget widget)
 					if(clickButtonInWidget(widget, buttonText))
 						return true;
-					
-				if(drawable instanceof OptionListWidget list)
-					for(OptionListWidget.WidgetEntry entry : list.children())
-						for(ClickableWidget widget : entry.widgets)
-							if(clickButtonInWidget(widget, buttonText))
-								return true;
 			}
 			
 			return false;
