@@ -46,6 +46,9 @@ public final class WiZoomTestClient implements ClientModInitializer
 		System.out.println("Starting WI Zoom End-to-End Test");
 		waitForResourceLoading();
 		
+		// Disable anisotropic filtering
+		submitAndWait(mc -> mc.options.method_76247().setValue(0));
+		
 		if(submitAndGet(mc -> mc.options.onboardAccessibility))
 		{
 			System.out.println("Onboarding is enabled. Waiting for it");
