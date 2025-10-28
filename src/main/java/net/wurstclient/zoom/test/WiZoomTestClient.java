@@ -46,9 +46,6 @@ public final class WiZoomTestClient implements ClientModInitializer
 		System.out.println("Starting WI Zoom End-to-End Test");
 		waitForResourceLoading();
 		
-		// Disable anisotropic filtering
-		submitAndWait(mc -> mc.options.method_76247().setValue(0));
-		
 		if(submitAndGet(mc -> mc.options.onboardAccessibility))
 		{
 			System.out.println("Onboarding is enabled. Waiting for it");
@@ -90,6 +87,10 @@ public final class WiZoomTestClient implements ClientModInitializer
 		
 		waitForWorldLoad();
 		dismissTutorialToasts();
+		
+		// Disable anisotropic filtering
+		submitAndWait(mc -> mc.options.method_76247().setValue(0));
+		
 		waitForWorldTicks(200);
 		runChatCommand("seed");
 		System.out.println("Reached singleplayer world");
