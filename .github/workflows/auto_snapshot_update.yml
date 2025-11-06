@@ -65,6 +65,7 @@ jobs:
     - name: Migrate mappings for main source set
       run: |
         ./gradlew migrateMappings --mappings ${{ inputs.yarn_mappings }} --overrideInputsIHaveABackup
+        ./gradlew migrateClassTweakerMappings --mappings ${{ inputs.yarn_mappings }} --overrideInputsIHaveABackup
 
     - name: Update version constants
       run: |
