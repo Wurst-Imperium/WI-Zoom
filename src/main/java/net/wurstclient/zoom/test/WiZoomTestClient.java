@@ -44,8 +44,7 @@ public final class WiZoomTestClient implements ClientModInitializer
 	private void runTests()
 	{
 		System.out.println("Starting WI Zoom End-to-End Test");
-		// waitForResourceLoading();
-		waitFor(Duration.ofSeconds(10));
+		waitForResourceLoading();
 		
 		if(submitAndGet(mc -> mc.options.onboardAccessibility))
 		{
