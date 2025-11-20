@@ -92,11 +92,22 @@ jobs:
         GITHUB_TOKEN: ${{ github.token }}
       run: ./gradlew closeMilestone --stacktrace --no-configuration-cache
 
+    - name: Build website update inputs
+      id: website_inputs
+      if: ${{ inputs.update_website }}
+      run: |
+        echo "mod_version=$(grep '^mod_version=' gradle.properties | cut -d'=' -f2 | tr -d ' \r' | sed 's/-MC.*$//')" >> "$GITHUB_OUTPUT"
+        echo "mc_version=$(grep '^minecraft_version=' gradle.properties | cut -d'=' -f2 | tr -d ' \r')" >> "$GITHUB_OUTPUT"
+        echo "fapi_version=$(grep '^fabric_version=' gradle.properties | cut -d'=' -f2 | tr -d ' \r')" >> "$GITHUB_OUTPUT"
+
     - name: Upload backups
       if: ${{ inputs.upload_backups }}
-      env:
-        WI_BACKUPS_API_KEY: ${{ secrets.WI_BACKUPS_API_KEY }}
-      run: ./gradlew uploadBackups --stacktrace --no-configuration-cache
+      uses: Wurst-Imperium/upload-backups@v1
+      with:
+        api_key: ${{ secrets.WI_BACKUPS_API_KEY }}
+        project: WI-Zoom
+        version: ${{ steps.website_inputs.outputs.mod_version }}
+        path: build/libs/*.jar
 
     - name: Publish to GitHub
       if: ${{ inputs.publish_github }}
@@ -123,14 +134,6 @@ jobs:
       env:
         MODRINTH_TOKEN: ${{ secrets.MODRINTH_TOKEN }}
       run: ./gradlew publishModrinth --stacktrace --no-configuration-cache
-
-    - name: Build website update inputs
-      id: website_inputs
-      if: ${{ inputs.update_website && inputs.publish_curseforge }}
-      run: |
-        echo "mod_version=$(grep '^mod_version=' gradle.properties | cut -d'=' -f2 | tr -d ' \r' | sed 's/-MC.*$//')" >> "$GITHUB_OUTPUT"
-        echo "mc_version=$(grep '^minecraft_version=' gradle.properties | cut -d'=' -f2 | tr -d ' \r')" >> "$GITHUB_OUTPUT"
-        echo "fapi_version=$(grep '^fabric_version=' gradle.properties | cut -d'=' -f2 | tr -d ' \r')" >> "$GITHUB_OUTPUT"
 
     - name: Trigger website update
       if: ${{ inputs.update_website && inputs.publish_curseforge }}
