@@ -5,7 +5,7 @@
  * License, version 3. If a copy of the GPL was not distributed with this
  * file, You can obtain one at: https://www.gnu.org/licenses/gpl-3.0.txt
  */
-package net.wurstclient.zoom.test;
+package net.wimods.zoom.test;
 
 import java.io.File;
 import java.time.Duration;

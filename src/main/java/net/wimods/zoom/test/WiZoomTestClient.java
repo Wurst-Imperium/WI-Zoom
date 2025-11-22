@@ -5,9 +5,9 @@
  * License, version 3. If a copy of the GPL was not distributed with this
  * file, You can obtain one at: https://www.gnu.org/licenses/gpl-3.0.txt
  */
-package net.wurstclient.zoom.test;
+package net.wimods.zoom.test;
 
-import static net.wurstclient.zoom.test.WiModsTestHelper.*;
+import static net.wimods.zoom.test.WiModsTestHelper.*;
 
 import java.time.Duration;
 
@@ -24,7 +24,7 @@ import net.minecraft.client.gui.screen.option.OptionsScreen;
 import net.minecraft.client.gui.screen.world.CreateWorldScreen;
 import net.minecraft.client.gui.screen.world.SelectWorldScreen;
 import net.minecraft.util.math.MathHelper;
-import net.wurstclient.zoom.WiZoom;
+import net.wimods.zoom.WiZoom;
 
 public final class WiZoomTestClient implements ClientModInitializer
 {

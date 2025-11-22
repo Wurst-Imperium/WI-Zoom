@@ -5,23 +5,23 @@
  * License, version 3. If a copy of the GPL was not distributed with this
  * file, You can obtain one at: https://www.gnu.org/licenses/gpl-3.0.txt
  */
-package net.wurstclient.zoom.mixin;
+package net.wimods.zoom.mixin;
 
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-import net.minecraft.client.Mouse;
-import net.wurstclient.zoom.WiZoom;
+import net.minecraft.entity.player.PlayerInventory;
+import net.wimods.zoom.WiZoom;
 
-@Mixin(Mouse.class)
-public class MouseMixin
+@Mixin(PlayerInventory.class)
+public class PlayerInventoryMixin
 {
-	@Inject(at = @At("RETURN"), method = "onMouseScroll(JDD)V")
-	private void onOnMouseScroll(long window, double horizontal,
-		double vertical, CallbackInfo ci)
+	@Inject(at = @At("HEAD"), method = "scrollInHotbar(D)V", cancellable = true)
+	private void onScrollInHotbar(double scrollAmount, CallbackInfo ci)
 	{
-		WiZoom.INSTANCE.onMouseScroll(vertical);
+		if(WiZoom.INSTANCE.getZoomKey().isPressed())
+			ci.cancel();
 	}
 }

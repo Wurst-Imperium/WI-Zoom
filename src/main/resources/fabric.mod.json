@@ -19,10 +19,10 @@
   "environment": "client",
   "entrypoints": {
     "main": [
-      "net.wurstclient.zoom.WiZoomInitializer"
+      "net.wimods.zoom.WiZoomInitializer"
     ],
     "client": [
-      "net.wurstclient.zoom.test.WiZoomTestClient"
+      "net.wimods.zoom.test.WiZoomTestClient"
     ]
   },
   "mixins": [
