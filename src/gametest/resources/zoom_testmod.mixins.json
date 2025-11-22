@@ -1,12 +1,9 @@
 {
   "required": true,
-  "package": "net.wurstclient.zoom.mixin",
+  "package": "net.wimods.zoom.gametest.mixin",
   "compatibilityLevel": "JAVA_21",
   "mixins": [],
-  "client": [
-    "GameRendererMixin",
-    "MouseMixin"
-  ],
+  "client": [],
   "injectors": {
     "defaultRequire": 1
   },

@@ -7,3 +7,4 @@ accessible	field	net/minecraft/client/gui/screen/option/ControlsListWidget$KeyBi
 accessible	field	net/minecraft/client/gui/screen/option/ControlsListWidget$KeyBindingEntry	binding	Lnet/minecraft/client/option/KeyBinding;
 accessible	field	net/minecraft/client/gui/widget/CyclingButtonWidget	optionText	Lnet/minecraft/text/Text;
 accessible	field	net/minecraft/client/gui/widget/OptionListWidget$WidgetEntry	widgets	Ljava/util/List;
+accessible	field	net/minecraft/client/texture/NativeImage	pointer	J
