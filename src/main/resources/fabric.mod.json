@@ -19,7 +19,7 @@
   "environment": "client",
   "entrypoints": {
     "main": [
-      "net.wurstclient.zoom.WiZoomInitializer"
+      "net.wimods.zoom.WiZoomInitializer"
     ]
   },
   "mixins": [
