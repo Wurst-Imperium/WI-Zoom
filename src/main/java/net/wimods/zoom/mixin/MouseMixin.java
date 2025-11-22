@@ -5,7 +5,7 @@
  * License, version 3. If a copy of the GPL was not distributed with this
  * file, You can obtain one at: https://www.gnu.org/licenses/gpl-3.0.txt
  */
-package net.wurstclient.zoom.mixin;
+package net.wimods.zoom.mixin;
 
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
@@ -16,7 +16,7 @@ import com.llamalad7.mixinextras.injector.v2.WrapWithCondition;
 
 import net.minecraft.client.Mouse;
 import net.minecraft.entity.player.PlayerInventory;
-import net.wurstclient.zoom.WiZoom;
+import net.wimods.zoom.WiZoom;
 
 @Mixin(Mouse.class)
 public class MouseMixin

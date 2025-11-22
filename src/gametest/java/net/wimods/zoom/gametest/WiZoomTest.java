@@ -135,13 +135,13 @@ public final class WiZoomTest implements FabricClientGameTest
 			input.releaseShift();
 		}
 		assertScreenshotEquals(context, "zoom_keybind_default",
-			"https://i.imgur.com/VzU0kZq.png");
+			"https://i.imgur.com/cKRp59f.png");
 		
 		LOGGER.info("Changing zoom keybind to B");
 		input.pressKey(GLFW.GLFW_KEY_ENTER);
 		input.pressKey(GLFW.GLFW_KEY_B);
 		assertScreenshotEquals(context, "zoom_keybind_changed",
-			"https://i.imgur.com/4a9tFMs.png");
+			"https://i.imgur.com/KXcNMjt.png");
 		
 		LOGGER.info("Closing screens");
 		for(int i = 0; i < 4; i++)
