@@ -30,7 +30,7 @@ jobs:
       run: echo ${{ inputs.distinct_id }}
 
     - name: Checkout repository
-      uses: actions/checkout@v5
+      uses: actions/checkout@v6
 
     - name: Set up Python 3.12
       uses: actions/setup-python@v6
@@ -73,6 +73,7 @@ jobs:
     - name: Run spotlessApply and build
       run: ./gradlew spotlessApply build --stacktrace --warning-mode=fail
 
-    - name: Run the mod and take screenshots
-      # TODO: Migrate to Fabric Client Gametest API so this can run with configuration cache enabled
-      run: xvfb-run --auto-servernum ./gradlew runEndToEndTest --stacktrace --warning-mode=fail --no-configuration-cache
+    - name: Run client gametests
+      env:
+        IMGUR_CLIENT_ID: ${{ secrets.IMGUR_CLIENT_ID }}
+      run: xvfb-run --auto-servernum ./gradlew runClientGameTest --stacktrace --warning-mode=fail
