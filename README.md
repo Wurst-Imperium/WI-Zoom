@@ -1,12 +1,12 @@
 # WI Zoom (Wurst-Imperium Zoom)
 
-WI Zoom is the zoom from the [Wurst Client](https://www.wurstclient.net/) as a standalone Minecraft mod, letting you zoom in and out with the mouse wheel and providing up to 50x magnification without the need for a spyglass. This mod is fully compatible with OptiFine and Sodium, but unlike OptiFine's zoom, WI Zoom lets the camera move in a logical way, without making it wobble around. WI Zoom supports all of the latest Minecraft versions, including snapshots.
+WI Zoom is the zoom from the [Wurst Client](https://go.wimods.net/from/github.com/Wurst-Imperium/WI-Zoom?to=https://www.wurstclient.net/) as a standalone Minecraft mod, letting you zoom in and out with the mouse wheel and providing up to 50x magnification without the need for a spyglass. This mod is fully compatible with OptiFine and Sodium, but unlike OptiFine's zoom, WI Zoom lets the camera move in a logical way, without making it wobble around. WI Zoom supports all of the latest Minecraft versions, including snapshots.
 
-![comparison of no zoom, 3x zoom, and 50x zoom](https://user-images.githubusercontent.com/10100202/67816432-973d2400-fab2-11e9-8699-e05eb5ba6551.jpg)
+![comparison of no zoom, 3x zoom, and 50x zoom](https://img.wimods.net/github.com/Wurst-Imperium/WI-Zoom?to=https://user-images.githubusercontent.com/10100202/67816432-973d2400-fab2-11e9-8699-e05eb5ba6551.jpg)
 
 ## Downloads
 
-[![Download WI Zoom](https://user-images.githubusercontent.com/10100202/214881367-956f0bc9-4dbe-43cb-850a-04d73e00b344.png)](https://www.wimods.net/wi-zoom/download/?utm_source=GitHub&utm_medium=WI+Zoom&utm_campaign=README.md&utm_content=WI+Zoom+GitHub+repo+download+button)
+[![Download WI Zoom](https://user-images.githubusercontent.com/10100202/214881367-956f0bc9-4dbe-43cb-850a-04d73e00b344.png)](https://go.wimods.net/from/github.com/Wurst-Imperium/WI-Zoom?to=https://www.wimods.net/wi-zoom/download/?utm_source=GitHub&utm_medium=WI+Zoom&utm_campaign=README.md&utm_content=WI+Zoom+GitHub+repo+download+button)
 
 ## Installation
 
@@ -15,23 +15,23 @@ WI Zoom is the zoom from the [Wurst Client](https://www.wurstclient.net/) as a s
 
 ### Installation using Fabric
 
-1. Install [Fabric Loader](https://fabricmc.net/use/installer/).
-2. Add [Fabric API](https://modrinth.com/mod/fabric-api) to your mods folder.
+1. Install [Fabric Loader](https://go.wimods.net/from/github.com/Wurst-Imperium/WI-Zoom?to=https://fabricmc.net/use/installer/).
+2. Add [Fabric API](https://go.wimods.net/from/github.com/Wurst-Imperium/WI-Zoom?to=https://modrinth.com/mod/fabric-api) to your mods folder.
 3. Add WI Zoom to your mods folder.
 
 ### Installation using NeoForge
 
-1. Install [NeoForge](https://neoforged.net/).
+1. Install [NeoForge](https://go.wimods.net/from/github.com/Wurst-Imperium/WI-Zoom?to=https://neoforged.net/).
 2. Add WI Zoom to your mods folder.
 
 ## Features
 
 - Up to 50x zoom!
-- No <a href="https://minecraft.wiki/w/Spyglass" target="_blank">spyglass</a> needed!
+- No <a href="https://go.wimods.net/from/github.com/Wurst-Imperium/WI-Zoom?to=https://minecraft.wiki/w/Spyglass" target="_blank">spyglass</a> needed!
 - Zoom in and out with the mouse wheel!
 - No wobbly camera nonsense!
 - Dynamic mouse sensitivity! (since v1.1)
-- Fully compatible with <a href="https://optifine.net/home" target="_blank">OptiFine</a> / <a href="https://github.com/CaffeineMC/sodium-fabric" target="_blank">Sodium</a>!
+- Fully compatible with <a href="https://go.wimods.net/from/github.com/Wurst-Imperium/WI-Zoom?to=https://optifine.net/home" target="_blank">OptiFine</a> / <a href="https://go.wimods.net/from/github.com/Wurst-Imperium/WI-Zoom?to=https://github.com/CaffeineMC/sodium-fabric" target="_blank">Sodium</a>!
 
 ## How to zoom
 
@@ -77,7 +77,7 @@ While zooming, you can use the <kbd>mouse wheel</kbd> to zoom in further.
 ## Development Setup
 
 > [!IMPORTANT]
-> Make sure you have [Java Development Kit 21](https://adoptium.net/?variant=openjdk21&jvmVariant=hotspot) installed. It won't work with other versions.
+> Make sure you have [Java Development Kit 21](https://go.wimods.net/from/github.com/Wurst-Imperium/WI-Zoom?to=https://adoptium.net/?variant=openjdk21&jvmVariant=hotspot) installed. It won't work with other versions.
 
 ### Development using Eclipse
 
@@ -107,7 +107,7 @@ While zooming, you can use the <kbd>mouse wheel</kbd> to zoom in further.
 ### Development using VSCode / Cursor
 
 > [!TIP]
-> You'll probably want to install the [Extension Pack for Java](https://marketplace.visualstudio.com/items?itemName=vscjava.vscode-java-pack) to make development easier.
+> You'll probably want to install the [Extension Pack for Java](https://go.wimods.net/from/github.com/Wurst-Imperium/WI-Zoom?to=https://marketplace.visualstudio.com/items?itemName=vscjava.vscode-java-pack) to make development easier.
 
 1. Clone the repository:
 
@@ -140,5 +140,11 @@ I don't use or recommend IntelliJ, but the commands to run would be:
 ```pwsh
 git clone https://github.com/Wurst-Imperium/WI-Zoom.git
 cd WI-Zoom
-./gradlew genSources idea
+./gradlew genSources idea --no-configuration-cache
 ```
+
+**Note:** IntelliJ IDEA is [not yet compatible](https://github.com/FabricMC/fabric-loom/issues/1349) with Gradle's configuration cache. You will run into issues.
+
+Possible workarounds:
+- Turn off args files ([this setting](https://i.imgur.com/zHqIOYg.png)). Won't work for some users because of a command length limit.
+- Add `--no-configuration-cache` to all of your Gradle commands.

@@ -35,7 +35,6 @@ on:
         type: boolean
         default: false
       distinct_id:
-        description: "Automatically set by the return-dispatch action (leave blank if running manually)"
         required: false
 
 permissions:
@@ -47,24 +46,19 @@ permissions:
 jobs:
   publish:
     runs-on: ubuntu-latest
-    env:
-      WI_BACKUPS_API_KEY: ${{ secrets.WI_BACKUPS_API_KEY }}
-      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      CURSEFORGE_API_KEY: ${{ secrets.CURSEFORGE_API_KEY }}
-      MODRINTH_TOKEN: ${{ secrets.MODRINTH_TOKEN }}
     steps:
 
-    - name: Echo distinct ID ${{ github.event.inputs.distinct_id }}
-      run: echo ${{ github.event.inputs.distinct_id }}
+    - name: Echo distinct ID ${{ inputs.distinct_id }}
+      run: echo ${{ inputs.distinct_id }}
 
     - name: Checkout repository
-      uses: actions/checkout@v4
+      uses: actions/checkout@v6
       with:
         # Include all tags in case the new tag already exists.
         fetch-tags: true
 
     - name: Set up Java 21
-      uses: actions/setup-java@v4
+      uses: actions/setup-java@v5
       with:
         java-version: "21"
         distribution: "microsoft"
@@ -73,7 +67,13 @@ jobs:
       run: chmod +x gradlew
 
     - name: Setup Gradle
-      uses: gradle/actions/setup-gradle@v4
+      uses: gradle/actions/setup-gradle@v5
+      with:
+        build-scan-publish: true
+        build-scan-terms-of-use-url: "https://gradle.com/help/legal-terms-of-use"
+        build-scan-terms-of-use-agree: "yes"
+        cache-encryption-key: ${{ secrets.GRADLE_ENCRYPTION_KEY }}
+        cache-read-only: ${{ github.ref != 'refs/heads/master' && !startsWith(github.ref, 'refs/heads/1.') }}
 
     - name: Build
       run: ./gradlew build --stacktrace --warning-mode=fail
@@ -88,73 +88,69 @@ jobs:
 
     - name: Close milestone
       if: ${{ inputs.close_milestone }}
-      run: ./gradlew closeMilestone --stacktrace
+      env:
+        GITHUB_TOKEN: ${{ github.token }}
+      run: ./gradlew closeMilestone --stacktrace --no-configuration-cache
+
+    - name: Build website update inputs
+      id: website_inputs
+      if: ${{ inputs.update_website }}
+      run: |
+        echo "mod_version=$(grep '^mod_version=' gradle.properties | cut -d'=' -f2 | tr -d ' \r' | sed 's/-MC.*$//')" >> "$GITHUB_OUTPUT"
+        echo "mc_version=$(grep '^minecraft_version=' gradle.properties | cut -d'=' -f2 | tr -d ' \r')" >> "$GITHUB_OUTPUT"
+        echo "fapi_version=$(grep '^fabric_version=' gradle.properties | cut -d'=' -f2 | tr -d ' \r')" >> "$GITHUB_OUTPUT"
 
     - name: Upload backups
       if: ${{ inputs.upload_backups }}
-      run: ./gradlew uploadBackups --stacktrace
+      uses: Wurst-Imperium/upload-backups@v1
+      with:
+        api_key: ${{ secrets.WI_BACKUPS_API_KEY }}
+        project: WI-Zoom
+        version: ${{ steps.website_inputs.outputs.mod_version }}
+        path: build/libs/*.jar
 
     - name: Publish to GitHub
       if: ${{ inputs.publish_github }}
       env:
         GITHUB_TOKEN: ${{ secrets.MCX_PUBLISH_TOKEN }}
-      run: ./gradlew github --stacktrace
+      run: ./gradlew github --stacktrace --no-configuration-cache
 
     - name: Publish to CurseForge
       if: ${{ inputs.publish_curseforge }}
-      run: ./gradlew publishCurseforge --stacktrace
+      env:
+        CURSEFORGE_API_KEY: ${{ secrets.CURSEFORGE_API_KEY }}
+      run: ./gradlew publishCurseforge --stacktrace --no-configuration-cache
 
     - name: Get CurseForge file ID
       id: cf_file_id
       if: ${{ inputs.publish_curseforge }}
       run: |
-        file_id=$(./gradlew getCurseforgeId -x publishCurseforge | grep -o 'CURSEFORGE_FILE_ID=[0-9]*' | grep -o '[0-9]*')
+        file_id=$(./gradlew getCurseforgeId -x publishCurseforge --no-configuration-cache | grep -o 'CURSEFORGE_FILE_ID=[0-9]*' | grep -o '[0-9]*')
         echo "file_id=$file_id" >> "$GITHUB_OUTPUT"
         echo "CurseForge file ID: \`$file_id\`" >> $GITHUB_STEP_SUMMARY
 
     - name: Publish to Modrinth
       if: ${{ inputs.publish_modrinth }}
-      run: ./gradlew publishModrinth --stacktrace
-
-    - name: Build website update inputs
-      id: website_inputs
-      if: ${{ inputs.update_website && inputs.publish_curseforge }}
-      run: |
-        MOD_VERSION=$(grep "^mod_version=" gradle.properties | cut -d'=' -f2 | tr -d ' \r' | sed 's/-MC.*$//')
-        MC_VERSION=$(grep "^minecraft_version=" gradle.properties | cut -d'=' -f2 | tr -d ' \r')
-        FAPI_VERSION=$(grep "^fabric_version=" gradle.properties | cut -d'=' -f2 | tr -d ' \r')
-        JSON_STRING=$(cat << EOF
-        {
-          "mod": "wi-zoom",
-          "modloader": "fabric",
-          "mod_version": "$MOD_VERSION",
-          "mc_version": "$MC_VERSION",
-          "fapi_version": "$FAPI_VERSION",
-          "file_id": "${{ steps.cf_file_id.outputs.file_id }}"
-        }
-        EOF
-        )
-        # Convert to single line and escape quotes
-        echo "json=${JSON_STRING//$'\n'/}" >> "$GITHUB_OUTPUT"
+      env:
+        MODRINTH_TOKEN: ${{ secrets.MODRINTH_TOKEN }}
+      run: ./gradlew publishModrinth --stacktrace --no-configuration-cache
 
     - name: Trigger website update
-      id: website_dispatch
       if: ${{ inputs.update_website && inputs.publish_curseforge }}
-      uses: codex-/return-dispatch@v2
+      uses: Wurst-Imperium/dispatch-and-wait@v1
       with:
         token: ${{ secrets.WIMODS_NET_PUBLISH_TOKEN }}
         owner: Wurst-Imperium
         repo: wimods.net
         ref: master
         workflow: add_mod_port.yml
-        workflow_inputs: ${{ steps.website_inputs.outputs.json }}
-
-    - name: Wait for website update to finish (run ${{ steps.website_dispatch.outputs.run_id }})
-      if: ${{ inputs.update_website && inputs.publish_curseforge }}
-      uses: codex-/await-remote-run@v1
-      with:
-        token: ${{ secrets.WIMODS_NET_PUBLISH_TOKEN }}
-        owner: Wurst-Imperium
-        repo: wimods.net
-        run_id: ${{ steps.website_dispatch.outputs.run_id }}
+        workflow_inputs: |
+          {
+            "mod": "wi-zoom",
+            "modloader": "fabric",
+            "mod_version": "${{ steps.website_inputs.outputs.mod_version }}",
+            "mc_version": "${{ steps.website_inputs.outputs.mc_version }}",
+            "fapi_version": "${{ steps.website_inputs.outputs.fapi_version }}",
+            "file_id": "${{ steps.cf_file_id.outputs.file_id }}"
+          }
         run_timeout_seconds: 600  # 10 minutes

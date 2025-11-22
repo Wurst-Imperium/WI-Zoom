@@ -1,13 +1,13 @@
 buildscript {
 	dependencies {
-		classpath "org.kohsuke:github-api:1.327"
+		classpath "org.kohsuke:github-api:1.330"
 	}
 }
 
 plugins {
-	id "fabric-loom" version "1.10-SNAPSHOT"
-	id "me.modmuss50.mod-publish-plugin" version "0.8.4"
-	id "com.diffplug.spotless" version "7.0.2"
+	id "fabric-loom" version "${loom_version}"
+	id "me.modmuss50.mod-publish-plugin" version "1.1.0"
+	id "com.diffplug.spotless" version "8.1.0"
 }
 
 def ENV = System.getenv()
@@ -25,16 +25,6 @@ repositories {
 	// Loom adds the essential maven repositories to download Minecraft and libraries from automatically.
 	// See https://docs.gradle.org/current/userguide/declaring_repositories.html
 	// for more information about repositories.
-}
-
-// Override vulnerable dependencies until Minecraft updates to newer versions
-configurations.all {
-	resolutionStrategy {
-		// v4.1.97.Final, used by Minecraft 1.21 - 1.21.3, is vulnerable to CVE-2024-47535
-		force "io.netty:netty-common:4.1.118.Final"
-		// v4.1.97.Final, used by Minecraft 1.21 - 1.21.3, is vulnerable to CVE-2025-24970
-		force "io.netty:netty-handler:4.1.118.Final"
-	}
 }
 
 dependencies {
@@ -97,10 +87,11 @@ tasks.register('runEndToEndTest', JavaExec) {
 }
 
 processResources {
-	inputs.property "version", project.version
+	def modVersion = project.version
+	inputs.property("version", modVersion)
 	
 	filesMatching("fabric.mod.json") {
-		expand "version": inputs.properties.version
+		expand(version: modVersion)
 	}
 }
 
@@ -120,10 +111,11 @@ java {
 }
 
 jar {
-	inputs.property "archivesName", project.base.archivesName
+	def archivesName = project.base.archivesName
+	inputs.property("archivesName", archivesName)
 	
-	from("LICENSE") {
-		rename {"${it}_${inputs.properties.archivesName}"}
+	from("LICENSE.txt") {
+		rename { "LICENSE-${archivesName.get()}.txt" }
 	}
 	
 	exclude("intentionally_untranslated.json")
@@ -154,35 +146,55 @@ def getGhVersion() {
 	return "v" + version.substring(0, version.indexOf("-MC"))
 }
 
-def getChangelogUrl() {
-	def modSlug = archives_base_name.toLowerCase()
-	def versionSlug = version.substring(0, version.indexOf("-MC")).replace(".", "-")
-	return "https://www.wimods.net/${modSlug}/${modSlug}-${versionSlug}/"
+def getChangelogLink(String platform, String from) {
+	def modSlug = project.archives_base_name.toLowerCase()
+	def versionSlug = getGhVersion().substring(1).replace(".", "-")
+	def shortURL = "https://www.wimods.net/${modSlug}/${modSlug}-${versionSlug}/"
+	def query = []
+	if (platform != "GitHub")
+		query.add("mc=${project.minecraft_version}")
+	query.add("utm_source=${platform}")
+	query.add("utm_medium=" + project.archives_base_name.replace("-", "+"))
+	def fullURL = shortURL + (query.isEmpty() ? "" : "?" + query.join("&"))
+	def encodedURL = java.net.URLEncoder.encode(fullURL, "UTF-8")
+	return "[${shortURL}](https://go.wimods.net/from/${from}?to=${encodedURL})"
+}
+
+def getChangelogImage(String from) {
+	return "![](https://img.wimods.net/${from})"
+}
+
+def getChangelog(String platform, String from) {
+	def prefix = platform == "GitHub" ? "" : "A changelog can be found at: "
+	def imgQuery = platform == "GitHub" ? "" : "?mc_version=${project.minecraft_version}&mod_loader=${project.mod_loader}"
+	return prefix + getChangelogLink(platform, from) + getChangelogImage(from + imgQuery)
 }
 
 publishMods {
-	file = remapJar.archiveFile
-	def archivesName = base.archivesName.get() as String
-	additionalFiles.from(
-		file("${project.buildDir}/libs/${archivesName}-${project.version}-sources.jar"),
-	)
+	def version = project.version
+	def archivesName = base.archivesName.get()
+	def modSlug = archivesName.toLowerCase()
+	
 	type = getGhVersion().contains("pre") ? BETA : STABLE
-	modLoaders.add("fabric")
-	def changelogUrl = getChangelogUrl()
+	modLoaders.add(project.mod_loader.toLowerCase())
+	file = remapJar.archiveFile
+	additionalFiles.from(
+		file("${project.buildDir}/libs/${archivesName}-${version}-sources.jar"),
+	)
 	
 	curseforge {
-		projectId = "349630"
+		projectId = project.cf_project_id
 		accessToken = providers.environmentVariable("CURSEFORGE_API_KEY")
-		minecraftVersions.add("${project.cf_game_version}")
+		minecraftVersions.add(project.cf_game_version)
 		requires("fabric-api")
-		changelog = "A changelog can be found at: [${changelogUrl}](${changelogUrl}?mc=${project.minecraft_version}&utm_source=CurseForge&utm_medium=WI+Zoom&utm_campaign=Changelog&utm_content=CurseForge+WI+Zoom+MC${project.minecraft_version})"
+		changelog = getChangelog("CurseForge", "curseforge.com/minecraft/mc-mods/${modSlug}/version/${version}")
 	}
 	modrinth {
-		projectId = "o7DitHWP"
+		projectId = project.mr_project_id
 		accessToken = providers.environmentVariable("MODRINTH_TOKEN")
-		minecraftVersions.add("${project.minecraft_version}")
+		minecraftVersions.add(project.minecraft_version)
 		requires("fabric-api")
-		changelog = "A changelog can be found at: [${changelogUrl}](${changelogUrl}?mc=${project.minecraft_version}&utm_source=Modrinth&utm_medium=WI+Zoom&utm_campaign=Changelog&utm_content=Modrinth+WI+Zoom+MC${project.minecraft_version})"
+		changelog = getChangelog("Modrinth", "modrinth.com/mod/${modSlug}/version/${version}")
 	}
 }
 
@@ -213,12 +225,15 @@ task github(dependsOn: build) {
 	
 	doLast {
 		def github = GitHub.connectUsingOAuth(ENV.GITHUB_TOKEN as String)
-		def repository = github.getRepository("Wurst-Imperium-MCX/WI-Zoom")
+		def repoId = project.mcx_repo_id
+		def repository = github.getRepository(repoId)
 		def ghVersion = getGhVersion()
 		
 		def ghRelease = repository.getReleaseByTagName(ghVersion as String)
 		if(ghRelease == null) {
 			def releaseBuilder = new GHReleaseBuilder(repository, ghVersion as String)
+			releaseBuilder.body(getChangelogImage("github.com/${repoId}/releases/tag/${ghVersion}"))
+			releaseBuilder.prerelease(ghVersion.contains("pre"))
 			ghRelease = releaseBuilder.create()
 		}
 		
@@ -226,10 +241,9 @@ task github(dependsOn: build) {
 		ghRelease.uploadAsset(remapSourcesJar.archiveFile.get().getAsFile(), "application/java-archive")
 	}
 }
-import java.time.LocalDate
 import org.kohsuke.github.GHIssueState
 import org.kohsuke.github.GHMilestoneState
-import java.time.ZoneId
+import java.time.Instant
 
 task closeMilestone {
 	onlyIf {
@@ -238,7 +252,8 @@ task closeMilestone {
 	
 	doLast {
 		def github = GitHub.connectUsingOAuth(ENV.GITHUB_TOKEN as String)
-		def repository = github.getRepository("Wurst-Imperium/WI-Zoom")
+		def repoId = project.gh_repo_id
+		def repository = github.getRepository(repoId)
 		def ghVersion = getGhVersion()
 		
 		// Weird API design: listMilestones() requires GHIssueState while everything else uses GHMilestoneState.
@@ -248,66 +263,9 @@ task closeMilestone {
 		}
 		
 		if (milestone.getState() != GHMilestoneState.CLOSED) {
-			milestone.setDueOn(Date.from(LocalDate.now().atStartOfDay(ZoneId.systemDefault()).toInstant()))
-			milestone.setDescription(getChangelogUrl())
+			milestone.setDueOn(Date.from(Instant.now()))
+			milestone.setDescription(getChangelog("GitHub", "github.com/${repoId}/milestone/${ghVersion}"))
 			milestone.close()
-		}
-	}
-}
-
-task uploadBackups {
-	dependsOn build
-	
-	onlyIf {
-		ENV.WI_BACKUPS_API_KEY
-	}
-	
-	doLast {
-		def shortVersion = getGhVersion().substring(1)
-		def backupUrl = "https://api.wurstclient.net/artifact-backups/WI-Zoom/${shortVersion}"
-		
-		def maxRetries = 3
-		def retryCount = 0
-		def success = false
-		
-		while (!success && retryCount < maxRetries) {
-			try {
-				def connection = new URL(backupUrl).openConnection() as HttpURLConnection
-				def boundary = UUID.randomUUID().toString()
-				connection.setRequestMethod("POST")
-				connection.setRequestProperty("X-API-Key", ENV.WI_BACKUPS_API_KEY)
-				connection.setRequestProperty("Accept", "application/json")
-				connection.setRequestProperty("Content-Type", "multipart/form-data; boundary=$boundary")
-				connection.doOutput = true
-				
-				def output = connection.outputStream
-				[remapJar, remapSourcesJar].each { jarTask ->
-					def file = jarTask.archiveFile.get().asFile
-					output << "--${boundary}\r\n"
-					output << "Content-Disposition: form-data; name=\"files\"; filename=\"${file.name}\"\r\n"
-					output << "Content-Type: application/java-archive\r\n\r\n"
-					file.withInputStream { input -> 
-						output << input
-					}
-					output << "\r\n"
-				}
-				output << "--${boundary}--\r\n"
-				output.flush()
-				
-				if(connection.responseCode != 200) {
-					throw new IOException("HTTP ${connection.responseCode}: ${connection.responseMessage}")
-				}
-				
-				success = true
-				
-			} catch (Exception e) {
-				retryCount++
-				if (retryCount >= maxRetries) {
-					throw new GradleException("Failed to upload backups after ${maxRetries} attempts: ${e.message}")
-				}
-				println "Upload attempt ${retryCount} failed: ${e.message}. Retrying in 5 seconds..."
-				Thread.sleep(5000)
-			}
 		}
 	}
 }

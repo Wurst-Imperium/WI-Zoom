@@ -9,23 +9,19 @@ package net.wurstclient.zoom.mixin;
 
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.Inject;
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
-import net.minecraft.client.render.Camera;
+import com.llamalad7.mixinextras.injector.ModifyReturnValue;
+
 import net.minecraft.client.render.GameRenderer;
 import net.wurstclient.zoom.WiZoom;
 
 @Mixin(GameRenderer.class)
 public abstract class GameRendererMixin implements AutoCloseable
 {
-	@Inject(at = @At(value = "RETURN", ordinal = 1),
-		method = "getFov(Lnet/minecraft/client/render/Camera;FZ)D",
-		cancellable = true)
-	private void onGetFov(Camera camera, float tickDelta, boolean changingFov,
-		CallbackInfoReturnable<Double> cir)
+	@ModifyReturnValue(at = @At("RETURN"),
+		method = "getFov(Lnet/minecraft/client/render/Camera;FZ)D")
+	private double onGetFov(double original)
 	{
-		cir.setReturnValue(
-			WiZoom.INSTANCE.changeFovBasedOnZoom(cir.getReturnValueD()));
+		return WiZoom.INSTANCE.changeFovBasedOnZoom(original);
 	}
 }

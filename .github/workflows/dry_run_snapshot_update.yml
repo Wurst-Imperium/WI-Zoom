@@ -1,11 +1,10 @@
-# Experimental workflow to automate updating to a new Minecraft snapshot.
-name: Auto Snapshot Update
+name: Test if old Fabric API works with new Snapshot
 
 on:
   workflow_dispatch:
     inputs:
       mc_version:
-        description: "Minecraft version to update to"
+        description: "Minecraft version to test"
         required: true
       yarn_mappings:
         description: "Yarn mappings version"
@@ -22,14 +21,8 @@ on:
       distinct_id:
         required: false
 
-permissions:
-  # To push changes to the snapshot branch.
-  contents: write
-  # To trigger the CI workflow.
-  actions: write
-
 jobs:
-  update:
+  test:
     runs-on: ubuntu-latest
     steps:
 
@@ -77,24 +70,9 @@ jobs:
           "${{ inputs.fapi_version }}" \
           "${{ inputs.cf_game_version }}"
 
-    # To fix any style issues that the migration scripts might cause
-    - name: Run spotlessApply task
-      run: ./gradlew spotlessApply
+    - name: Run spotlessApply and build
+      run: ./gradlew spotlessApply build --stacktrace --warning-mode=fail
 
-    - name: Commit and push changes
-      run: |
-        git config --global user.name "Wurst-Bot"
-        git config --global user.email "contact.wurstimperium@gmail.com"
-        git add .
-        git commit -m "[Wurst-Bot] Update to ${{ inputs.mc_version }}"
-        git push
-
-    - name: Trigger CI
-      uses: Wurst-Imperium/dispatch-and-wait@v1
-      with:
-        token: ${{ github.token }}
-        owner: ${{ github.repository_owner }}
-        repo: ${{ github.event.repository.name }}
-        ref: ${{ github.ref }}
-        workflow: gradle.yml
-        run_timeout_seconds: 600  # 10 minutes
+    - name: Run the mod and take screenshots
+      # TODO: Migrate to Fabric Client Gametest API so this can run with configuration cache enabled
+      run: xvfb-run --auto-servernum ./gradlew runEndToEndTest --stacktrace --warning-mode=fail --no-configuration-cache
