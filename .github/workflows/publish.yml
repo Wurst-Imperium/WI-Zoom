@@ -30,7 +30,7 @@ on:
         type: boolean
         default: true
       update_website:
-        description: "Update wimods.net post (only works if there already is one and publish_curseforge is true)"
+        description: "Update wimods.net post (only works if there already is one)"
         required: false
         type: boolean
         default: false
@@ -125,7 +125,7 @@ jobs:
       id: cf_file_id
       if: ${{ inputs.publish_curseforge }}
       run: |
-        file_id=$(./gradlew getCurseforgeId -x publishCurseforge --no-configuration-cache | grep -o 'CURSEFORGE_FILE_ID=[0-9]*' | grep -o '[0-9]*')
+        file_id=$(./gradlew getCurseforgeId -x publishCurseforge --no-configuration-cache --warning-mode none | grep -o 'CURSEFORGE_FILE_ID=[0-9]*' | grep -o '[0-9]*')
         echo "file_id=$file_id" >> "$GITHUB_OUTPUT"
         echo "CurseForge file ID: \`$file_id\`" >> $GITHUB_STEP_SUMMARY
 
@@ -136,7 +136,7 @@ jobs:
       run: ./gradlew publishModrinth --stacktrace --no-configuration-cache
 
     - name: Trigger website update
-      if: ${{ inputs.update_website && inputs.publish_curseforge }}
+      if: ${{ inputs.update_website }}
       uses: Wurst-Imperium/dispatch-and-wait@v1
       with:
         token: ${{ secrets.WIMODS_NET_PUBLISH_TOKEN }}
