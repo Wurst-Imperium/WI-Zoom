@@ -16,14 +16,14 @@ import org.spongepowered.asm.mixin.MixinEnvironment;
 
 import net.fabricmc.api.ClientModInitializer;
 import net.minecraft.SharedConstants;
-import net.minecraft.client.gui.screen.AccessibilityOnboardingScreen;
-import net.minecraft.client.gui.screen.TitleScreen;
-import net.minecraft.client.gui.screen.option.ControlsOptionsScreen;
-import net.minecraft.client.gui.screen.option.KeybindsScreen;
-import net.minecraft.client.gui.screen.option.OptionsScreen;
-import net.minecraft.client.gui.screen.world.CreateWorldScreen;
-import net.minecraft.client.gui.screen.world.SelectWorldScreen;
-import net.minecraft.util.math.MathHelper;
+import net.minecraft.client.gui.screens.AccessibilityOnboardingScreen;
+import net.minecraft.client.gui.screens.TitleScreen;
+import net.minecraft.client.gui.screens.options.OptionsScreen;
+import net.minecraft.client.gui.screens.options.controls.ControlsScreen;
+import net.minecraft.client.gui.screens.options.controls.KeyBindsScreen;
+import net.minecraft.client.gui.screens.worldselection.CreateWorldScreen;
+import net.minecraft.client.gui.screens.worldselection.SelectWorldScreen;
+import net.minecraft.util.Mth;
 import net.wimods.zoom.WiZoom;
 
 public final class WiZoomTestClient implements ClientModInitializer
@@ -62,7 +62,8 @@ public final class WiZoomTestClient implements ClientModInitializer
 		System.out.println("Clicking singleplayer button");
 		clickButton("menu.singleplayer");
 		
-		if(submitAndGet(mc -> !mc.getLevelStorage().getLevelList().isEmpty()))
+		if(submitAndGet(
+			mc -> !mc.getLevelSource().findLevelCandidates().isEmpty()))
 		{
 			System.out.println("World list is not empty. Waiting for it");
 			waitForScreen(SelectWorldScreen.class);
@@ -76,7 +77,7 @@ public final class WiZoomTestClient implements ClientModInitializer
 		
 		// Set MC version as world name
 		setTextFieldText(0,
-			"E2E Test " + SharedConstants.getGameVersion().getName());
+			"E2E Test " + SharedConstants.getCurrentVersion().getName());
 		// Select creative mode
 		clickButton("selectWorld.gameMode");
 		clickButton("selectWorld.gameMode");
@@ -137,13 +138,13 @@ public final class WiZoomTestClient implements ClientModInitializer
 		
 		System.out.println("Clicking Controls button");
 		clickButton("options.controls");
-		waitForScreen(ControlsOptionsScreen.class);
+		waitForScreen(ControlsScreen.class);
 		System.out.println("Reached controls screen");
 		takeScreenshot("controls_screen", Duration.ZERO);
 		
 		System.out.println("Clicking Key Binds button");
 		clickButton("controls.keybinds");
-		waitForScreen(KeybindsScreen.class);
+		waitForScreen(KeyBindsScreen.class);
 		System.out.println("Reached keybinds screen");
 		// Scroll down to the bottom
 		for(int i = 0; i < 100; i++)
@@ -171,8 +172,8 @@ public final class WiZoomTestClient implements ClientModInitializer
 		
 		System.out.println("Changing zoom keybind back to V");
 		submitAndWait(mc -> WiZoom.INSTANCE.getZoomKey()
-			.setBoundKey(WiZoom.INSTANCE.getZoomKey().getDefaultKey()));
-		submitAndWait(mc -> mc.options.write());
+			.setKey(WiZoom.INSTANCE.getZoomKey().getDefaultKey()));
+		submitAndWait(mc -> mc.options.save());
 		
 		System.out.println("Stopping the game");
 		clickButton("menu.quit");
@@ -216,8 +217,7 @@ public final class WiZoomTestClient implements ClientModInitializer
 	
 	private void scrollUpToMaxZoom()
 	{
-		int scrollsNeededFor50x =
-			MathHelper.ceil(Math.log(50 / 3) / Math.log(1.1));
+		int scrollsNeededFor50x = Mth.ceil(Math.log(50 / 3) / Math.log(1.1));
 		for(int i = 0; i < scrollsNeededFor50x; i++)
 			scrollMouse(0, 1);
 		waitForWorldTicks(1);
@@ -225,7 +225,7 @@ public final class WiZoomTestClient implements ClientModInitializer
 	
 	private void assertSelectedSlotIsZero()
 	{
-		if(submitAndGet(mc -> mc.player.getInventory().selectedSlot != 0))
+		if(submitAndGet(mc -> mc.player.getInventory().selected != 0))
 			throw new RuntimeException(
 				"Scrolling up while zooming changed the selected slot");
 	}

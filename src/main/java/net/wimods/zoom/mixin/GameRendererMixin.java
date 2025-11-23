@@ -11,15 +11,14 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 
 import com.llamalad7.mixinextras.injector.ModifyReturnValue;
-
-import net.minecraft.client.render.GameRenderer;
+import net.minecraft.client.renderer.GameRenderer;
 import net.wimods.zoom.WiZoom;
 
 @Mixin(GameRenderer.class)
 public abstract class GameRendererMixin implements AutoCloseable
 {
 	@ModifyReturnValue(at = @At("RETURN"),
-		method = "getFov(Lnet/minecraft/client/render/Camera;FZ)D")
+		method = "getFov(Lnet/minecraft/client/Camera;FZ)D")
 	private double onGetFov(double original)
 	{
 		return WiZoom.INSTANCE.changeFovBasedOnZoom(original);

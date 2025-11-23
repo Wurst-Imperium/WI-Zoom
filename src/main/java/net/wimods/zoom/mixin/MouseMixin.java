@@ -11,14 +11,13 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
-
-import net.minecraft.client.Mouse;
+import net.minecraft.client.MouseHandler;
 import net.wimods.zoom.WiZoom;
 
-@Mixin(Mouse.class)
+@Mixin(MouseHandler.class)
 public class MouseMixin
 {
-	@Inject(at = @At("RETURN"), method = "onMouseScroll(JDD)V")
+	@Inject(at = @At("RETURN"), method = "onScroll(JDD)V")
 	private void onOnMouseScroll(long window, double horizontal,
 		double vertical, CallbackInfo ci)
 	{
