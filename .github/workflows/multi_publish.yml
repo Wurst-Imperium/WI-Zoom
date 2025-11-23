@@ -12,6 +12,16 @@ on:
         description: "Space-separated list of branches to publish from"
         required: true
         type: string
+      publish_curseforge:
+        description: "Publish to CurseForge"
+        required: true
+        type: boolean
+        default: true
+      publish_modrinth:
+        description: "Publish to Modrinth"
+        required: true
+        type: boolean
+        default: true
       announce_update:
         description: "Announce as an update on WurstForum"
         required: true
@@ -77,8 +87,8 @@ jobs:
             "close_milestone": "true",
             "upload_backups": "true",
             "publish_github": "true",
-            "publish_curseforge": "true",
-            "publish_modrinth": "true",
+            "publish_curseforge": "${{ inputs.publish_curseforge }}",
+            "publish_modrinth": "${{ inputs.publish_modrinth }}",
             "update_website": "true"
           }
         run_timeout_seconds: 1800  # 30 minutes
