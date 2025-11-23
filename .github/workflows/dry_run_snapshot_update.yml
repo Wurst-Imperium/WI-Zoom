@@ -7,8 +7,8 @@ on:
         description: "Minecraft version to test"
         required: true
       yarn_mappings:
-        description: "Yarn mappings version"
-        required: true
+        description: "Yarn mappings version (no longer used)"
+        required: false
       fabric_loader:
         description: "Fabric Loader version"
         required: true
@@ -55,23 +55,16 @@ jobs:
         cache-encryption-key: ${{ secrets.GRADLE_ENCRYPTION_KEY }}
         cache-read-only: ${{ github.ref != 'refs/heads/master' && !startsWith(github.ref, 'refs/heads/1.') }}
 
-    - name: Migrate mappings for main source set
-      run: |
-        ./gradlew migrateMappings --mappings ${{ inputs.yarn_mappings }} --input "src/main/java" --output "src/main/java_"
-        rm -rf ./src/main/java
-        mv ./src/main/java_ ./src/main/java
-
     - name: Update version constants
       run: |
         python scripts/update_version_constants.py \
           "${{ inputs.mc_version }}" \
-          "${{ inputs.yarn_mappings }}" \
           "${{ inputs.fabric_loader }}" \
           "${{ inputs.fapi_version }}" \
           "${{ inputs.cf_game_version }}"
 
-    - name: Run spotlessApply and build
-      run: ./gradlew spotlessApply build --stacktrace --warning-mode=fail
+    - name: Run build
+      run: ./gradlew build --stacktrace --warning-mode=fail
 
     - name: Run client gametests
       env:
