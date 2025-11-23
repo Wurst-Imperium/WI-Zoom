@@ -8,24 +8,23 @@
 package net.wimods.zoom;
 
 import org.lwjgl.glfw.GLFW;
-
+import com.mojang.blaze3d.platform.InputConstants;
 import net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper;
 import net.fabricmc.loader.api.FabricLoader;
 import net.fabricmc.loader.api.ModContainer;
 import net.fabricmc.loader.api.Version;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.option.KeyBinding;
-import net.minecraft.client.option.SimpleOption;
-import net.minecraft.client.util.InputUtil;
-import net.minecraft.util.math.MathHelper;
+import net.minecraft.client.KeyMapping;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.OptionInstance;
+import net.minecraft.util.Mth;
 
 public enum WiZoom
 {
 	INSTANCE;
 	
-	public static final MinecraftClient MC = MinecraftClient.getInstance();
+	public static final Minecraft MC = Minecraft.getInstance();
 	
-	private KeyBinding zoomKey;
+	private KeyMapping zoomKey;
 	private final double defaultLevel = 3;
 	private Double currentLevel;
 	private Double defaultMouseSensitivity;
@@ -38,26 +37,26 @@ public enum WiZoom
 		Version version = modContainer.getMetadata().getVersion();
 		System.out.println("Starting WI Zoom v" + version.getFriendlyString());
 		
-		zoomKey = new KeyBinding("key.wi_zoom.zoom", InputUtil.Type.KEYSYM,
+		zoomKey = new KeyMapping("key.wi_zoom.zoom", InputConstants.Type.KEYSYM,
 			GLFW.GLFW_KEY_V, "WI Zoom");
 		KeyBindingHelper.registerKeyBinding(zoomKey);
 	}
 	
 	public float changeFovBasedOnZoom(float fov)
 	{
-		SimpleOption<Double> mouseSensitivitySetting =
-			MC.options.getMouseSensitivity();
+		OptionInstance<Double> mouseSensitivitySetting =
+			MC.options.sensitivity();
 		
 		if(currentLevel == null)
 			currentLevel = defaultLevel;
 		
-		if(!zoomKey.isPressed())
+		if(!zoomKey.isDown())
 		{
 			currentLevel = defaultLevel;
 			
 			if(defaultMouseSensitivity != null)
 			{
-				mouseSensitivitySetting.setValue(defaultMouseSensitivity);
+				mouseSensitivitySetting.set(defaultMouseSensitivity);
 				defaultMouseSensitivity = null;
 			}
 			
@@ -65,20 +64,20 @@ public enum WiZoom
 		}
 		
 		if(defaultMouseSensitivity == null)
-			defaultMouseSensitivity = mouseSensitivitySetting.getValue();
+			defaultMouseSensitivity = mouseSensitivitySetting.get();
 			
 		// Adjust mouse sensitivity in relation to zoom level.
 		// 1.0 / currentLevel is a value between 0.02 (50x zoom)
 		// and 1 (no zoom).
 		mouseSensitivitySetting
-			.setValue(defaultMouseSensitivity * (1.0 / currentLevel));
+			.set(defaultMouseSensitivity * (1.0 / currentLevel));
 		
 		return (float)(fov / currentLevel);
 	}
 	
 	public void onMouseScroll(double amount)
 	{
-		if(!zoomKey.isPressed())
+		if(!zoomKey.isDown())
 			return;
 		
 		if(currentLevel == null)
@@ -89,10 +88,10 @@ public enum WiZoom
 		else if(amount < 0)
 			currentLevel *= 0.9;
 		
-		currentLevel = MathHelper.clamp(currentLevel, 1, 50);
+		currentLevel = Mth.clamp(currentLevel, 1, 50);
 	}
 	
-	public KeyBinding getZoomKey()
+	public KeyMapping getZoomKey()
 	{
 		return zoomKey;
 	}
