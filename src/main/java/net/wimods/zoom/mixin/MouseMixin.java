@@ -13,15 +13,14 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import com.llamalad7.mixinextras.injector.v2.WrapWithCondition;
-
-import net.minecraft.client.Mouse;
-import net.minecraft.entity.player.PlayerInventory;
+import net.minecraft.client.MouseHandler;
+import net.minecraft.world.entity.player.Inventory;
 import net.wimods.zoom.WiZoom;
 
-@Mixin(Mouse.class)
+@Mixin(MouseHandler.class)
 public class MouseMixin
 {
-	@Inject(at = @At("RETURN"), method = "onMouseScroll(JDD)V")
+	@Inject(at = @At("RETURN"), method = "onScroll(JDD)V")
 	private void onOnMouseScroll(long window, double horizontal,
 		double vertical, CallbackInfo ci)
 	{
@@ -29,10 +28,10 @@ public class MouseMixin
 	}
 	
 	@WrapWithCondition(at = @At(value = "INVOKE",
-		target = "Lnet/minecraft/entity/player/PlayerInventory;setSelectedSlot(I)V"),
-		method = "onMouseScroll(JDD)V")
-	private boolean wrapOnMouseScroll(PlayerInventory inventory, int slot)
+		target = "Lnet/minecraft/world/entity/player/Inventory;setSelectedSlot(I)V"),
+		method = "onScroll(JDD)V")
+	private boolean wrapOnMouseScroll(Inventory inventory, int slot)
 	{
-		return !WiZoom.INSTANCE.getZoomKey().isPressed();
+		return !WiZoom.INSTANCE.getZoomKey().isDown();
 	}
 }

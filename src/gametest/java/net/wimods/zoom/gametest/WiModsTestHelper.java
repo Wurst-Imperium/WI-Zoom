@@ -23,7 +23,9 @@ import java.util.UUID;
 import org.joml.Vector2i;
 import org.lwjgl.glfw.GLFW;
 import org.lwjgl.system.MemoryUtil;
-
+import com.mojang.blaze3d.platform.InputConstants;
+import com.mojang.blaze3d.platform.InputConstants.Key;
+import com.mojang.blaze3d.platform.NativeImage;
 import com.mojang.brigadier.ParseResults;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 
@@ -34,12 +36,9 @@ import net.fabricmc.fabric.api.client.gametest.v1.screenshot.TestScreenshotCompa
 import net.fabricmc.fabric.impl.client.gametest.screenshot.TestScreenshotComparisonAlgorithms.RawImageImpl;
 import net.fabricmc.fabric.impl.client.gametest.threading.ThreadingImpl;
 import net.fabricmc.fabric.mixin.client.gametest.input.KeyboardAccessor;
-import net.minecraft.client.gui.screen.TitleScreen;
-import net.minecraft.client.input.KeyInput;
-import net.minecraft.client.texture.NativeImage;
-import net.minecraft.client.util.InputUtil;
-import net.minecraft.client.util.InputUtil.Key;
-import net.minecraft.server.command.ServerCommandSource;
+import net.minecraft.client.gui.screens.TitleScreen;
+import net.minecraft.client.input.KeyEvent;
+import net.minecraft.commands.CommandSourceStack;
 
 public enum WiModsTestHelper
 {
@@ -99,7 +98,7 @@ public enum WiModsTestHelper
 	
 	private static boolean[][] alphaChannelToMask(NativeImage template)
 	{
-		if(!template.getFormat().hasAlpha())
+		if(!template.format().hasAlpha())
 		{
 			int width = template.getWidth();
 			int height = template.getHeight();
@@ -115,15 +114,15 @@ public enum WiModsTestHelper
 		boolean[][] mask = new boolean[width][height];
 		
 		int size = width * height;
-		int alphaOffset = template.getFormat().getAlphaOffset() / 8;
-		int channelCount = template.getFormat().getChannelCount();
+		int alphaOffset = template.format().alphaOffset() / 8;
+		int channelCount = template.format().components();
 		
 		for(int i = 0; i < size; i++)
 		{
 			int x = i % width;
 			int y = i / width;
 			int alpha = MemoryUtil.memGetByte(
-				template.imageId() + i * channelCount + alphaOffset) & 0xff;
+				template.getPointer() + i * channelCount + alphaOffset) & 0xff;
 			mask[x][y] = alpha > 127;
 		}
 		
@@ -172,7 +171,7 @@ public enum WiModsTestHelper
 	public static void hideSplashTexts(ClientGameTestContext context)
 	{
 		context.runOnClient(mc -> {
-			mc.options.getHideSplashTexts().setValue(true);
+			mc.options.hideSplashTexts().set(true);
 		});
 	}
 	
@@ -183,10 +182,10 @@ public enum WiModsTestHelper
 	public static void waitForTitleScreenFade(ClientGameTestContext context)
 	{
 		context.waitFor(mc -> {
-			if(!(mc.currentScreen instanceof TitleScreen titleScreen))
+			if(!(mc.screen instanceof TitleScreen titleScreen))
 				return false;
 			
-			return !titleScreen.doBackgroundFade;
+			return !titleScreen.fading;
 		});
 	}
 	
@@ -194,9 +193,9 @@ public enum WiModsTestHelper
 	{
 		String commandWithPlayer = "execute as @p at @s run " + command;
 		server.runOnServer(mc -> {
-			ParseResults<ServerCommandSource> results =
-				mc.getCommandManager().getDispatcher().parse(commandWithPlayer,
-					mc.getCommandSource());
+			ParseResults<CommandSourceStack> results =
+				mc.getCommands().getDispatcher().parse(commandWithPlayer,
+					mc.createCommandSourceStack());
 			
 			if(!results.getExceptions().isEmpty())
 			{
@@ -208,7 +207,7 @@ public enum WiModsTestHelper
 				throw new RuntimeException(errors.toString());
 			}
 			
-			mc.getCommandManager().execute(results, commandWithPlayer);
+			mc.getCommands().performCommand(results, commandWithPlayer);
 		});
 	}
 	
@@ -279,14 +278,14 @@ public enum WiModsTestHelper
 	public static void pressKeyWithModifiers(ClientGameTestContext context,
 		int keyCode, int modifiers)
 	{
-		Key key = InputUtil.Type.KEYSYM.createFromCode(keyCode);
+		Key key = InputConstants.Type.KEYSYM.getOrCreate(keyCode);
 		context.runOnClient(mc -> {
-			KeyboardAccessor kb = (KeyboardAccessor)mc.keyboard;
-			long handle = mc.getWindow().getHandle();
+			KeyboardAccessor kb = (KeyboardAccessor)mc.keyboardHandler;
+			long handle = mc.getWindow().handle();
 			kb.invokeOnKey(handle, GLFW.GLFW_PRESS,
-				new KeyInput(key.getCode(), 0, modifiers));
+				new KeyEvent(key.getValue(), 0, modifiers));
 			kb.invokeOnKey(handle, GLFW.GLFW_RELEASE,
-				new KeyInput(key.getCode(), 0, modifiers));
+				new KeyEvent(key.getValue(), 0, modifiers));
 		});
 	}
 }

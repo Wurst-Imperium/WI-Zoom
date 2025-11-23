@@ -24,13 +24,13 @@ import net.fabricmc.fabric.api.client.gametest.v1.context.TestServerContext;
 import net.fabricmc.fabric.api.client.gametest.v1.context.TestSingleplayerContext;
 import net.fabricmc.fabric.api.client.gametest.v1.world.TestWorldBuilder;
 import net.minecraft.SharedConstants;
-import net.minecraft.block.Blocks;
-import net.minecraft.client.gui.screen.world.WorldCreator;
-import net.minecraft.util.math.MathHelper;
-import net.minecraft.world.GameRules;
-import net.minecraft.world.gen.chunk.FlatChunkGenerator;
-import net.minecraft.world.gen.chunk.FlatChunkGeneratorConfig;
-import net.minecraft.world.gen.chunk.FlatChunkGeneratorLayer;
+import net.minecraft.client.gui.screens.worldselection.WorldCreationUiState;
+import net.minecraft.util.Mth;
+import net.minecraft.world.level.GameRules;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.levelgen.FlatLevelSource;
+import net.minecraft.world.level.levelgen.flat.FlatLayerInfo;
+import net.minecraft.world.level.levelgen.flat.FlatLevelGeneratorSettings;
 
 public final class WiZoomTest implements FabricClientGameTest
 {
@@ -49,10 +49,10 @@ public final class WiZoomTest implements FabricClientGameTest
 		LOGGER.info("Creating test world");
 		TestWorldBuilder worldBuilder = context.worldBuilder();
 		worldBuilder.adjustSettings(creator -> {
-			String mcVersion = SharedConstants.getGameVersion().name();
-			creator.setWorldName("E2E Test " + mcVersion);
-			creator.setGameMode(WorldCreator.Mode.CREATIVE);
-			creator.getGameRules().get(GameRules.SEND_COMMAND_FEEDBACK)
+			String mcVersion = SharedConstants.getCurrentVersion().name();
+			creator.setName("E2E Test " + mcVersion);
+			creator.setGameMode(WorldCreationUiState.SelectedGameMode.CREATIVE);
+			creator.getGameRules().getRule(GameRules.RULE_SENDCOMMANDFEEDBACK)
 				.set(false, null);
 			applyFlatPresetWithSmoothStone(creator);
 		});
@@ -188,8 +188,7 @@ public final class WiZoomTest implements FabricClientGameTest
 	private void scrollUpToMaxZoom(ClientGameTestContext context)
 	{
 		TestInput input = context.getInput();
-		int scrollsNeededFor50x =
-			MathHelper.ceil(Math.log(50 / 3) / Math.log(1.1));
+		int scrollsNeededFor50x = Mth.ceil(Math.log(50 / 3) / Math.log(1.1));
 		for(int i = 0; i < scrollsNeededFor50x; i++)
 			input.scroll(0, 1);
 		context.waitTick();
@@ -204,19 +203,19 @@ public final class WiZoomTest implements FabricClientGameTest
 	}
 	
 	// because the grass texture is randomized and smooth stone isn't
-	private void applyFlatPresetWithSmoothStone(WorldCreator creator)
+	private void applyFlatPresetWithSmoothStone(WorldCreationUiState creator)
 	{
-		FlatChunkGeneratorConfig config =
-			((FlatChunkGenerator)creator.getGeneratorOptionsHolder()
-				.selectedDimensions().getChunkGenerator()).getConfig();
+		FlatLevelGeneratorSettings config = ((FlatLevelSource)creator
+			.getSettings().selectedDimensions().overworld()).settings();
 		
-		List<FlatChunkGeneratorLayer> layers =
-			List.of(new FlatChunkGeneratorLayer(1, Blocks.BEDROCK),
-				new FlatChunkGeneratorLayer(2, Blocks.DIRT),
-				new FlatChunkGeneratorLayer(1, Blocks.SMOOTH_STONE));
+		List<FlatLayerInfo> layers =
+			List.of(new FlatLayerInfo(1, Blocks.BEDROCK),
+				new FlatLayerInfo(2, Blocks.DIRT),
+				new FlatLayerInfo(1, Blocks.SMOOTH_STONE));
 		
-		creator.applyModifier((drm, dorHolder) -> dorHolder.with(drm,
-			new FlatChunkGenerator(config.with(layers,
-				config.getStructureOverrides(), config.getBiome()))));
+		creator.updateDimensions(
+			(drm, dorHolder) -> dorHolder.replaceOverworldGenerator(drm,
+				new FlatLevelSource(config.withBiomeAndLayers(layers,
+					config.structureOverrides(), config.getBiome()))));
 	}
 }
