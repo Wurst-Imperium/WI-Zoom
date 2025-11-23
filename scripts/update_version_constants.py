@@ -3,7 +3,6 @@ import argparse
 if __name__ == "__main__":
 	parser = argparse.ArgumentParser()
 	parser.add_argument("mc_version", help="Minecraft version")
-	parser.add_argument("yarn_mappings", help="Yarn mappings version")
 	parser.add_argument("fabric_loader", help="Fabric Loader version")
 	parser.add_argument("fapi_version", help="Fabric API version")
 	parser.add_argument("cf_game_version", help="CurseForge GameVersion")
@@ -17,7 +16,6 @@ if __name__ == "__main__":
 	# Define replacements
 	replacements = {
 		"minecraft_version": lambda v: args.mc_version,
-		"yarn_mappings": lambda v: args.yarn_mappings,
 		"loader_version": lambda v: args.fabric_loader,
 		"fabric_version": lambda v: args.fapi_version,
 		"mod_version": lambda v: v[: v.index("MC") + 2] + args.mc_version,

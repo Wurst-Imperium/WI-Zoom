@@ -1,10 +1,10 @@
 accessWidener	v1	named
-accessible	class	net/minecraft/client/gui/widget/OptionListWidget$WidgetEntry
-accessible	method	net/minecraft/client/Keyboard	onKey	(JILnet/minecraft/client/input/KeyInput;)V
-accessible	method	net/minecraft/client/Mouse	onMouseScroll	(JDD)V
-accessible	field	net/minecraft/client/gui/screen/Screen	drawables	Ljava/util/List;
-accessible	field	net/minecraft/client/gui/screen/TitleScreen	doBackgroundFade	Z
-accessible	field	net/minecraft/client/gui/screen/option/ControlsListWidget$KeyBindingEntry	editButton	Lnet/minecraft/client/gui/widget/ButtonWidget;
-accessible	field	net/minecraft/client/gui/screen/option/ControlsListWidget$KeyBindingEntry	binding	Lnet/minecraft/client/option/KeyBinding;
-accessible	field	net/minecraft/client/gui/widget/CyclingButtonWidget	optionText	Lnet/minecraft/text/Text;
-accessible	field	net/minecraft/client/gui/widget/OptionListWidget$WidgetEntry	widgets	Ljava/util/List;
+accessible	class	net/minecraft/client/gui/components/OptionsList$Entry
+accessible	method	net/minecraft/client/KeyboardHandler	keyPress	(JILnet/minecraft/client/input/KeyEvent;)V
+accessible	method	net/minecraft/client/MouseHandler	onScroll	(JDD)V
+accessible	field	net/minecraft/client/gui/screens/Screen	renderables	Ljava/util/List;
+accessible	field	net/minecraft/client/gui/screens/TitleScreen	fading	Z
+accessible	field	net/minecraft/client/gui/screens/options/controls/KeyBindsList$KeyEntry	changeButton	Lnet/minecraft/client/gui/components/Button;
+accessible	field	net/minecraft/client/gui/screens/options/controls/KeyBindsList$KeyEntry	key	Lnet/minecraft/client/KeyMapping;
+accessible	field	net/minecraft/client/gui/components/CycleButton	name	Lnet/minecraft/network/chat/Component;
+accessible	field	net/minecraft/client/gui/components/OptionsList$Entry	children	Ljava/util/List;
