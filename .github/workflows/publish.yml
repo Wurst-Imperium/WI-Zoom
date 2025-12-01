@@ -6,35 +6,30 @@ on:
     inputs:
       close_milestone:
         description: "Close milestone"
-        required: true
         type: boolean
         default: true
       upload_backups:
         description: "Upload to backups server"
-        required: true
         type: boolean
         default: true
       publish_github:
         description: "Publish to GitHub"
-        required: true
         type: boolean
         default: true
       publish_curseforge:
         description: "Publish to CurseForge"
-        required: true
         type: boolean
         default: true
       publish_modrinth:
         description: "Publish to Modrinth"
-        required: true
         type: boolean
         default: true
       update_website:
         description: "Update wimods.net post (only works if there already is one)"
-        required: false
         type: boolean
         default: false
       distinct_id:
+        type: string
         required: false
 
 permissions:
