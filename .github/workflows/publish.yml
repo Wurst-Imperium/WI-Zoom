@@ -6,35 +6,30 @@ on:
     inputs:
       close_milestone:
         description: "Close milestone"
-        required: true
         type: boolean
         default: true
       upload_backups:
         description: "Upload to backups server"
-        required: true
         type: boolean
         default: true
       publish_github:
         description: "Publish to GitHub"
-        required: true
         type: boolean
         default: true
       publish_curseforge:
         description: "Publish to CurseForge"
-        required: true
         type: boolean
         default: true
       publish_modrinth:
         description: "Publish to Modrinth"
-        required: true
         type: boolean
         default: true
       update_website:
         description: "Update wimods.net post (only works if there already is one)"
-        required: false
         type: boolean
         default: false
       distinct_id:
+        type: string
         required: false
 
 permissions:
@@ -79,6 +74,7 @@ jobs:
       run: ./gradlew build --stacktrace --warning-mode=fail
 
     - name: Create and push tag
+      if: ${{ github.ref_type != 'tag' }}
       run: |
         MOD_VERSION=$(grep "^mod_version=" gradle.properties | cut -d'=' -f2 | tr -d ' \r')
         git config --global user.name "Wurst-Bot"
@@ -151,6 +147,7 @@ jobs:
             "mod_version": "${{ steps.website_inputs.outputs.mod_version }}",
             "mc_version": "${{ steps.website_inputs.outputs.mc_version }}",
             "fapi_version": "${{ steps.website_inputs.outputs.fapi_version }}",
-            "file_id": "${{ steps.cf_file_id.outputs.file_id }}"
+            "file_id": "${{ steps.cf_file_id.outputs.file_id }}",
+            "modrinth": "${{ inputs.publish_modrinth }}"
           }
         run_timeout_seconds: 600  # 10 minutes

@@ -6,35 +6,30 @@ on:
     inputs:
       mod_version:
         description: "Mod version (without v or -MC)"
-        required: true
         type: string
+        required: true
       branches:
         description: "Space-separated list of branches to publish from"
-        required: true
         type: string
+        required: true
       publish_curseforge:
         description: "Publish to CurseForge"
-        required: true
         type: boolean
         default: true
       publish_modrinth:
         description: "Publish to Modrinth"
-        required: true
         type: boolean
         default: true
       announce_update:
         description: "Announce as an update on WurstForum"
-        required: true
         type: boolean
         default: false
       announce_ports:
         description: "Announce as ports on WurstForum"
-        required: true
         type: boolean
         default: false
       dry_run:
         description: "Dry-run mode (don't actually publish anything)"
-        required: false
         type: boolean
         default: false
 
@@ -57,6 +52,15 @@ jobs:
         JSON_ARRAY="[${quoted_branches%,}]"
         echo "branches=$JSON_ARRAY" >> "$GITHUB_OUTPUT"
         echo "Branches: $JSON_ARRAY" >> "$GITHUB_STEP_SUMMARY"
+    - name: Verify mod_version is as expected
+      run: |
+        expected_prefix="${{ inputs.mod_version }}-MC"
+        for branch in ${{ inputs.branches }}; do
+          url="https://raw.githubusercontent.com/${{ github.repository }}/${branch}/gradle.properties"
+          actual=$(curl -sf "$url" | grep "^mod_version=" | cut -d'=' -f2)
+          echo "$branch: $actual"
+          [[ "$actual" == "$expected_prefix"* ]] || { echo "::error::Expected $expected_prefix*, got $actual"; exit 1; }
+        done
 
   publish_each:
     runs-on: ubuntu-latest
@@ -72,7 +76,6 @@ jobs:
       fail-fast: true
       matrix:
         branch: ${{ fromJson(needs.prepare.outputs.branches) }}
-    # TODO: Maybe also verify that the mod_version in each branch is as expected before publishing?
     steps:
     - name: Trigger publish workflow
       uses: Wurst-Imperium/dispatch-and-wait@v1
