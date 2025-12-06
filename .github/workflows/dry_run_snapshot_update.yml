@@ -69,4 +69,4 @@ jobs:
     - name: Run client gametests
       env:
         IMGUR_CLIENT_ID: ${{ secrets.IMGUR_CLIENT_ID }}
-      run: xvfb-run --auto-servernum ./gradlew runClientGameTest --stacktrace --warning-mode=fail
+      run: ./gradlew runClientGameTest --stacktrace --warning-mode=fail
