@@ -47,6 +47,12 @@ fabricApi.configureTests {
 
 loom {
 	accessWidenerPath = file("src/main/resources/wi-zoom.accesswidener")
+	
+	runs {
+		clientGameTest {
+			vmArgs.add("-Dfabric.client.gametest.disableNetworkSynchronizer=true")
+		}
+	}
 }
 
 processResources {
