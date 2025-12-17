@@ -1,4 +1,4 @@
-accessWidener	v1	named
+accessWidener	v1	official
 accessible	class	net/minecraft/client/gui/components/OptionsList$Entry
 accessible	method	net/minecraft/client/KeyboardHandler	keyPress	(JILnet/minecraft/client/input/KeyEvent;)V
 accessible	method	net/minecraft/client/MouseHandler	onScroll	(JDD)V

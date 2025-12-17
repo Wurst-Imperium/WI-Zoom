@@ -5,7 +5,7 @@ buildscript {
 }
 
 plugins {
-	id "fabric-loom" version "${loom_version}"
+	id "net.fabricmc.fabric-loom" version "${loom_version}"
 	id "me.modmuss50.mod-publish-plugin" version "1.1.0"
 	id "com.diffplug.spotless" version "8.1.0"
 }
@@ -30,11 +30,10 @@ repositories {
 dependencies {
 	// To change the versions see the gradle.properties file
 	minecraft "com.mojang:minecraft:${project.minecraft_version}"
-	mappings loom.officialMojangMappings()
-	modImplementation "net.fabricmc:fabric-loader:${project.loader_version}"
+	implementation "net.fabricmc:fabric-loader:${project.loader_version}"
 	
 	// Fabric API. This is technically optional, but you probably want it anyway.
-	modImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}"
+	implementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}"
 }
 
 fabricApi.configureTests {
@@ -65,8 +64,8 @@ processResources {
 }
 
 tasks.withType(JavaCompile).configureEach {
-	// Minecraft 1.20.5 (24w14a) upwards uses Java 21.
-	it.options.release = 21
+	// Minecraft 26.1 (26.1-snapshot-1) upwards uses Java 25.
+	it.options.release = 25
 }
 
 java {
@@ -75,8 +74,8 @@ java {
 	// If you remove this line, sources will not be generated.
 	withSourcesJar()
 	
-	sourceCompatibility = JavaVersion.VERSION_21
-	targetCompatibility = JavaVersion.VERSION_21
+	sourceCompatibility = JavaVersion.VERSION_25
+	targetCompatibility = JavaVersion.VERSION_25
 }
 
 jar {
@@ -146,7 +145,7 @@ publishMods {
 	
 	type = getGhVersion().contains("pre") ? BETA : STABLE
 	modLoaders.add(project.mod_loader.toLowerCase())
-	file = remapJar.archiveFile
+	file = jar.archiveFile
 	additionalFiles.from(
 		file("${project.buildDir}/libs/${archivesName}-${version}-sources.jar"),
 	)
@@ -206,8 +205,8 @@ task github(dependsOn: build) {
 			ghRelease = releaseBuilder.create()
 		}
 		
-		ghRelease.uploadAsset(remapJar.archiveFile.get().getAsFile(), "application/java-archive")
-		ghRelease.uploadAsset(remapSourcesJar.archiveFile.get().getAsFile(), "application/java-archive")
+		ghRelease.uploadAsset(jar.archiveFile.get().getAsFile(), "application/java-archive")
+		ghRelease.uploadAsset(sourcesJar.archiveFile.get().getAsFile(), "application/java-archive")
 	}
 }
 
