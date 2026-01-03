@@ -23,6 +23,7 @@ import java.util.UUID;
 import org.joml.Vector2i;
 import org.lwjgl.glfw.GLFW;
 import org.lwjgl.system.MemoryUtil;
+
 import com.mojang.blaze3d.platform.InputConstants;
 import com.mojang.blaze3d.platform.InputConstants.Key;
 import com.mojang.blaze3d.platform.NativeImage;
@@ -283,9 +284,9 @@ public enum WiModsTestHelper
 			KeyboardHandlerAccessor kb =
 				(KeyboardHandlerAccessor)mc.keyboardHandler;
 			long handle = mc.getWindow().handle();
-			kb.invokeOnKey(handle, GLFW.GLFW_PRESS,
+			kb.invokeKeyPress(handle, GLFW.GLFW_PRESS,
 				new KeyEvent(key.getValue(), 0, modifiers));
-			kb.invokeOnKey(handle, GLFW.GLFW_RELEASE,
+			kb.invokeKeyPress(handle, GLFW.GLFW_RELEASE,
 				new KeyEvent(key.getValue(), 0, modifiers));
 		});
 	}
