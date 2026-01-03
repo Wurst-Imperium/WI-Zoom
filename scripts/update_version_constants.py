@@ -17,7 +17,7 @@ if __name__ == "__main__":
 	replacements = {
 		"minecraft_version": lambda v: args.mc_version,
 		"loader_version": lambda v: args.fabric_loader,
-		"fabric_version": lambda v: args.fapi_version,
+		"fabric_api_version": lambda v: args.fapi_version,
 		"mod_version": lambda v: v[: v.index("MC") + 2] + args.mc_version,
 		"cf_game_version": lambda v: args.cf_game_version,
 	}
