@@ -129,7 +129,7 @@ public final class WiZoomTest implements FabricClientGameTest
 		context.takeScreenshot("options_screen");
 		
 		LOGGER.info("Clicking Controls button");
-		for(int i = 0; i < 6; i++)
+		for(int i = 0; i < 5; i++)
 			input.pressKey(GLFW.GLFW_KEY_TAB);
 		input.pressKey(GLFW.GLFW_KEY_ENTER);
 		context.takeScreenshot("controls_screen");
