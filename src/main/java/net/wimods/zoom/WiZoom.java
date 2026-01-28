@@ -45,13 +45,42 @@ public enum WiZoom
 			GLFW.GLFW_KEY_V, zoomCategory);
 		KeyBindingHelper.registerKeyBinding(zoomKey);
 	}
-	
-	public float changeFovBasedOnZoom(float fov)
+
+    private void updateZoomText()
+    {
+        if(currentLevel == null)
+            return;
+
+        if(MC.player == null)
+            return;
+
+        if(ZoomConfig.INSTANCE.actionBarMode == ActionBarMode.DISABLED)
+            return;
+
+        String msg;
+
+        if(ZoomConfig.INSTANCE.actionBarMode == ActionBarMode.PERCENT)
+        {
+            int pct = (int) Math.round(currentLevel * 100.0);
+            msg = "Zoom " + pct + "%";
+        }
+        else
+        {
+            int zoom = (int) Math.round(currentLevel);
+            msg = "Zoom " + zoom + "x";
+        }
+
+
+        MC.gui.setOverlayMessage(net.minecraft.network.chat.Component.literal(msg), false);
+    }
+
+    public float changeFovBasedOnZoom(float fov)
 	{
 		OptionInstance<Double> mouseSensitivitySetting =
 			MC.options.sensitivity();
 		
 		if(currentLevel == null)
+
 			currentLevel = defaultLevel;
 		
 		if(!zoomKey.isDown())
@@ -75,26 +104,29 @@ public enum WiZoom
 		// and 1 (no zoom).
 		mouseSensitivitySetting
 			.set(defaultMouseSensitivity * (1.0 / currentLevel));
-		
+
+        updateZoomText();
 		return (float)(fov / currentLevel);
 	}
 	
 	public void onMouseScroll(double amount)
 	{
-		if(!zoomKey.isDown())
-			return;
-		
-		if(currentLevel == null)
+        if(!zoomKey.isDown() && amount != 0)
+            return;
+
+        if(currentLevel == null)
 			currentLevel = defaultLevel;
 		
 		if(amount > 0)
 			currentLevel *= 1.1;
 		else if(amount < 0)
-			currentLevel *= 0.9;
-		
-		currentLevel = Mth.clamp(currentLevel, 1, 50);
-	}
-	
+			currentLevel /= 1.1;
+
+        currentLevel = Mth.clamp(currentLevel, 1, ZoomConfig.INSTANCE.maxZoom);
+        updateZoomText();
+
+    }
+
 	public KeyMapping getZoomKey()
 	{
 		return zoomKey;

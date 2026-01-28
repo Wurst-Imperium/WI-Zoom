@@ -12,19 +12,16 @@ import net.fabricmc.api.ModInitializer;
 public final class WiZoomInitializer implements ModInitializer
 {
 	private static boolean initialized;
-	
+
 	@Override
 	public void onInitialize()
 	{
-		// This code runs as soon as Minecraft is in a mod-load-ready state.
-		// However, some things (like resources) may still be uninitialized.
-		// Proceed with mild caution.
-		
-		if(initialized)
-			throw new RuntimeException(
-				"WiZoomInitializer.onInitialize() ran twice!");
-		
-		WiZoom.INSTANCE.initialize();
+        if(initialized)
+			throw new RuntimeException("WiZoomInitializer.onInitialize() ran twice!");
+
+        ZoomConfig.load();
+        WiZoom.INSTANCE.initialize();
+
 		initialized = true;
 	}
 }

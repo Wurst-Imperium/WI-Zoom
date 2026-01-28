@@ -20,8 +20,12 @@
   "entrypoints": {
     "main": [
       "net.wimods.zoom.WiZoomInitializer"
+    ],
+    "modmenu": [
+      "net.wimods.zoom.ModMenuApiImpl"
     ]
-  },
+  }
+,
   "mixins": [
     "wi-zoom.mixins.json"
   ],
