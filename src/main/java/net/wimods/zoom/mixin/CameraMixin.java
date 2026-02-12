@@ -11,15 +11,28 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 
 import com.llamalad7.mixinextras.injector.ModifyReturnValue;
-import net.minecraft.client.renderer.GameRenderer;
+
+import net.minecraft.client.Camera;
 import net.wimods.zoom.WiZoom;
 
-@Mixin(GameRenderer.class)
-public abstract class GameRendererMixin implements AutoCloseable
+@Mixin(Camera.class)
+public abstract class CameraMixin
 {
-	@ModifyReturnValue(at = @At("RETURN"),
-		method = "getFov(Lnet/minecraft/client/Camera;FZ)F")
-	private float onGetFov(float original)
+	/**
+	 * Makes the zoom work.
+	 */
+	@ModifyReturnValue(at = @At("RETURN"), method = "calculateFov(F)F")
+	private float onCalculateFov(float original)
+	{
+		return WiZoom.INSTANCE.changeFovBasedOnZoom(original);
+	}
+	
+	/**
+	 * Moves the hand in first person mode out of the way as you zoom in
+	 * further.
+	 */
+	@ModifyReturnValue(at = @At("RETURN"), method = "calculateHudFov(F)F")
+	private float onCalculateHudFov(float original)
 	{
 		return WiZoom.INSTANCE.changeFovBasedOnZoom(original);
 	}

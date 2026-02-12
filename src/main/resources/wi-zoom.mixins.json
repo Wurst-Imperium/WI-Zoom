@@ -4,7 +4,7 @@
   "compatibilityLevel": "JAVA_25",
   "mixins": [],
   "client": [
-    "GameRendererMixin",
+    "CameraMixin",
     "MouseMixin"
   ],
   "injectors": {
