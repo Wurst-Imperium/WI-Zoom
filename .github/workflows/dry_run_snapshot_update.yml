@@ -81,6 +81,7 @@ jobs:
       run: ./gradlew build --stacktrace --warning-mode=fail
 
     - name: Run client gametests
+      timeout-minutes: 5
       env:
         IMGUR_CLIENT_ID: ${{ secrets.IMGUR_CLIENT_ID }}
       run: ./gradlew runClientGameTest --stacktrace --warning-mode=fail
