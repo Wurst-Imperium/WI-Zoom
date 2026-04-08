@@ -80,6 +80,9 @@ jobs:
     - name: Run build
       run: ./gradlew build --stacktrace --warning-mode=fail
 
+    - name: Install Mesa Vulkan drivers
+      run: sudo apt-get install -y mesa-vulkan-drivers
+
     - name: Run client gametests
       timeout-minutes: 5
       env:
