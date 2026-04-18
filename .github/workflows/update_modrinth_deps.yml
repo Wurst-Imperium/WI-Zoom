@@ -12,7 +12,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        branch: ["master"]
+        branch: ["26.2", "master"]
     steps:
       - name: Update Modrinth Dependencies
         uses: Wurst-Imperium/update-modrinth-deps@v1
