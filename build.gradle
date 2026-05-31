@@ -6,7 +6,7 @@ buildscript {
 
 plugins {
 	id "net.fabricmc.fabric-loom" version "${loom_version}"
-	id "me.modmuss50.mod-publish-plugin" version "1.1.0"
+	id "me.modmuss50.mod-publish-plugin" version "2.0.0-beta.2"
 	id "com.diffplug.spotless" version "8.5.1"
 	id "net.wimods.github-compile-summary" version "0.1.0"
 }
@@ -147,14 +147,14 @@ publishMods {
 	type = getGhVersion().contains("pre") ? BETA : STABLE
 	modLoaders.add(project.mod_loader.toLowerCase())
 	file = jar.archiveFile
-	additionalFiles.from(
-		file("${project.buildDir}/libs/${archivesName}-${version}-sources.jar"),
-	)
+	additionalFiles.from(sourcesJar.archiveFile)
 	
 	curseforge {
 		projectId = project.cf_project_id
 		accessToken = providers.environmentVariable("CURSEFORGE_API_KEY")
 		minecraftVersions.add(project.cf_game_version)
+		client = true
+		server = false
 		requires("fabric-api")
 		changelog = getChangelog("CurseForge", "curseforge.com/minecraft/mc-mods/${modSlug}/version/${version}")
 	}
