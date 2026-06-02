@@ -28,7 +28,7 @@ public class MouseMixin
 	}
 	
 	@WrapWithCondition(at = @At(value = "INVOKE",
-		target = "Lnet/minecraft/world/entity/player/Inventory;setSelectedSlotDeferred(I)V"),
+		target = "Lnet/minecraft/world/entity/player/Inventory;setSelectedSlot(I)V"),
 		method = "onScroll(JDD)V")
 	private boolean wrapOnMouseScroll(Inventory inventory, int slot)
 	{
