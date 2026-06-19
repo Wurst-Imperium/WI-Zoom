@@ -50,7 +50,7 @@ loom {
 	
 	runs {
 		clientGameTest {
-			vmArgs.add("-Dfabric.client.gametest.disableNetworkSynchronizer=true")
+			jvmArguments.add("-Dfabric.client.gametest.disableNetworkSynchronizer=true")
 		}
 	}
 }
