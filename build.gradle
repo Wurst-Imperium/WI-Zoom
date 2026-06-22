@@ -6,7 +6,7 @@ buildscript {
 
 plugins {
 	id "net.fabricmc.fabric-loom" version "${loom_version}"
-	id "me.modmuss50.mod-publish-plugin" version "2.0.0"
+	id "me.modmuss50.mod-publish-plugin" version "2.0.1"
 	id "com.diffplug.spotless" version "8.7.0"
 	id "net.wimods.github-compile-summary" version "0.1.1"
 }
