@@ -148,7 +148,7 @@ public final class WiZoomTest implements FabricClientGameTest
 		input.pressKey(GLFW.GLFW_KEY_ENTER);
 		input.pressKey(GLFW.GLFW_KEY_B);
 		assertScreenshotEquals(context, "zoom_keybind_changed",
-			"https://i.imgur.com/pjri9O8.png");
+			"https://i.imgur.com/awid07I.png");
 		
 		LOGGER.info("Closing screens");
 		for(int i = 0; i < 4; i++)

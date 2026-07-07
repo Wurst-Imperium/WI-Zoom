@@ -28,8 +28,8 @@
   "accessWidener": "wi-zoom.accesswidener",
   "depends": {
     "fabricloader": ">=0.18.3",
-    "fabric-api": ">=0.153.1",
-    "minecraft": "~26.3-alpha.1",
+    "fabric-api": ">=0.154.3",
+    "minecraft": "~26.3-alpha.3",
     "java": ">=25"
   },
   "suggests": {
