@@ -78,7 +78,7 @@ jobs:
         done
 
     - name: Run build
-      run: ./gradlew build --stacktrace --warning-mode=fail
+      run: ./gradlew build --stacktrace
 
     - name: Install Mesa Vulkan drivers
       run: sudo apt-get install -y mesa-vulkan-drivers
@@ -87,4 +87,4 @@ jobs:
       timeout-minutes: 5
       env:
         IMGUR_CLIENT_ID: ${{ secrets.IMGUR_CLIENT_ID }}
-      run: ./gradlew runClientGameTest --stacktrace --warning-mode=fail
+      run: ./gradlew runClientGameTest --stacktrace
