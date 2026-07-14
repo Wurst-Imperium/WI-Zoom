@@ -92,15 +92,15 @@ While zooming, you can use the <kbd>mouse wheel</kbd> to zoom in further.
 
    In Fabric versions:
    ```pwsh
-   ./gradlew genSources eclipse
+   ./gradlew genSources genEclipseRuns
    ```
 
    In NeoForge versions:
    ```pwsh
-   ./gradlew eclipse
+   ./gradlew build
    ```
 
-3. In Eclipse, go to `Import...` > `Existing Projects into Workspace` and select this project.
+3. In Eclipse, go to `Import...` > `Gradle` > `Existing Gradle Project` and select this project.
 
 4. **Optional:** Right-click on the project and select `Properties` > `Java Code Style`. Then under `Clean Up`, `Code Templates`, `Formatter`, import the respective files in the `codestyle` folder.
 
@@ -125,9 +125,8 @@ While zooming, you can use the <kbd>mouse wheel</kbd> to zoom in further.
 
    In NeoForge versions:
    ```pwsh
-   ./gradlew eclipse
+   ./gradlew build
    ```
-   (That's not a typo. NeoForge doesn't have `vscode`, but `eclipse` works fine.)
 
 3. Open the `WI-Zoom` folder in VSCode / Cursor.
 
@@ -140,7 +139,7 @@ I don't use or recommend IntelliJ, but the commands to run would be:
 ```pwsh
 git clone https://github.com/Wurst-Imperium/WI-Zoom.git
 cd WI-Zoom
-./gradlew genSources idea --no-configuration-cache
+./gradlew genSources ideaSyncTask --no-configuration-cache
 ```
 
 **Note:** IntelliJ IDEA is [not yet compatible](https://github.com/FabricMC/fabric-loom/issues/1349) with Gradle's configuration cache. You will run into issues.
