@@ -7,11 +7,12 @@
  */
 package net.wimods.zoom.gametest;
 
+import com.mojang.blaze3d.platform.InputConstants;
+
 import static net.wimods.zoom.gametest.WiModsTestHelper.*;
 
 import java.util.List;
 
-import org.lwjgl.glfw.GLFW;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.spongepowered.asm.mixin.MixinEnvironment;
@@ -96,63 +97,63 @@ public final class WiZoomTest implements FabricClientGameTest
 			"https://i.imgur.com/i2Nr9is.png");
 		
 		LOGGER.info("Recording debug menu");
-		input.pressKey(GLFW.GLFW_KEY_F3);
+		input.pressKey(InputConstants.KEY_F3);
 		context.takeScreenshot("debug_menu");
-		input.pressKey(GLFW.GLFW_KEY_F3);
+		input.pressKey(InputConstants.KEY_F3);
 		
 		LOGGER.info("Checking for broken mixins");
 		MixinEnvironment.getCurrentEnvironment().audit();
 		
 		LOGGER.info("Opening inventory");
-		input.pressKey(GLFW.GLFW_KEY_E);
+		input.pressKey(InputConstants.KEY_E);
 		String invTemplate = "https://i.imgur.com/GP74ZNS.png";
 		assertScreenshotEquals(context, "inventory", invTemplate);
 		// Try to zoom in inventory to confirm it does nothing
-		input.holdKey(GLFW.GLFW_KEY_V);
+		input.holdKey(InputConstants.KEY_V);
 		context.waitTick();
 		assertScreenshotEquals(context, "trying_to_zoom_in_inventory",
 			invTemplate);
-		input.releaseKey(GLFW.GLFW_KEY_V);
+		input.releaseKey(InputConstants.KEY_V);
 		context.waitTick();
-		input.pressKey(GLFW.GLFW_KEY_ESCAPE);
+		input.pressKey(InputConstants.KEY_ESCAPE);
 		
 		testZoomInWorld(context);
 		
 		LOGGER.info("Opening game menu");
-		input.pressKey(GLFW.GLFW_KEY_ESCAPE);
+		input.pressKey(InputConstants.KEY_ESCAPE);
 		context.takeScreenshot("game_menu");
 		
 		LOGGER.info("Clicking Options button");
 		for(int i = 0; i < 7; i++)
-			input.pressKey(GLFW.GLFW_KEY_TAB);
-		input.pressKey(GLFW.GLFW_KEY_ENTER);
+			input.pressKey(InputConstants.KEY_TAB);
+		input.pressKey(InputConstants.KEY_RETURN);
 		context.takeScreenshot("options_screen");
 		
 		LOGGER.info("Clicking Controls button");
 		for(int i = 0; i < 5; i++)
-			input.pressKey(GLFW.GLFW_KEY_TAB);
-		input.pressKey(GLFW.GLFW_KEY_ENTER);
+			input.pressKey(InputConstants.KEY_TAB);
+		input.pressKey(InputConstants.KEY_RETURN);
 		context.takeScreenshot("controls_screen");
 		
 		LOGGER.info("Clicking Key Binds button");
-		input.pressKey(GLFW.GLFW_KEY_TAB);
-		input.pressKey(GLFW.GLFW_KEY_ENTER);
+		input.pressKey(InputConstants.KEY_TAB);
+		input.pressKey(InputConstants.KEY_RETURN);
 		// Select the last keybind in the list
 		for(int i = 0; i < 2; i++)
-			pressKeyWithModifiers(context, GLFW.GLFW_KEY_TAB,
-				GLFW.GLFW_MOD_SHIFT);
+			pressKeyWithModifiers(context, InputConstants.KEY_TAB,
+				InputConstants.MOD_SHIFT);
 		assertScreenshotEquals(context, "zoom_keybind_default",
 			"https://i.imgur.com/y7Uk7E0.png");
 		
 		LOGGER.info("Changing zoom keybind to B");
-		input.pressKey(GLFW.GLFW_KEY_ENTER);
-		input.pressKey(GLFW.GLFW_KEY_B);
+		input.pressKey(InputConstants.KEY_RETURN);
+		input.pressKey(InputConstants.KEY_B);
 		assertScreenshotEquals(context, "zoom_keybind_changed",
 			"https://i.imgur.com/awid07I.png");
 		
 		LOGGER.info("Closing screens");
 		for(int i = 0; i < 4; i++)
-			input.pressKey(GLFW.GLFW_KEY_ESCAPE);
+			input.pressKey(InputConstants.KEY_ESCAPE);
 		
 		testZoomWithChangedKeybind(context);
 	}
@@ -162,7 +163,7 @@ public final class WiZoomTest implements FabricClientGameTest
 		TestInput input = context.getInput();
 		
 		// Press V to enable zoom
-		input.holdKey(GLFW.GLFW_KEY_V);
+		input.holdKey(InputConstants.KEY_V);
 		context.waitTick();
 		assertScreenshotEquals(context, "3x_zoom",
 			"https://i.imgur.com/Xy0VdFE.png");
@@ -173,7 +174,7 @@ public final class WiZoomTest implements FabricClientGameTest
 		assertSelectedSlotIsZero(context);
 		
 		// Release V to disable zoom
-		input.releaseKey(GLFW.GLFW_KEY_V);
+		input.releaseKey(InputConstants.KEY_V);
 		context.waitTick();
 	}
 	
@@ -181,7 +182,7 @@ public final class WiZoomTest implements FabricClientGameTest
 	{
 		TestInput input = context.getInput();
 		
-		input.holdKey(GLFW.GLFW_KEY_B);
+		input.holdKey(InputConstants.KEY_B);
 		context.waitTick();
 		assertScreenshotEquals(context, "custom_keybind_3x_zoom",
 			"https://i.imgur.com/Xy0VdFE.png");
@@ -191,7 +192,7 @@ public final class WiZoomTest implements FabricClientGameTest
 			"https://i.imgur.com/DF5Tr8F.png");
 		assertSelectedSlotIsZero(context);
 		
-		input.releaseKey(GLFW.GLFW_KEY_B);
+		input.releaseKey(InputConstants.KEY_B);
 		context.waitTick();
 	}
 	
