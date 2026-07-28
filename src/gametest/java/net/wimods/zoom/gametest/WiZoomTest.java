@@ -20,11 +20,10 @@ import org.spongepowered.asm.mixin.MixinEnvironment;
 import net.fabricmc.fabric.api.client.gametest.v1.FabricClientGameTest;
 import net.fabricmc.fabric.api.client.gametest.v1.TestInput;
 import net.fabricmc.fabric.api.client.gametest.v1.context.ClientGameTestContext;
-import net.fabricmc.fabric.api.client.gametest.v1.context.TestClientLevelContext;
+import net.fabricmc.fabric.api.client.gametest.v1.context.TestServerConnection;
 import net.fabricmc.fabric.api.client.gametest.v1.context.TestServerContext;
 import net.fabricmc.fabric.api.client.gametest.v1.context.TestSingleplayerContext;
 import net.fabricmc.fabric.api.client.gametest.v1.world.TestWorldBuilder;
-import net.fabricmc.fabric.impl.client.gametest.TestSystemProperties;
 import net.minecraft.SharedConstants;
 import net.minecraft.client.gui.screens.worldselection.WorldCreationUiState;
 import net.minecraft.util.Mth;
@@ -41,9 +40,6 @@ public final class WiZoomTest implements FabricClientGameTest
 	@Override
 	public void runTest(ClientGameTestContext context)
 	{
-		if(!TestSystemProperties.DISABLE_NETWORK_SYNCHRONIZER)
-			throw new RuntimeException("Network synchronizer is not disabled");
-		
 		LOGGER.info("Starting WI Zoom Client GameTest");
 		hideSplashTexts(context);
 		waitForTitleScreenFade(context);
@@ -75,7 +71,7 @@ public final class WiZoomTest implements FabricClientGameTest
 		TestSingleplayerContext spContext)
 	{
 		TestInput input = context.getInput();
-		TestClientLevelContext world = spContext.getClientLevel();
+		TestServerConnection connection = spContext.getConnection();
 		TestServerContext server = spContext.getServer();
 		
 		// Disable anisotropic filtering
@@ -91,7 +87,7 @@ public final class WiZoomTest implements FabricClientGameTest
 		
 		LOGGER.info("Loading chunks");
 		context.waitTicks(2);
-		world.waitForChunksRender();
+		connection.waitForChunksRender();
 		
 		assertScreenshotEquals(context, "in_game",
 			"https://i.imgur.com/i2Nr9is.png");
