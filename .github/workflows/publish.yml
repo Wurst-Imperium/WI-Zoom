@@ -21,9 +21,9 @@ on:
         type: boolean
         default: true
       publish_modrinth:
-        description: "Publish to Modrinth"
+        description: "Dummy input. Does nothing."
         type: boolean
-        default: true
+        default: false
       update_website:
         description: "Update wimods.net post (only works if there already is one)"
         type: boolean
@@ -139,12 +139,6 @@ jobs:
         echo "file_id=$file_id" >> "$GITHUB_OUTPUT"
         echo "CurseForge file ID: \`$file_id\`" >> $GITHUB_STEP_SUMMARY
 
-    - name: Publish to Modrinth
-      if: ${{ inputs.publish_modrinth }}
-      env:
-        MODRINTH_TOKEN: ${{ secrets.MODRINTH_TOKEN }}
-      run: ./gradlew publishModrinth --stacktrace --no-configuration-cache
-
     - name: Trigger website update
       if: ${{ inputs.update_website }}
       uses: Wurst-Imperium/dispatch-and-wait@v1
@@ -162,6 +156,6 @@ jobs:
             "mc_version": "${{ steps.website_inputs.outputs.mc_version }}",
             "fapi_version": "${{ steps.website_inputs.outputs.fapi_version }}",
             "file_id": "${{ steps.cf_file_id.outputs.file_id }}",
-            "modrinth": "${{ inputs.publish_modrinth }}"
+            "modrinth": "false"
           }
         run_timeout_seconds: 600  # 10 minutes
