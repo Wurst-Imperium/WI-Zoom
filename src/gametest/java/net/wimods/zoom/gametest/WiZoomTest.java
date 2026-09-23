@@ -32,6 +32,7 @@ import net.minecraft.world.level.gamerules.GameRules;
 import net.minecraft.world.level.levelgen.FlatLevelSource;
 import net.minecraft.world.level.levelgen.flat.FlatLayerInfo;
 import net.minecraft.world.level.levelgen.flat.FlatLevelGeneratorSettings;
+import net.wimods.zoom.gametest.tests.ModListPrivacyTest;
 
 public final class WiZoomTest implements FabricClientGameTest
 {
@@ -46,6 +47,9 @@ public final class WiZoomTest implements FabricClientGameTest
 		
 		LOGGER.info("Reached title screen");
 		context.takeScreenshot("title_screen");
+		
+		ModListPrivacyTest modListPrivacyTest = new ModListPrivacyTest();
+		modListPrivacyTest.start();
 		
 		LOGGER.info("Creating test world");
 		TestWorldBuilder worldBuilder = context.worldBuilder();
@@ -64,6 +68,7 @@ public final class WiZoomTest implements FabricClientGameTest
 			LOGGER.info("Exiting test world");
 		}
 		
+		modListPrivacyTest.finish();
 		LOGGER.info("Test complete");
 	}
 	
