@@ -17,7 +17,6 @@ import net.minecraft.client.KeyMapping.Category;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.OptionInstance;
 import net.minecraft.resources.Identifier;
-import net.minecraft.util.Mth;
 
 public enum WiZoom
 {
@@ -91,7 +90,7 @@ public enum WiZoom
 		else if(amount < 0)
 			currentLevel *= 0.9;
 		
-		currentLevel = Mth.clamp(currentLevel, 1, 50);
+		currentLevel = Math.clamp(currentLevel, 1, 50);
 	}
 	
 	public KeyMapping getZoomKey()
