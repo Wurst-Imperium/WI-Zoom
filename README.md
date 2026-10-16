@@ -77,7 +77,7 @@ While zooming, you can use the <kbd>mouse wheel</kbd> to zoom in further.
 ## Development Setup
 
 > [!IMPORTANT]
-> Make sure you have [Java Development Kit 21](https://go.wimods.net/from/github.com/Wurst-Imperium/WI-Zoom?to=https://adoptium.net/?variant=openjdk21&jvmVariant=hotspot) installed. It won't work with other versions.
+> Make sure you have [Java Development Kit 25](https://go.wimods.net/from/github.com/Wurst-Imperium/WI-Zoom?to=https://adoptium.net/?variant=openjdk25&jvmVariant=hotspot) installed. It won't work with other versions.
 
 ### Development using Eclipse
 
