@@ -17,9 +17,9 @@ on:
         type: boolean
         default: true
       publish_modrinth:
-        description: "Publish to Modrinth"
+        description: "Dummy input. Does nothing."
         type: boolean
-        default: true
+        default: false
       announce_update:
         description: "Announce as an update on WurstForum"
         type: boolean
@@ -67,13 +67,7 @@ jobs:
     needs: prepare
     if: ${{ !fromJson(inputs.dry_run) }}
     strategy:
-      # Each job pushes an automated commit to wimods.net@master, so running them all in parallel
-      # would likely cause conflicts. Also, various servers might hit rate limits if we just upload
-      # all of the files at once.
-      max-parallel: 1
-      # If something goes wrong, all published files have to be manually deleted.
-      # Best to fail as early as possible.
-      fail-fast: true
+      fail-fast: false
       matrix:
         branch: ${{ fromJson(needs.prepare.outputs.branches) }}
     steps:
@@ -91,7 +85,7 @@ jobs:
             "upload_backups": "true",
             "publish_github": "true",
             "publish_curseforge": "${{ inputs.publish_curseforge }}",
-            "publish_modrinth": "${{ inputs.publish_modrinth }}",
+            "publish_modrinth": "false",
             "update_website": "true"
           }
         run_timeout_seconds: 1800  # 30 minutes
