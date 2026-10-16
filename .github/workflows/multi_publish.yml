@@ -17,9 +17,9 @@ on:
         type: boolean
         default: true
       publish_modrinth:
-        description: "Publish to Modrinth"
+        description: "Dummy input. Does nothing."
         type: boolean
-        default: true
+        default: false
       announce_update:
         description: "Announce as an update on WurstForum"
         type: boolean
@@ -85,7 +85,7 @@ jobs:
             "upload_backups": "true",
             "publish_github": "true",
             "publish_curseforge": "${{ inputs.publish_curseforge }}",
-            "publish_modrinth": "${{ inputs.publish_modrinth }}",
+            "publish_modrinth": "false",
             "update_website": "true"
           }
         run_timeout_seconds: 1800  # 30 minutes

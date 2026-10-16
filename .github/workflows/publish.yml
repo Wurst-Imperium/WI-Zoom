@@ -21,9 +21,9 @@ on:
         type: boolean
         default: true
       publish_modrinth:
-        description: "Publish to Modrinth"
+        description: "Dummy input. Does nothing."
         type: boolean
-        default: true
+        default: false
       update_website:
         description: "Update wimods.net post (only works if there already is one)"
         type: boolean
@@ -53,7 +53,7 @@ jobs:
         fetch-tags: true
 
     - name: Set up Java 25
-      uses: actions/setup-java@v5
+      uses: actions/setup-java@v6
       with:
         java-version: "25"
         distribution: "microsoft"
@@ -100,7 +100,7 @@ jobs:
       if: ${{ inputs.close_milestone }}
       env:
         GITHUB_TOKEN: ${{ github.token }}
-      run: ./gradlew closeMilestone --stacktrace --no-configuration-cache
+      run: ./gradlew closeMilestone --stacktrace
 
     - name: Build website update inputs
       id: website_inputs
@@ -123,27 +123,21 @@ jobs:
       if: ${{ inputs.publish_github }}
       env:
         GITHUB_TOKEN: ${{ secrets.MCX_PUBLISH_TOKEN }}
-      run: ./gradlew github --stacktrace --no-configuration-cache
+      run: ./gradlew github --stacktrace
 
     - name: Publish to CurseForge
       if: ${{ inputs.publish_curseforge }}
       env:
         CURSEFORGE_API_KEY: ${{ secrets.CURSEFORGE_API_KEY }}
-      run: ./gradlew publishCurseforge --stacktrace --no-configuration-cache
+      run: ./gradlew publishCurseforge --stacktrace
 
     - name: Get CurseForge file ID
       id: cf_file_id
       if: ${{ inputs.publish_curseforge }}
       run: |
-        file_id=$(./gradlew getCurseforgeId -x publishCurseforge --no-configuration-cache --warning-mode none | grep -o 'CURSEFORGE_FILE_ID=[0-9]*' | grep -o '[0-9]*')
+        file_id=$(./gradlew getCurseforgeId -x publishCurseforge | grep -o 'CURSEFORGE_FILE_ID=[0-9]*' | grep -o '[0-9]*')
         echo "file_id=$file_id" >> "$GITHUB_OUTPUT"
         echo "CurseForge file ID: \`$file_id\`" >> $GITHUB_STEP_SUMMARY
-
-    - name: Publish to Modrinth
-      if: ${{ inputs.publish_modrinth }}
-      env:
-        MODRINTH_TOKEN: ${{ secrets.MODRINTH_TOKEN }}
-      run: ./gradlew publishModrinth --stacktrace --no-configuration-cache
 
     - name: Trigger website update
       if: ${{ inputs.update_website }}
@@ -162,6 +156,6 @@ jobs:
             "mc_version": "${{ steps.website_inputs.outputs.mc_version }}",
             "fapi_version": "${{ steps.website_inputs.outputs.fapi_version }}",
             "file_id": "${{ steps.cf_file_id.outputs.file_id }}",
-            "modrinth": "${{ inputs.publish_modrinth }}"
+            "modrinth": "false"
           }
         run_timeout_seconds: 600  # 10 minutes
