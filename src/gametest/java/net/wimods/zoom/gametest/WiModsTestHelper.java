@@ -7,6 +7,7 @@
  */
 package net.wimods.zoom.gametest;
 
+import org.lwjgl.sdl.SDLKeyboard;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
@@ -21,7 +22,6 @@ import java.util.Base64;
 import java.util.UUID;
 
 import org.joml.Vector2i;
-import org.lwjgl.glfw.GLFW;
 import org.lwjgl.system.MemoryUtil;
 
 import com.mojang.blaze3d.platform.InputConstants;
@@ -279,15 +279,17 @@ public enum WiModsTestHelper
 	public static void pressKeyWithModifiers(ClientGameTestContext context,
 		int keyCode, int modifiers)
 	{
-		Key key = InputConstants.Type.KEYSYM.getOrCreate(keyCode);
+		Key key = InputConstants.Type.KEYBOARD.getOrCreate(keyCode);
 		context.runOnClient(mc -> {
 			KeyboardHandlerAccessor kb =
 				(KeyboardHandlerAccessor)mc.keyboardHandler;
 			long handle = mc.getWindow().handle();
-			kb.invokeKeyPress(handle, GLFW.GLFW_PRESS,
-				new KeyEvent(key.getValue(), 0, modifiers));
-			kb.invokeKeyPress(handle, GLFW.GLFW_RELEASE,
-				new KeyEvent(key.getValue(), 0, modifiers));
+			kb.invokeKeyPress(handle, InputConstants.PRESS,
+				new KeyEvent(key.getValue(), SDLKeyboard.SDL_GetKeyFromScancode(
+					key.getValue(), (short)0, false), modifiers));
+			kb.invokeKeyPress(handle, InputConstants.RELEASE,
+				new KeyEvent(key.getValue(), SDLKeyboard.SDL_GetKeyFromScancode(
+					key.getValue(), (short)0, false), modifiers));
 		});
 	}
 }

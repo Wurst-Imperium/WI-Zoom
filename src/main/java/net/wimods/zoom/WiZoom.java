@@ -7,7 +7,6 @@
  */
 package net.wimods.zoom;
 
-import org.lwjgl.glfw.GLFW;
 import com.mojang.blaze3d.platform.InputConstants;
 import net.fabricmc.fabric.api.client.keymapping.v1.KeyMappingHelper;
 import net.fabricmc.loader.api.FabricLoader;
@@ -41,8 +40,8 @@ public enum WiZoom
 		
 		Category zoomCategory = KeyMapping.Category
 			.register(Identifier.fromNamespaceAndPath("wi_zoom", "wi_zoom"));
-		zoomKey = new KeyMapping("key.wi_zoom.zoom", InputConstants.Type.KEYSYM,
-			GLFW.GLFW_KEY_V, zoomCategory);
+		zoomKey = new KeyMapping("key.wi_zoom.zoom",
+			InputConstants.Type.KEYBOARD, InputConstants.KEY_V, zoomCategory);
 		KeyMappingHelper.registerKeyMapping(zoomKey);
 	}
 	
