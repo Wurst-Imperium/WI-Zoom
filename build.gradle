@@ -43,6 +43,10 @@ fabricApi.configureTests {
 	username = "Wurst-Bot"
 }
 
+tasks.named("runClientGameTest") {
+	systemProperty "renderpearl.vulkan.allowcpudevice", "true"
+}
+
 loom {
 	accessWidenerPath = file("src/main/resources/wi-zoom.accesswidener")
 }

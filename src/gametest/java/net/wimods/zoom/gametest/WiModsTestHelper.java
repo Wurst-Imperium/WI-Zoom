@@ -56,31 +56,58 @@ public enum WiModsTestHelper
 		String fileName, String templateUrl)
 	{
 		ThreadingImpl.checkOnGametestThread("assertScreenshotEquals");
-		
+		waitForScreenshotMatchImpl(context, fileName, templateUrl, 1);
+	}
+	
+	/**
+	 * Same as
+	 * {@link #assertScreenshotEquals(ClientGameTestContext, String, String)},
+	 * but retries for up to 10 seconds to get a matching screenshot.
+	 */
+	public static void waitForScreenshotMatch(ClientGameTestContext context,
+		String fileName, String templateUrl)
+	{
+		ThreadingImpl.checkOnGametestThread("waitForScreenshotMatch");
+		waitForScreenshotMatchImpl(context, fileName, templateUrl,
+			ClientGameTestContext.DEFAULT_TIMEOUT);
+	}
+	
+	private static void waitForScreenshotMatchImpl(
+		ClientGameTestContext context, String fileName, String templateUrl,
+		int maxAttempts)
+	{
 		NativeImage nativeTemplateImage = downloadImage(templateUrl);
 		boolean[][] mask = alphaChannelToMask(nativeTemplateImage);
 		RawImage<int[]> rawTemplateImage =
 			RawImageImpl.fromColorNativeImage(nativeTemplateImage);
 		RawImage<int[]> maskedTemplateImage = applyMask(rawTemplateImage, mask);
 		
-		Path screenshotPath = context.takeScreenshot(fileName);
-		RawImage<int[]> rawScreenshotImage =
-			RawImageImpl.fromColorNativeImage(loadImageFile(screenshotPath));
-		RawImage<int[]> maskedScreenshotImage =
-			applyMask(rawScreenshotImage, mask);
-		
-		if(maskedScreenshotImage.width() != maskedTemplateImage.width()
-			|| maskedScreenshotImage.height() != maskedTemplateImage.height())
-			throw new AssertionError(
-				"Screenshot and template dimensions do not match");
-		
-		TestScreenshotComparisonAlgorithm algo =
-			TestScreenshotComparisonAlgorithm.meanSquaredDifference(3e-4F);
-		
-		Vector2i result =
-			algo.findColor(maskedScreenshotImage, maskedTemplateImage);
-		if(result != null)
-			return;
+		Path screenshotPath = null;
+		for(int i = 0; i < maxAttempts; i++)
+		{
+			if(i > 0)
+				context.waitTick();
+			
+			screenshotPath = context.takeScreenshot(fileName);
+			RawImage<int[]> rawScreenshotImage = RawImageImpl
+				.fromColorNativeImage(loadImageFile(screenshotPath));
+			RawImage<int[]> maskedScreenshotImage =
+				applyMask(rawScreenshotImage, mask);
+			
+			if(maskedScreenshotImage.width() != maskedTemplateImage.width()
+				|| maskedScreenshotImage.height() != maskedTemplateImage
+					.height())
+				throw new AssertionError(
+					"Screenshot and template dimensions do not match");
+			
+			TestScreenshotComparisonAlgorithm algo =
+				TestScreenshotComparisonAlgorithm.meanSquaredDifference(3e-4F);
+			
+			Vector2i result =
+				algo.findColor(maskedScreenshotImage, maskedTemplateImage);
+			if(result != null)
+				return;
+		}
 		
 		ghSummary("### Screenshot " + fileName + " does not match template");
 		ghSummary("Expected:");
@@ -286,10 +313,10 @@ public enum WiModsTestHelper
 			long handle = mc.getWindow().handle();
 			kb.invokeKeyPress(handle, InputConstants.PRESS,
 				new KeyEvent(key.getValue(), SDLKeyboard.SDL_GetKeyFromScancode(
-					key.getValue(), (short)0, false), modifiers));
+					key.getValue(), (short)0, false), modifiers, false));
 			kb.invokeKeyPress(handle, InputConstants.RELEASE,
 				new KeyEvent(key.getValue(), SDLKeyboard.SDL_GetKeyFromScancode(
-					key.getValue(), (short)0, false), modifiers));
+					key.getValue(), (short)0, false), modifiers, false));
 		});
 	}
 }
