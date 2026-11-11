@@ -27,7 +27,6 @@ import org.lwjgl.system.MemoryUtil;
 import com.mojang.blaze3d.platform.InputConstants;
 import com.mojang.blaze3d.platform.InputConstants.Key;
 import com.mojang.blaze3d.platform.NativeImage;
-import com.mojang.brigadier.ParseResults;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 
 import net.fabricmc.fabric.api.client.gametest.v1.context.ClientGameTestContext;
@@ -40,6 +39,9 @@ import net.fabricmc.fabric.mixin.client.gametest.input.KeyboardHandlerAccessor;
 import net.minecraft.client.gui.screens.TitleScreen;
 import net.minecraft.client.input.KeyEvent;
 import net.minecraft.commands.CommandSourceStack;
+import net.minecraft.commands.Commands;
+import net.minecraft.commands.ParseBox;
+import net.minecraft.commands.ParseContext;
 
 public enum WiModsTestHelper
 {
@@ -221,21 +223,20 @@ public enum WiModsTestHelper
 	{
 		String commandWithPlayer = "execute as @p at @s run " + command;
 		server.runOnServer(mc -> {
-			ParseResults<CommandSourceStack> results =
-				mc.getCommands().getDispatcher().parse(commandWithPlayer,
-					mc.createCommandSourceStack());
+			CommandSourceStack source = mc.createCommandSourceStack();
+			ParseBox.Result result = mc.getCommands().parseBox()
+				.parse(commandWithPlayer, ParseContext.of(source));
 			
-			if(!results.getExceptions().isEmpty())
+			try
 			{
-				StringBuilder errors =
-					new StringBuilder("Invalid command: /" + commandWithPlayer);
-				for(CommandSyntaxException e : results.getExceptions().values())
-					errors.append("\n").append(e.getMessage());
-				
-				throw new RuntimeException(errors.toString());
+				result.unpack();
+			}catch(CommandSyntaxException e)
+			{
+				throw new RuntimeException("Invalid command: /"
+					+ commandWithPlayer + "\n" + e.getMessage(), e);
 			}
 			
-			mc.getCommands().performCommand(results, commandWithPlayer);
+			Commands.performCommand(source, result, commandWithPlayer);
 		});
 	}
 	
