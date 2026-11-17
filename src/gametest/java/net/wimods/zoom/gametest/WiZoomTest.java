@@ -89,7 +89,7 @@ public final class WiZoomTest implements FabricClientGameTest
 		context.runOnClient(mc -> mc.options.chunkSectionFadeInTime().set(0.0));
 		
 		runCommand(server, "time set noon");
-		runCommand(server, "tp 0 -57 0");
+		runCommand(server, "tp 0 -57.0 0");
 		runCommand(server, "fill ~ ~-3 ~ ~ ~-1 ~ smooth_stone");
 		runCommand(server, "fill ~-12 ~-3 ~10 ~12 ~9 ~10 smooth_stone");
 		
