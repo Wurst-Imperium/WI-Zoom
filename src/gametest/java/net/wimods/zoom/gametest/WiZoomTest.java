@@ -26,6 +26,7 @@ import net.fabricmc.fabric.api.client.gametest.v1.world.TestWorldBuilder;
 import net.fabricmc.fabric.impl.client.gametest.TestSystemProperties;
 import net.minecraft.SharedConstants;
 import net.minecraft.client.gui.screens.worldselection.WorldCreationUiState;
+import net.minecraft.sounds.SoundSource;
 import net.minecraft.util.Mth;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.gamerules.GameRules;
@@ -44,6 +45,8 @@ public final class WiZoomTest implements FabricClientGameTest
 			throw new RuntimeException("Network synchronizer is not disabled");
 		
 		LOGGER.info("Starting WI Zoom Client GameTest");
+		context.runOnClient(mc -> mc.options
+			.getSoundSourceOptionInstance(SoundSource.MASTER).set(0.0));
 		hideSplashTexts(context);
 		waitForTitleScreenFade(context);
 		
