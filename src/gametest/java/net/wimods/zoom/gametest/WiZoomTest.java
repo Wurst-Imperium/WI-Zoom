@@ -110,6 +110,7 @@ public final class WiZoomTest implements FabricClientGameTest
 		
 		LOGGER.info("Opening inventory");
 		input.pressKey(InputConstants.KEY_E);
+		input.setCursorPos(0, 0);
 		String invTemplate = "https://i.imgur.com/Hm9z8ME.png";
 		assertScreenshotEquals(context, "inventory", invTemplate);
 		// Try to zoom in inventory to confirm it does nothing
